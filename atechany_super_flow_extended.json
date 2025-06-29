@@ -1,0 +1,103 @@
+{
+  "metadata": {
+    "version": 1,
+    "name": "ATECHANY SUPER FLOW EXTENDED",
+    "description": "Flujo extendido con Google Sheets > GPT > Amazon > Airtable > Pinterest > Reddit"
+  },
+  "flow": {
+    "modules": [
+      {
+        "id": "googleSheetsModule",
+        "type": "google-sheets:watchRows",
+        "parameters": {
+          "sheetId": "1VTZ3HNNndZgl7SKuZmgV6iHCDatjSdHNTzXFClgZKQ4",
+          "range": "Ecosistema Global!A2:F",
+          "limit": 200
+        }
+      },
+      {
+        "id": "gptModule",
+        "type": "openai:chat-completion",
+        "parameters": {
+          "model": "gpt-4o",
+          "prompt": "Crea una descripci\u00f3n emocional y persuasiva para este producto de Amazon: {{2.link}} en menos de 30 palabras. Incluye una llamada a la acci\u00f3n directa."
+        }
+      },
+      {
+        "id": "amazonLinkModule",
+        "type": "tools:textAggregator",
+        "parameters": {
+          "template": "{{2.link}}?tag=diegoedgard0f-20&utm_source=atechany&utm_medium=automation&utm_campaign=autoaff"
+        }
+      },
+      {
+        "id": "airtableUpload",
+        "type": "airtable:createRecord",
+        "parameters": {
+          "baseId": "appATECHANY",
+          "tableId": "tblAfiliados",
+          "fields": {
+            "Producto": "{{2.name}}",
+            "LinkAmazon": "{{3.text}}",
+            "Descripci\u00f3n": "{{2.description}}",
+            "Descripci\u00f3nIA": "{{4.choices[0].message.content}}"
+          }
+        }
+      },
+      {
+        "id": "pinterestModule",
+        "type": "pinterest:createPin",
+        "parameters": {
+          "boardId": "tech_board",
+          "title": "{{2.name}}",
+          "description": "{{4.choices[0].message.content}}",
+          "link": "{{3.text}}",
+          "imageUrl": "{{2.image}}"
+        }
+      },
+      {
+        "id": "redditModule",
+        "type": "reddit:submitPost",
+        "parameters": {
+          "subreddit": "AmazonFinds",
+          "title": "{{2.name}}",
+          "content": "{{4.choices[0].message.content}}\nCompra directa aqu\u00ed: {{3.text}}"
+        }
+      }
+    ],
+    "connections": [
+      {
+        "source": "googleSheetsModule",
+        "target": "gptModule"
+      },
+      {
+        "source": "googleSheetsModule",
+        "target": "amazonLinkModule"
+      },
+      {
+        "source": "gptModule",
+        "target": "airtableUpload"
+      },
+      {
+        "source": "amazonLinkModule",
+        "target": "airtableUpload"
+      },
+      {
+        "source": "amazonLinkModule",
+        "target": "pinterestModule"
+      },
+      {
+        "source": "gptModule",
+        "target": "pinterestModule"
+      },
+      {
+        "source": "amazonLinkModule",
+        "target": "redditModule"
+      },
+      {
+        "source": "gptModule",
+        "target": "redditModule"
+      }
+    ]
+  }
+}
