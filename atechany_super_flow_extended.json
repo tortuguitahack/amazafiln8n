@@ -1,8 +1,8 @@
 {
   "metadata": {
-    "version": 1,
-    "name": "ATECHANY SUPER FLOW EXTENDED",
-    "description": "Flujo extendido con Google Sheets > GPT > Amazon > Airtable > Pinterest > Reddit"
+    "version": 2,
+    "name": "ATECHANY SUPER FLOW EXTENDED - PRO",
+    "description": "Flujo avanzado y robusto: Google Sheets > GPT > Amazon > Airtable > Pinterest > Reddit. Persuasión máxima y control total."
   },
   "flow": {
     "modules": [
@@ -16,18 +16,38 @@
         }
       },
       {
+        "id": "validateAmazonLinkModule",
+        "type": "tools:code",
+        "parameters": {
+          "code": "if (!/^https?:\\/\\/www\\.amazon\\./.test(input.link)) throw new Error('El enlace no es válido de Amazon'); return input.link;"
+        },
+        "inputs": {
+          "link": "{{2.link}}"
+        }
+      },
+      {
+        "id": "deduplicationModule",
+        "type": "airtable:findRecords",
+        "parameters": {
+          "baseId": "appATECHANY",
+          "tableId": "tblAfiliados",
+          "filterByFormula": "AND({Producto} = '{{2.name}}', {LinkAmazon} = '{{3.text}}')",
+          "maxRecords": 1
+        }
+      },
+      {
         "id": "gptModule",
         "type": "openai:chat-completion",
         "parameters": {
           "model": "gpt-4o",
-          "prompt": "Crea una descripci\u00f3n emocional y persuasiva para este producto de Amazon: {{2.link}} en menos de 30 palabras. Incluye una llamada a la acci\u00f3n directa."
+          "prompt": "Imagina que estás a punto de descubrir algo que transformará tu día. Este producto, llamado '{{2.name}}', no solo cumple lo que promete, sino que despierta una sensación de bienestar y oportunidad. Descubre más aquí: {{2.link}}. Permítete imaginar cómo mejora tu vida en menos de 30 palabras. ¡Hazlo tuyo ahora mismo y siente la diferencia!"
         }
       },
       {
         "id": "amazonLinkModule",
         "type": "tools:textAggregator",
         "parameters": {
-          "template": "{{2.link}}?tag=diegoedgard0f-20&utm_source=atechany&utm_medium=automation&utm_campaign=autoaff"
+          "template": "{{3.text}}?tag=diegoedgard0f-20&utm_source=atechany&utm_medium=automation&utm_campaign=autoaff"
         }
       },
       {
@@ -38,10 +58,16 @@
           "tableId": "tblAfiliados",
           "fields": {
             "Producto": "{{2.name}}",
-            "LinkAmazon": "{{3.text}}",
+            "LinkAmazon": "{{5.text}}",
             "Descripci\u00f3n": "{{2.description}}",
-            "Descripci\u00f3nIA": "{{4.choices[0].message.content}}"
+            "Descripci\u00f3nIA": "{{4.choices[0].message.content}}",
+            "FechaCreacion": "{{now}}",
+            "Estado": "Publicado"
           }
+        },
+        "condition": {
+          "type": "if",
+          "expression": "{{4.records.length}} == 0"
         }
       },
       {
@@ -50,9 +76,13 @@
         "parameters": {
           "boardId": "tech_board",
           "title": "{{2.name}}",
-          "description": "{{4.choices[0].message.content}}",
-          "link": "{{3.text}}",
+          "description": "¿Te imaginas sentirte mejor cada día? {{4.choices[0].message.content}} Haz clic en el enlace y deja que la magia ocurra: {{5.text}}",
+          "link": "{{5.text}}",
           "imageUrl": "{{2.image}}"
+        },
+        "condition": {
+          "type": "if",
+          "expression": "{{4.records.length}} == 0 && {{2.image}}"
         }
       },
       {
@@ -60,44 +90,26 @@
         "type": "reddit:submitPost",
         "parameters": {
           "subreddit": "AmazonFinds",
-          "title": "{{2.name}}",
-          "content": "{{4.choices[0].message.content}}\nCompra directa aqu\u00ed: {{3.text}}"
+          "title": "Descubre {{2.name}}: lo que estabas esperando",
+          "content": "{{4.choices[0].message.content}}\n\n¿Listo para experimentar el cambio? Compra aquí: {{5.text}}"
+        },
+        "condition": {
+          "type": "if",
+          "expression": "{{4.records.length}} == 0"
         }
       }
     ],
     "connections": [
-      {
-        "source": "googleSheetsModule",
-        "target": "gptModule"
-      },
-      {
-        "source": "googleSheetsModule",
-        "target": "amazonLinkModule"
-      },
-      {
-        "source": "gptModule",
-        "target": "airtableUpload"
-      },
-      {
-        "source": "amazonLinkModule",
-        "target": "airtableUpload"
-      },
-      {
-        "source": "amazonLinkModule",
-        "target": "pinterestModule"
-      },
-      {
-        "source": "gptModule",
-        "target": "pinterestModule"
-      },
-      {
-        "source": "amazonLinkModule",
-        "target": "redditModule"
-      },
-      {
-        "source": "gptModule",
-        "target": "redditModule"
-      }
+      { "source": "googleSheetsModule", "target": "validateAmazonLinkModule" },
+      { "source": "googleSheetsModule", "target": "deduplicationModule" },
+      { "source": "googleSheetsModule", "target": "gptModule" },
+      { "source": "validateAmazonLinkModule", "target": "deduplicationModule" },
+      { "source": "validateAmazonLinkModule", "target": "amazonLinkModule" },
+      { "source": "deduplicationModule", "target": "airtableUpload" },
+      { "source": "gptModule", "target": "airtableUpload" },
+      { "source": "amazonLinkModule", "target": "airtableUpload" },
+      { "source": "airtableUpload", "target": "pinterestModule" },
+      { "source": "airtableUpload", "target": "redditModule" }
     ]
   }
 }
