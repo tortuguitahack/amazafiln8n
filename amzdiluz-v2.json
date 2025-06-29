@@ -1,0 +1,90 @@
+{
+  "metadata": {
+    "version": 2,
+    "name": "amzdiluz-v2",
+    "description": "Flujo optimizado ATECHANY para ventas inmediatas en Amazon con IA y distribución multicanal"
+  },
+  "flow": {
+    "modules": [
+      {
+        "id": "googleSheetsModule",
+        "type": "google-sheets:watchRows",
+        "parameters": {
+          "sheetId": "1VTZ3HNNndZgl7SKuZmgV6iHCDatjSdHNTzXFClgZKQ4",
+          "range": "Ecosistema Global!A2:F",
+          "limit": 200
+        }
+      },
+      {
+        "id": "gptModule",
+        "type": "openai:chat-completion",
+        "parameters": {
+          "model": "gpt-4o",
+          "prompt": "Actúa como una experta en ventas irresistibles. Redacta una descripción de menos de 30 palabras, usando hipnosis conversacional, lenguaje emocional, persuasión extrema, y finaliza con una llamada a la acción seductora. Producto: {{2.link}}"
+        }
+      },
+      {
+        "id": "amazonLinkModule",
+        "type": "tools:textAggregator",
+        "parameters": {
+          "template": "{{2.link}}?tag=diegoedgard0f-20&utm_source=atechany&utm_medium=ai&utm_campaign=autoaff1000"
+        }
+      },
+      {
+        "id": "airtableModule",
+        "type": "airtable:createRecord",
+        "parameters": {
+          "baseId": "appATECHANY",
+          "tableId": "tblAfiliados",
+          "fields": {
+            "Producto": "{{2.name}}",
+            "LinkAmazon": "{{3.text}}",
+            "Descripción GPT": "{{4.choices[0].message.content}}"
+          }
+        }
+      },
+      {
+        "id": "pinterestModule",
+        "type": "pinterest:createPin",
+        "parameters": {
+          "boardId": "atechany_board",
+          "title": "{{2.name}}",
+          "description": "{{4.choices[0].message.content}}",
+          "link": "{{3.text}}",
+          "imageUrl": "{{2.image}}"
+        }
+      },
+      {
+        "id": "redditModule",
+        "type": "reddit:submitPost",
+        "parameters": {
+          "subreddit": "AmazonFinds",
+          "title": "{{2.name}}",
+          "content": "{{4.choices[0].message.content}}\nCompra aquí 👉 {{3.text}}"
+        }
+      },
+      {
+        "id": "notionWebhook",
+        "type": "webhook:sendData",
+        "parameters": {
+          "url": "https://hook.us1.make.com/jj4ekr2j7rsdp81tog2ps6gph1o7fk83",
+          "payload": {
+            "producto": "{{2.name}}",
+            "mensaje": "🚨 ¡Clic detectado! Revisa en Amazon: {{3.text}}"
+          }
+        }
+      }
+    ],
+    "connections": [
+      { "source": "googleSheetsModule", "target": "gptModule" },
+      { "source": "googleSheetsModule", "target": "amazonLinkModule" },
+      { "source": "gptModule", "target": "airtableModule" },
+      { "source": "amazonLinkModule", "target": "airtableModule" },
+      { "source": "gptModule", "target": "pinterestModule" },
+      { "source": "amazonLinkModule", "target": "pinterestModule" },
+      { "source": "gptModule", "target": "redditModule" },
+      { "source": "amazonLinkModule", "target": "redditModule" },
+      { "source": "amazonLinkModule", "target": "notionWebhook" }
+    ]
+  }
+}
