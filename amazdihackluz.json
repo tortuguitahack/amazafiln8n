@@ -1,8 +1,10 @@
 {
   "metadata": {
-    "version": 3,
-    "name": "amzdiluz-v3",
-    "description": "Flujo ultra-optimizado ATECHANY para ventas inmediatas Amazon con IA, validación robusta, logging, seguridad y distribución multicanal avanzada."
+    "version": 4,
+    "name": "amzdiluz-v4-pro",
+    "description": "Flujo ultra-optimizado ATECHANY para ventas Amazon con IA, validación avanzada, logging profesional, seguridad reforzada y distribución multicanal.",
+    "author": "tortuguitahack",
+    "lastUpdated": "2025-06-30"
   },
   "flow": {
     "modules": [
@@ -11,7 +13,29 @@
         "type": "custom:validateInput",
         "parameters": {
           "requiredFields": ["name", "link", "image"],
-          "onError": "loggerModule"
+          "fieldFormats": {
+            "name": { "minLength": 3, "maxLength": 100 },
+            "link": { "type": "url" },
+            "image": { "type": "url" }
+          },
+          "customErrorMessages": {
+            "name": "El nombre del producto es obligatorio y debe tener entre 3 y 100 caracteres.",
+            "link": "El enlace debe ser una URL válida.",
+            "image": "La imagen debe ser una URL válida."
+          },
+          "onError": "terminateOnErrorModule",
+          "logOnError": true,
+          "logContext": true
+        }
+      },
+      {
+        "id": "terminateOnErrorModule",
+        "type": "custom:terminateOnError",
+        "parameters": {
+          "logError": true,
+          "notify": true,
+          "notifyWebhook": "{{env.ERROR_NOTIFY_WEBHOOK}}",
+          "logContext": true
         }
       },
       {
@@ -20,14 +44,21 @@
         "parameters": {
           "sheetId": "{{env.GOOGLE_SHEET_ID}}",
           "range": "Ecosistema Global!A2:F",
-          "limit": 100
+          "limit": 500,
+          "validateSheet": true,
+          "skipEmptyRows": true,
+          "onError": "terminateOnErrorModule",
+          "logOnError": true
         }
       },
       {
         "id": "dedupeModule",
         "type": "custom:deduplicate",
         "parameters": {
-          "uniqueField": "link"
+          "uniqueField": "link",
+          "dedupeBy": ["link", "name"],
+          "logDuplicates": true,
+          "onError": "terminateOnErrorModule"
         }
       },
       {
@@ -35,17 +66,23 @@
         "type": "openai:chat-completion",
         "parameters": {
           "model": "gpt-4o",
-          "prompt": "Actúa como una experta en ventas irresistibles. Redacta una descripción de menos de 30 palabras, usando hipnosis conversacional, lenguaje emocional, persuasión extrema y llamado a la acción directo para el producto: {{2.name}}.",
+          "prompt": "Actúa como experta en ventas irresistibles. Redacta una descripción de máximo 30 palabras, con hipnosis conversacional, lenguaje emocional, persuasión extrema y llamado a la acción directo para el producto: {{2.name}}.",
           "max_tokens": 100,
-          "retryOnFail": 2,
-          "validateWordLimit": 30
+          "wordLimit": 30,
+          "retryOnFail": 3,
+          "failOnWordLimitExceeded": true,
+          "onError": "terminateOnErrorModule",
+          "logPromptAndResponse": true
         }
       },
       {
         "id": "linkBuilderModule",
         "type": "tools:textAggregator",
         "parameters": {
-          "template": "{{2.link}}?tag={{env.AMAZON_TAG}}&utm_source=atechany&utm_medium=ai&utm_campaign=autoaff_{{timestamp}}"
+          "template": "{{2.link}}?tag={{env.AMAZON_TAG}}&utm_source=atechany&utm_medium=ai&utm_campaign=autoaff_{{timestamp}}",
+          "validateUrl": true,
+          "hashTimestamp": true,
+          "onError": "terminateOnErrorModule"
         }
       },
       {
@@ -58,7 +95,11 @@
             "Producto": "{{2.name}}",
             "LinkAmazon": "{{5.text}}",
             "Descripción GPT": "{{4.choices[0].message.content}}"
-          }
+          },
+          "validateBeforeInsert": true,
+          "preventDuplicateInsert": true,
+          "onError": "terminateOnErrorModule",
+          "logInsert": true
         }
       },
       {
@@ -69,7 +110,10 @@
           "title": "{{2.name}}",
           "description": "{{4.choices[0].message.content}}",
           "link": "{{5.text}}",
-          "imageUrl": "{{2.image}}"
+          "imageUrl": "{{2.image}}",
+          "validateImage": true,
+          "validateTitleLength": true,
+          "onError": "loggerModule"
         }
       },
       {
@@ -78,7 +122,10 @@
         "parameters": {
           "subreddit": "{{env.REDDIT_SUBREDDIT}}",
           "title": "{{2.name}}",
-          "content": "{{4.choices[0].message.content}}\nCompra aquí 👉 {{5.text}}"
+          "content": "{{4.choices[0].message.content}}\nCompra aquí 👉 {{5.text}}",
+          "validateTitle": true,
+          "validateContent": true,
+          "onError": "loggerModule"
         }
       },
       {
@@ -89,17 +136,25 @@
           "payload": {
             "producto": "{{2.name}}",
             "mensaje": "🚨 ¡Clic detectado! Revisa en Amazon: {{5.text}}"
-          }
+          },
+          "validateUrl": true,
+          "onError": "loggerModule"
         }
       },
       {
         "id": "loggerModule",
         "type": "custom:logger",
         "parameters": {
-          "logLevel": "info",
+          "logLevel": "auto",
           "logFields": [
-            "timestamp", "module", "status", "product", "link", "error"
-          ]
+            "timestamp", "module", "status", "product", "link", "error", "user", "context", "input", "output"
+          ],
+          "externalLog": {
+            "enable": true,
+            "service": "Sentry",
+            "webhookUrl": "{{env.LOG_WEBHOOK}}"
+          },
+          "logFormat": "json"
         }
       }
     ],
