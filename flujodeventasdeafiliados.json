@@ -1,0 +1,155 @@
+{
+  "name": "flujo-ventas-afiliados",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "1",
+      "name": "Inicio Manual",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [0, 0]
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "sheetId": "1VTZ3HNNndZgl7SKuZmgV6iHCDatjSdHNTzXFClgZKQ4",
+        "range": "Productos!A1:G",
+        "options": {
+          "valueRenderMode": "UNFORMATTED_VALUE"
+        }
+      },
+      "id": "2",
+      "name": "Leer Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [200, 0],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "tu_credencial_google",
+          "name": "Google API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "value": "gpt-4"
+        },
+        "text": "={{ 'Eres un experto en ventas por redes sociales. Analiza este producto: ' + $json.producto + ' para el país ' + $json.pais + ' y crea contenido para Instagram, Twitter, Reel y un prompt para imagen IA.' }}"
+      },
+      "id": "3",
+      "name": "Generar Contenido IA",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1,
+      "position": [400, 0],
+      "credentials": {
+        "openAiApi": {
+          "id": "tu_credencial_openai",
+          "name": "OpenAI"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://image.pollinations.ai/prompt={{ $json.image_prompt }}"
+      },
+      "id": "4",
+      "name": "Generar Imagen IA",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [600, 0]
+    },
+    {
+      "parameters": {
+        "chatId": "@tu_canal",
+        "text": "={{ $json.instagram }}\n{{ $json.url_afiliado }}",
+        "photo": "={{ $json.img_url_generada }}"
+      },
+      "id": "5",
+      "name": "Publicar en Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [800, 0],
+      "credentials": {
+        "telegramApi": {
+          "id": "tu_credencial_telegram",
+          "name": "Telegram Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://affiliate-api.amazon.com/reporting?startDate=TODAY&endDate=TODAY"
+      },
+      "id": "6",
+      "name": "Obtener Ventas Amazon",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [1000, 0],
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "tu_token_amazon",
+          "name": "Amazon Partner API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{ $json.ventas }}",
+              "operation": "equal",
+              "value2": 0
+            }
+          ]
+        }
+      },
+      "id": "7",
+      "name": "Verificar Sin Ventas",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [1200, 0]
+    },
+    {
+      "parameters": {
+        "chatId": "@tu_canal",
+        "text": "⚠️ Sin ventas tras 2h del producto {{ $json.producto }} en {{ $json.pais }}. Revisa el post."
+      },
+      "id": "8",
+      "name": "Alerta Sin Ventas",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [1400, 0],
+      "credentials": {
+        "telegramApi": {
+          "id": "tu_credencial_telegram",
+          "name": "Telegram Bot"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Inicio Manual": {
+      "main": [[{"node": "Leer Google Sheets","type": "main","index": 0}]]
+    },
+    "Leer Google Sheets": {
+      "main": [[{"node": "Generar Contenido IA","type": "main","index": 0}]]
+    },
+    "Generar Contenido IA": {
+      "main": [[{"node": "Generar Imagen IA","type": "main","index": 0}]]
+    },
+    "Generar Imagen IA": {
+      "main": [[{"node": "Publicar en Telegram","type": "main","index": 0}]]
+    },
+    "Publicar en Telegram": {
+      "main": [[{"node": "Obtener Ventas Amazon","type": "main","index": 0}]]
+    },
+    "Obtener Ventas Amazon": {
+      "main": [[{"node": "Verificar Sin Ventas","type": "main","index": 0}]]
+    },
+    "Verificar Sin Ventas": {
+      "main": [[],[{"node": "Alerta Sin Ventas","type": "main","index": 0}]]
+    }
+  }
+}
