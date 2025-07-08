@@ -1,0 +1,131 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "read",
+        "sheetId": "1VTZ3HNNndZgl7SKuZmgV6iHCDatjSdHNTzXFClgZKQ4",
+        "range": "A:Z",
+        "headerRow": 1
+      },
+      "name": "Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [250, 300],
+      "credentials": {
+        "googleApi": "Google Service Account"
+      }
+    },
+    {
+      "parameters": {
+        "functionCode": "// Procesamiento MASIVO de 1000 links\nexport async function turboProcess(items) {\n  const MEGA_RESULTS = [];\n  \n  for (const item of items) {\n    try {\n      // Extraer ASIN dinámicamente\n      const url = item.json['Link Afiliado'];\n      const asinMatch = url.match(/\\/dp\\/([A-Z0-9]{10})/);\n      const asin = asinMatch ? asinMatch[1] : null;\n      \n      if (asin) {\n        // Generar nuevo link con tu tag\n        const TURBO_LINK = `https://www.amazon.com/dp/${asin}?tag=diegoedgard0f-20`;\n        \n        // Obtener datos de producto\n        const paapiResponse = await $fetch('https://webservices.amazon.com/paapi5/getitems', {\n          method: 'POST',\n          headers: {\n            'Content-Type': 'application/json'\n          },\n          body: JSON.stringify({\n            'ItemIds': [asin],\n            'PartnerTag': 'diegoedgard0f-20',\n            'PartnerType': 'Associates',\n            'Resources': ['Offers.Listings.Price', 'Images.Primary.Large']\n          }),\n          aws: {\n            service: 'ProductAdvertisingAPI',\n            accessKeyId: $env.AMAZON_ACCESS_KEY,\n            secretAccessKey: $env.AMAZON_SECRET_KEY,\n            region: 'us-east-1'\n          }\n        });\n        \n        const productData = paapiResponse.ItemsResult.Items[0];\n        \n        MEGA_RESULTS.push({\n          ...item.json,\n          'Nuevo Link': TURBO_LINK,\n          'Precio Actual': productData.Offers.Listings[0].Price.DisplayAmount,\n          'Imagen': productData.Images.Primary.Large.URL,\n          'Status': 'ACTIVO',\n          'Última Verificación': new Date().toISOString()\n        });\n      } else {\n        MEGA_RESULTS.push({\n          ...item.json,\n          'Status': 'ERROR_ASIN',\n          'Última Verificación': new Date().toISOString()\n        });\n      }\n    } catch (error) {\n      MEGA_RESULTS.push({\n        ...item.json,\n        'Status': 'ERROR_API',\n        'Error': error.message,\n        'Última Verificación': new Date().toISOString()\n      });\n    }\n  }\n  \n  return MEGA_RESULTS;\n}\n\nreturn turboProcess($input.all());"
+      },
+      "name": "Procesador MCP",
+      "type": "n8n-nodes-base.functionItem",
+      "typeVersion": 1,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "sheetId": "1VTZ3HNNndZgl7SKuZmgV6iHCDatjSdHNTzXFClgZKQ4",
+        "range": "A:Z",
+        "headerRow": 1
+      },
+      "name": "Actualizar Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [650, 300],
+      "credentials": {
+        "googleApi": "Google Service Account"
+      }
+    },
+    {
+      "parameters": {
+        "text": "🔥 VENTAS MASIVAS ACTIVADAS 🔥\n✅ Links procesados: {{$json[0].total}}\n🔄 Actualizados: {{$json[0].updated}}\n⏰ Hora: {{$json[0].timestamp}}\n\nACCIONA: https://docs.google.com/spreadsheets/d/1VTZ3HNNndZgl7SKuZmgV6iHCDatjSdHNTzXFClgZKQ4",
+        "chatId": "={{$env.TELEGRAM_CHAT_ID}}"
+      },
+      "name": "Notificar Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [650, 450],
+      "credentials": {
+        "telegramApi": "Telegram Bot"
+      }
+    },
+    {
+      "parameters": {
+        "interval": 30,
+        "unit": "minutes"
+      },
+      "name": "Trigger 30 Min",
+      "type": "n8n-nodes-base.interval",
+      "typeVersion": 1,
+      "position": [50, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Stats para Telegram\nconst stats = {\n  total: $input.all().length,\n  updated: $input.all().filter(item => item.json.Status === 'ACTIVO').length,\n  errors: $input.all().filter(item => item.json.Status.includes('ERROR')).length,\n  timestamp: new Date().toLocaleTimeString()\n};\n\nreturn [{\n  json: stats\n}];"
+      },
+      "name": "Generar Stats",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [650, 600]
+    }
+  ],
+  "connections": {
+    "Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "Procesador MCP",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Procesador MCP": {
+      "main": [
+        [
+          {
+            "node": "Actualizar Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Generar Stats",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generar Stats": {
+      "main": [
+        [
+          {
+            "node": "Notificar Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Trigger 30 Min": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {},
+  "name": "MCP Ventas Masivas 24/7"
+}
