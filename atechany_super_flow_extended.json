@@ -1,115 +1,205 @@
 {
-  "metadata": {
-    "version": 2,
-    "name": "ATECHANY SUPER FLOW EXTENDED - PRO",
-    "description": "Flujo avanzado y robusto: Google Sheets > GPT > Amazon > Airtable > Pinterest > Reddit. Persuasión máxima y control total."
-  },
-  "flow": {
-    "modules": [
-      {
-        "id": "googleSheetsModule",
-        "type": "google-sheets:watchRows",
-        "parameters": {
-          "sheetId": "1VTZ3HNNndZgl7SKuZmgV6iHCDatjSdHNTzXFClgZKQ4",
-          "range": "Ecosistema Global!A2:F",
-          "limit": 200
-        }
+  "name": "ATECHANY SUPER FLOW EXTENDED - PRO (n8n)",
+  "nodes": [
+    {
+      "parameters": {
+        "sheetId": "1VTZ3HNNndZgl7SKuZmgV6iHCDatjSdHNTzXFClgZKQ4",
+        "range": "Ecosistema Global!A2:F",
+        "rawData": false
       },
-      {
-        "id": "validateAmazonLinkModule",
-        "type": "tools:code",
-        "parameters": {
-          "code": "if (!/^https?:\\/\\/www\\.amazon\\./.test(input.link)) throw new Error('El enlace no es válido de Amazon'); return input.link;"
-        },
-        "inputs": {
-          "link": "{{2.link}}"
-        }
+      "name": "Google Sheets - Leer Productos",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 1,
+      "position": [100, 300],
+      "credentials": { "googleSheetsOAuth2Api": { "id": "REEMPLAZA_TU_ID", "name": "Google Sheets OAuth2 API" } }
+    },
+    {
+      "parameters": {
+        "functionCode": "// Validación y normalización de campos obligatorios\nconst required = [\"Producto\", \"LinkAmazon\", \"Descripción\", \"Imagen\"];\nfor (const r of required) {\n  if (!$json[r]) {\n    throw new Error(`Falta el campo obligatorio: ${r}`);\n  }\n}\nreturn items;"
       },
-      {
-        "id": "deduplicationModule",
-        "type": "airtable:findRecords",
-        "parameters": {
-          "baseId": "appATECHANY",
-          "tableId": "tblAfiliados",
-          "filterByFormula": "AND({Producto} = '{{2.name}}', {LinkAmazon} = '{{3.text}}')",
+      "name": "Validar y Normalizar",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [320, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Validación avanzada de enlaces Amazon (multipaís)\nconst link = $json[\"LinkAmazon\"];\nif (!/^https?:\\/\\/(www\\.)?amazon\\.[a-z.]{2,6}\\//i.test(link)) {\n  throw new Error('El enlace NO es válido de Amazon');\n}\nreturn items;"
+      },
+      "name": "Validar Amazon Link",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [520, 300]
+    },
+    {
+      "parameters": {
+        "application": "appATECHANY",
+        "table": "tblAfiliados",
+        "operation": "list",
+        "options": {
+          "filterByFormula": "AND(LOWER({Producto}) = LOWER('{{$json[\"Producto\"]}}'), LOWER({LinkAmazon}) = LOWER('{{$json[\"LinkAmazon\"]}}'))",
           "maxRecords": 1
         }
       },
-      {
-        "id": "gptModule",
-        "type": "openai:chat-completion",
-        "parameters": {
-          "model": "gpt-4o",
-          "prompt": "Imagina que estás a punto de descubrir algo que transformará tu día. Este producto, llamado '{{2.name}}', no solo cumple lo que promete, sino que despierta una sensación de bienestar y oportunidad. Descubre más aquí: {{2.link}}. Permítete imaginar cómo mejora tu vida en menos de 30 palabras. ¡Hazlo tuyo ahora mismo y siente la diferencia!"
+      "name": "Buscar Duplicados",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 1,
+      "position": [720, 300],
+      "credentials": { "airtableApi": { "id": "REEMPLAZA_AIRTABLE_ID", "name": "Airtable API" } }
+    },
+    {
+      "parameters": {
+        "functionCode": "// Si ya existe, no seguir\nif (items[0].json.records && items[0].json.records.length > 0) {\n  return [];\n}\nreturn items;"
+      },
+      "name": "Filtro No Duplicados",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [920, 300]
+    },
+    {
+      "parameters": {
+        "model": "gpt-4o",
+        "prompt": "Redacta un texto persuasivo, emocional, breve (máx 350 caracteres, incluye emojis y llamada a la acción) sobre el producto \"{{$json[\"Producto\"]}}\". Usa un tono entusiasta, creativo, y orientado a conversión para Amazon. Incluye una frase que invite a descubrir más en el enlace."
+      },
+      "name": "OpenAI - Copy Persuasivo",
+      "type": "n8n-nodes-base.openai",
+      "typeVersion": 1,
+      "position": [1100, 220],
+      "credentials": { "openAIApi": { "id": "REEMPLAZA_OPENAI_ID", "name": "OpenAI API" } }
+    },
+    {
+      "parameters": {
+        "functionCode": "// Construir link afiliado/UTM seguro\nconst url = $json[\"LinkAmazon\"];\nlet glue = url.includes('?') ? '&' : '?';\nconst tag = 'diegoedgard0f-20';\nconst utm = 'utm_source=atechany&utm_medium=automation&utm_campaign=autoaff';\nreturn [{json: {...$json, LinkAfiliado: `${url}${glue}tag=${tag}&${utm}` }}];"
+      },
+      "name": "Preparar Link Afiliado",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [1100, 380]
+    },
+    {
+      "parameters": {
+        "application": "appATECHANY",
+        "table": "tblAfiliados",
+        "operation": "create",
+        "fields": {
+          "Producto": "={{$json[\"Producto\"]}}",
+          "LinkAmazon": "={{$json[\"LinkAfiliado\"]}}",
+          "Descripción": "={{$json[\"Descripción\"]}}",
+          "DescripciónIA": "={{$node[\"OpenAI - Copy Persuasivo\"].json[\"choices\"][0][\"message\"][\"content\"]}}",
+          "FechaCreacion": "={{$now}}",
+          "Estado": "Publicado",
+          "Imagen": "={{$json[\"Imagen\"]}}"
         }
       },
-      {
-        "id": "amazonLinkModule",
-        "type": "tools:textAggregator",
-        "parameters": {
-          "template": "{{3.text}}?tag=diegoedgard0f-20&utm_source=atechany&utm_medium=automation&utm_campaign=autoaff"
-        }
+      "name": "Crear en Airtable",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 1,
+      "position": [1300, 300],
+      "credentials": { "airtableApi": { "id": "REEMPLAZA_AIRTABLE_ID", "name": "Airtable API" } }
+    },
+    {
+      "parameters": {
+        "board": "tech_board",
+        "note": "{{$node[\"OpenAI - Copy Persuasivo\"].json[\"choices\"][0][\"message\"][\"content\"]}} Descúbrelo aquí 👉 {{$json[\"LinkAfiliado\"]}}",
+        "link": "={{$json[\"LinkAfiliado\"]}}",
+        "imageUrl": "={{$json[\"Imagen\"]}}"
       },
-      {
-        "id": "airtableUpload",
-        "type": "airtable:createRecord",
-        "parameters": {
-          "baseId": "appATECHANY",
-          "tableId": "tblAfiliados",
-          "fields": {
-            "Producto": "{{2.name}}",
-            "LinkAmazon": "{{5.text}}",
-            "Descripci\u00f3n": "{{2.description}}",
-            "Descripci\u00f3nIA": "{{4.choices[0].message.content}}",
-            "FechaCreacion": "{{now}}",
-            "Estado": "Publicado"
-          }
-        },
-        "condition": {
-          "type": "if",
-          "expression": "{{4.records.length}} == 0"
-        }
+      "name": "Pinterest - Crear Pin",
+      "type": "n8n-nodes-base.pinterest",
+      "typeVersion": 1,
+      "position": [1500, 200],
+      "credentials": { "pinterestOAuth2Api": { "id": "REEMPLAZA_PINTEREST_ID", "name": "Pinterest OAuth2 API" } }
+    },
+    {
+      "parameters": {
+        "subreddit": "AmazonFinds",
+        "title": "Descubre {{$json[\"Producto\"]}} en Amazon 🚀",
+        "text": "{{$node[\"OpenAI - Copy Persuasivo\"].json[\"choices\"][0][\"message\"][\"content\"]}}\n\nCompra aquí: {{$json[\"LinkAfiliado\"]}}"
       },
-      {
-        "id": "pinterestModule",
-        "type": "pinterest:createPin",
-        "parameters": {
-          "boardId": "tech_board",
-          "title": "{{2.name}}",
-          "description": "¿Te imaginas sentirte mejor cada día? {{4.choices[0].message.content}} Haz clic en el enlace y deja que la magia ocurra: {{5.text}}",
-          "link": "{{5.text}}",
-          "imageUrl": "{{2.image}}"
-        },
-        "condition": {
-          "type": "if",
-          "expression": "{{4.records.length}} == 0 && {{2.image}}"
-        }
+      "name": "Reddit - Publicar Post",
+      "type": "n8n-nodes-base.reddit",
+      "typeVersion": 1,
+      "position": [1500, 400],
+      "credentials": { "redditOAuth2Api": { "id": "REEMPLAZA_REDDIT_ID", "name": "Reddit OAuth2 API" } }
+    },
+    {
+      "parameters": {
+        "functionCode": "// Logging de éxito\ndate = new Date().toISOString();\nconsole.log(`[${date}] Producto publicado en todas las plataformas:`, $json[\"Producto\"]);\nreturn items;"
       },
-      {
-        "id": "redditModule",
-        "type": "reddit:submitPost",
-        "parameters": {
-          "subreddit": "AmazonFinds",
-          "title": "Descubre {{2.name}}: lo que estabas esperando",
-          "content": "{{4.choices[0].message.content}}\n\n¿Listo para experimentar el cambio? Compra aquí: {{5.text}}"
-        },
-        "condition": {
-          "type": "if",
-          "expression": "{{4.records.length}} == 0"
-        }
-      }
-    ],
-    "connections": [
-      { "source": "googleSheetsModule", "target": "validateAmazonLinkModule" },
-      { "source": "googleSheetsModule", "target": "deduplicationModule" },
-      { "source": "googleSheetsModule", "target": "gptModule" },
-      { "source": "validateAmazonLinkModule", "target": "deduplicationModule" },
-      { "source": "validateAmazonLinkModule", "target": "amazonLinkModule" },
-      { "source": "deduplicationModule", "target": "airtableUpload" },
-      { "source": "gptModule", "target": "airtableUpload" },
-      { "source": "amazonLinkModule", "target": "airtableUpload" },
-      { "source": "airtableUpload", "target": "pinterestModule" },
-      { "source": "airtableUpload", "target": "redditModule" }
-    ]
-  }
+      "name": "Log Éxito",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [1700, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Logging y notificación de errores\ndate = new Date().toISOString();\nconsole.error(`[${date}] Error en flujo:`, $json.message || $json);\nreturn items;"
+      },
+      "name": "Log Error",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [900, 500]
+    }
+  ],
+  "connections": {
+    "Google Sheets - Leer Productos": {
+      "main": [
+        [{ "node": "Validar y Normalizar", "type": "main", "index": 0 }]
+      ]
+    },
+    "Validar y Normalizar": {
+      "main": [
+        [{ "node": "Validar Amazon Link", "type": "main", "index": 0 }]
+      ]
+    },
+    "Validar Amazon Link": {
+      "main": [
+        [{ "node": "Buscar Duplicados", "type": "main", "index": 0 }]
+      ],
+      "error": [
+        [{ "node": "Log Error", "type": "main", "index": 0 }]
+      ]
+    },
+    "Buscar Duplicados": {
+      "main": [
+        [{ "node": "Filtro No Duplicados", "type": "main", "index": 0 }]
+      ]
+    },
+    "Filtro No Duplicados": {
+      "main": [
+        [
+          { "node": "OpenAI - Copy Persuasivo", "type": "main", "index": 0 },
+          { "node": "Preparar Link Afiliado", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "OpenAI - Copy Persuasivo": {
+      "main": [
+        [{ "node": "Crear en Airtable", "type": "main", "index": 0 }]
+      ],
+      "error": [
+        [{ "node": "Log Error", "type": "main", "index": 0 }]
+      ]
+    },
+    "Preparar Link Afiliado": {
+      "main": [
+        [{ "node": "Crear en Airtable", "type": "main", "index": 0 }]
+      ]
+    },
+    "Crear en Airtable": {
+      "main": [
+        [
+          { "node": "Pinterest - Crear Pin", "type": "main", "index": 0 },
+          { "node": "Reddit - Publicar Post", "type": "main", "index": 0 },
+          { "node": "Log Éxito", "type": "main", "index": 0 }
+        ]
+      ],
+      "error": [
+        [{ "node": "Log Error", "type": "main", "index": 0 }]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "id": "atechany-super-flow-extended-pro"
 }
