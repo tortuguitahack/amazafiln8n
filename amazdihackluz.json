@@ -1,10 +1,10 @@
 {
   "metadata": {
-    "version": 4,
-    "name": "amzdiluz-v4-pro",
-    "description": "Flujo ultra-optimizado ATECHANY para ventas Amazon con IA, validación avanzada, logging profesional, seguridad reforzada y distribución multicanal.",
+    "version": 5,
+    "name": "amzdiluz-v5-ultra",
+    "description": "Flujo ATECHANY n8n ultra-pro para ventas masivas Amazon: IA, validación avanzada, logging multinivel, tracking, seguridad y distribución multicanal.",
     "author": "tortuguitahack",
-    "lastUpdated": "2025-06-30"
+    "lastUpdated": "2025-07-08"
   },
   "flow": {
     "modules": [
@@ -14,28 +14,30 @@
         "parameters": {
           "requiredFields": ["name", "link", "image"],
           "fieldFormats": {
-            "name": { "minLength": 3, "maxLength": 100 },
-            "link": { "type": "url" },
-            "image": { "type": "url" }
+            "name": { "minLength": 3, "maxLength": 100, "regex": "^[\\w\\sáéíóúüñÁÉÍÓÚÜÑ-]+$" },
+            "link": { "type": "url", "allowedDomains": ["amazon"], "regex": "amazon\\.(com|es|mx|it|fr|de|co\\.uk)/.*tag=" },
+            "image": { "type": "url", "regex": "\\.(jpg|jpeg|png|webp)$" }
           },
+          "antispamCheck": true,
           "customErrorMessages": {
-            "name": "El nombre del producto es obligatorio y debe tener entre 3 y 100 caracteres.",
-            "link": "El enlace debe ser una URL válida.",
-            "image": "La imagen debe ser una URL válida."
+            "name": "Nombre inválido. Debe tener entre 3 y 100 caracteres y solo caracteres permitidos.",
+            "link": "El enlace debe ser de Amazon y contener el tag de afiliado.",
+            "image": "Solo URLs de imágenes válidas (jpg, png, webp)."
           },
-          "onError": "terminateOnErrorModule",
+          "onError": "errorHandlerModule",
           "logOnError": true,
           "logContext": true
         }
       },
       {
-        "id": "terminateOnErrorModule",
-        "type": "custom:terminateOnError",
+        "id": "dedupeModule",
+        "type": "custom:deduplicate",
         "parameters": {
-          "logError": true,
-          "notify": true,
-          "notifyWebhook": "{{env.ERROR_NOTIFY_WEBHOOK}}",
-          "logContext": true
+          "uniqueField": "link",
+          "dedupeBy": ["link", "name"],
+          "antispamCheck": true,
+          "logDuplicates": true,
+          "onError": "errorHandlerModule"
         }
       },
       {
@@ -47,18 +49,9 @@
           "limit": 500,
           "validateSheet": true,
           "skipEmptyRows": true,
-          "onError": "terminateOnErrorModule",
-          "logOnError": true
-        }
-      },
-      {
-        "id": "dedupeModule",
-        "type": "custom:deduplicate",
-        "parameters": {
-          "uniqueField": "link",
-          "dedupeBy": ["link", "name"],
-          "logDuplicates": true,
-          "onError": "terminateOnErrorModule"
+          "onError": "errorHandlerModule",
+          "logOnError": true,
+          "batchMode": true
         }
       },
       {
@@ -66,12 +59,13 @@
         "type": "openai:chat-completion",
         "parameters": {
           "model": "gpt-4o",
-          "prompt": "Actúa como experta en ventas irresistibles. Redacta una descripción de máximo 30 palabras, con hipnosis conversacional, lenguaje emocional, persuasión extrema y llamado a la acción directo para el producto: {{2.name}}.",
-          "max_tokens": 100,
+          "prompt": "Actúa como copywriter de élite en ventas Amazon. Genera 3 descripciones hipnóticas, máximo 30 palabras, con llamado a la acción y formato A/B test. Producto: {{2.name}}.",
+          "max_tokens": 150,
           "wordLimit": 30,
-          "retryOnFail": 3,
+          "n": 3,
+          "retryOnFail": 5,
           "failOnWordLimitExceeded": true,
-          "onError": "terminateOnErrorModule",
+          "onError": "errorHandlerModule",
           "logPromptAndResponse": true
         }
       },
@@ -79,10 +73,10 @@
         "id": "linkBuilderModule",
         "type": "tools:textAggregator",
         "parameters": {
-          "template": "{{2.link}}?tag={{env.AMAZON_TAG}}&utm_source=atechany&utm_medium=ai&utm_campaign=autoaff_{{timestamp}}",
+          "template": "{{2.link}}?tag={{env.AMAZON_TAG}}&utm_source=atechany&utm_medium=ai&utm_campaign=autoaff_{{timestamp}}&utm_content={{randomString}}",
           "validateUrl": true,
           "hashTimestamp": true,
-          "onError": "terminateOnErrorModule"
+          "onError": "errorHandlerModule"
         }
       },
       {
@@ -94,11 +88,13 @@
           "fields": {
             "Producto": "{{2.name}}",
             "LinkAmazon": "{{5.text}}",
-            "Descripción GPT": "{{4.choices[0].message.content}}"
+            "Descripción GPT A": "{{4.choices[0].message.content}}",
+            "Descripción GPT B": "{{4.choices[1].message.content}}",
+            "Descripción GPT C": "{{4.choices[2].message.content}}"
           },
           "validateBeforeInsert": true,
           "preventDuplicateInsert": true,
-          "onError": "terminateOnErrorModule",
+          "onError": "errorHandlerModule",
           "logInsert": true
         }
       },
@@ -113,7 +109,7 @@
           "imageUrl": "{{2.image}}",
           "validateImage": true,
           "validateTitleLength": true,
-          "onError": "loggerModule"
+          "onError": "errorHandlerModule"
         }
       },
       {
@@ -122,10 +118,20 @@
         "parameters": {
           "subreddit": "{{env.REDDIT_SUBREDDIT}}",
           "title": "{{2.name}}",
-          "content": "{{4.choices[0].message.content}}\nCompra aquí 👉 {{5.text}}",
+          "content": "{{4.choices[1].message.content}}\nCompra aquí 👉 {{5.text}}",
           "validateTitle": true,
           "validateContent": true,
-          "onError": "loggerModule"
+          "onError": "errorHandlerModule"
+        }
+      },
+      {
+        "id": "telegramModule",
+        "type": "telegram:sendMessage",
+        "parameters": {
+          "chatId": "{{env.TELEGRAM_CHANNEL_ID}}",
+          "message": "🔥{{2.name}}🔥\n{{4.choices[2].message.content}}\nEnlace: {{5.text}}",
+          "parseMode": "HTML",
+          "onError": "errorHandlerModule"
         }
       },
       {
@@ -138,7 +144,33 @@
             "mensaje": "🚨 ¡Clic detectado! Revisa en Amazon: {{5.text}}"
           },
           "validateUrl": true,
-          "onError": "loggerModule"
+          "onError": "errorHandlerModule"
+        }
+      },
+      {
+        "id": "trackingWebhookModule",
+        "type": "webhook:sendData",
+        "parameters": {
+          "url": "{{env.TRACKING_WEBHOOK_URL}}",
+          "payload": {
+            "producto": "{{2.name}}",
+            "canal": "{{currentModule}}",
+            "timestamp": "{{timestamp}}",
+            "usuario": "{{env.MARKETER_ID}}"
+          },
+          "onError": "errorHandlerModule"
+        }
+      },
+      {
+        "id": "errorHandlerModule",
+        "type": "custom:errorHandler",
+        "parameters": {
+          "logError": true,
+          "notifyChannels": ["Sentry", "Discord", "Email"],
+          "externalLogWebhook": "{{env.LOG_WEBHOOK}}",
+          "retryOnFail": 3,
+          "logContext": true,
+          "maskSensitiveData": true
         }
       },
       {
@@ -169,11 +201,16 @@
       { "source": "linkBuilderModule", "target": "pinterestModule" },
       { "source": "gptModule", "target": "redditModule" },
       { "source": "linkBuilderModule", "target": "redditModule" },
+      { "source": "gptModule", "target": "telegramModule" },
+      { "source": "linkBuilderModule", "target": "telegramModule" },
       { "source": "linkBuilderModule", "target": "notionWebhookModule" },
+      { "source": "linkBuilderModule", "target": "trackingWebhookModule" },
       { "source": "airtableModule", "target": "loggerModule" },
       { "source": "pinterestModule", "target": "loggerModule" },
       { "source": "redditModule", "target": "loggerModule" },
-      { "source": "notionWebhookModule", "target": "loggerModule" }
+      { "source": "telegramModule", "target": "loggerModule" },
+      { "source": "notionWebhookModule", "target": "loggerModule" },
+      { "source": "trackingWebhookModule", "target": "loggerModule" }
     ]
   }
 }
