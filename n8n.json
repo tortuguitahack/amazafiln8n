@@ -1,0 +1,36 @@
+{
+  "nodes": [
+    {
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "parameters": { "triggerTimes": { "item": [ { "hour": 10 } ] } }
+    },
+    {
+      "name": "Read Airtable",
+      "type": "n8n-nodes-base.airtable",
+      "parameters": { /* credenciales y tabla */ }
+    },
+    {
+      "name": "Split Data",
+      "type": "n8n-nodes-base.splitInBatches",
+      "parameters": { "batchSize": 5 }
+    },
+    {
+      "name": "Prepare Link",
+      "type": "n8n-nodes-base.function",
+      "parameters": { "functionCode": "/* construir URL con tag de afiliado */" }
+    },
+    {
+      "name": "Post to Twitter",
+      "type": "n8n-nodes-base.twitter",
+      "parameters": { "operation": "post", "text": "={{$node[\"Prepare Link\"].json[\"mensaje\"]}}" }
+    }
+    /* otros nodos de Facebook, LinkedIn, etc. */
+  ],
+  "connections": {
+    "Schedule Trigger": { "main": [[{ "node": "Read Airtable", "type": "main", "index": 0 }]] },
+    "Read Airtable": { "main": [[{ "node": "Split Data", "type": "main", "index": 0 }]] },
+    "Split Data": { "main": [[{ "node": "Prepare Link", "type": "main", "index": 0 }]] },
+    "Prepare Link": { "main": [[{ "node": "Post to Twitter", "type": "main", "index": 0 }]] }
+  }
+}
