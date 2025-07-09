@@ -1,0 +1,185 @@
+{
+  "name": "flujo-ventas-afiliados-multicanal",
+  "nodes": [
+    {
+      "parameters": {
+        "triggerTimes": [
+          {
+            "mode": "custom",
+            "cronExpression": "0 */3 * * *",
+            "timezone": "America/Bogota"
+          }
+        ]
+      },
+      "id": "1",
+      "name": "Ejecutar cada 3 horas",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [0, 0]
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "sheetId": "1VTZ3HNNndZgl7SKuZmgV6iHCDatjSdHNTzXFClgZKQ4",
+        "range": "Productos!A1:G",
+        "options": {
+          "valueRenderMode": "UNFORMATTED_VALUE"
+        }
+      },
+      "id": "2",
+      "name": "Leer Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [200, 0],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "google_sheets_2025",
+          "name": "Google Sheets Principal"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "functionCode": "return items.map(item => ({ json: {
+  producto: item.json.Producto || '',
+  pais: item.json.Pais || '',
+  url_afiliado: item.json.UrlAfiliado || '',
+} }));"
+      },
+      "id": "3a",
+      "name": "Preparar Datos",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [350, 0]
+    },
+    {
+      "parameters": {
+        "model": { "value": "gpt-4" },
+        "text": "={{'Eres un experto en ventas por redes sociales. Analiza este producto: ' + $json.producto + ' para el país ' + $json.pais + '. Genera el siguiente contenido en formato JSON: {\"instagram\":\"copy instagram\",\"twitter\":\"copy tweet\",\"reel\":\"script video\",\"image_prompt\":\"prompt para imagen\"}'}}"
+      },
+      "id": "4",
+      "name": "Generar Contenido IA",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1,
+      "position": [500, 0],
+      "credentials": {
+        "openAiApi": {
+          "id": "openai_2025",
+          "name": "OpenAI Principal"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "functionCode": "let content; try { content = typeof $json.text === 'string' ? JSON.parse($json.text) : $json.text; } catch(e) { content = { instagram: '', twitter: '', reel: '', image_prompt: '' }; } return [{ json: { ...$json, ...content } }];"
+      },
+      "id": "5",
+      "name": "Parsear Contenido IA",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [650, 0]
+    },
+    {
+      "parameters": {
+        "url": "https://image.pollinations.ai/prompt={{ $json.image_prompt }}",
+        "responseFormat": "json"
+      },
+      "id": "6",
+      "name": "Generar Imagen IA",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [800, 0]
+    },
+    {
+      "parameters": {
+        "functionCode": "return [{ json: { ...$json, img_url_generada: $json.url || ($json.body && $json.body.url) || '' } }];"
+      },
+      "id": "7",
+      "name": "Obtener URL Imagen",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [950, 0]
+    },
+    {
+      "parameters": {
+        "chatId": "@canal_afiliados",
+        "text": "={{ $json.instagram + '\n' + $json.url_afiliado }}",
+        "photo": "={{ $json.img_url_generada }}"
+      },
+      "id": "8",
+      "name": "Publicar en Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [1150, 0],
+      "credentials": {
+        "telegramApi": {
+          "id": "telegram_bot_2025",
+          "name": "Telegram Bot Principal"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "status": "={{ $json.twitter + '\n' + $json.url_afiliado }}",
+        "media": "={{ $json.img_url_generada }}"
+      },
+      "id": "9",
+      "name": "Publicar en Twitter",
+      "type": "n8n-nodes-base.twitter",
+      "typeVersion": 1,
+      "position": [1150, 150],
+      "credentials": {
+        "twitterOAuth1Api": {
+          "id": "twitter_api_2025",
+          "name": "Twitter Principal"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "ventas@empresa.com",
+        "toEmail": "alertas@empresa.com",
+        "subject": "{{ $json.producto }} - Campaña lanzada",
+        "text": "={{ $json.instagram + '\n' + $json.url_afiliado + '\n' + $json.img_url_generada }}"
+      },
+      "id": "11",
+      "name": "Enviar Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 1,
+      "position": [1150, 450],
+      "credentials": {
+        "smtp": {
+          "id": "smtp_2025",
+          "name": "SMTP Principal"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Ejecutar cada 3 horas": {
+      "main": [[{ "node": "Leer Google Sheets", "type": "main", "index": 0 }]]
+    },
+    "Leer Google Sheets": {
+      "main": [[{ "node": "Preparar Datos", "type": "main", "index": 0 }]]
+    },
+    "Preparar Datos": {
+      "main": [[{ "node": "Generar Contenido IA", "type": "main", "index": 0 }]]
+    },
+    "Generar Contenido IA": {
+      "main": [[{ "node": "Parsear Contenido IA", "type": "main", "index": 0 }]]
+    },
+    "Parsear Contenido IA": {
+      "main": [[{ "node": "Generar Imagen IA", "type": "main", "index": 0 }]]
+    },
+    "Generar Imagen IA": {
+      "main": [[{ "node": "Obtener URL Imagen", "type": "main", "index": 0 }]]
+    },
+    "Obtener URL Imagen": {
+      "main": [
+        [{ "node": "Publicar en Telegram", "type": "main", "index": 0 }],
+        [{ "node": "Publicar en Twitter", "type": "main", "index": 0 }],
+        [{ "node": "Enviar Email", "type": "main", "index": 0 }]
+      ]
+    }
+  }
+}
