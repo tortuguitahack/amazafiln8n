@@ -1,0 +1,42 @@
+{
+  "name": "Automation_Affiliate_Amazon_Masivo",
+  "nodes": [
+    {
+      "type": "scheduleTrigger",
+      "settings": { "interval": "daily", "timezone": "America/New_York" }
+    },
+    {
+      "type": "httpRequest",
+      "settings": {
+        "url": "https://api.amazon.com/product-data",
+        "authentication": "genericAuth",
+        "parameters": { "category": "bestsellers", "maxResults": 50 }
+      }
+    },
+    {
+      "type": "function",
+      "settings": { "jsCode": "filter products with >4.5 stars & commission >8%" }
+    },
+    {
+      "type": "openAi",
+      "settings": { 
+        "model": "gpt-4-omni", 
+        "prompt": "Generate promotional posts for {{product}} incl. SEO keywords" 
+      }
+    },
+    {
+      "type": "if",
+      "settings": { 
+        "conditions": [{ "value1": "{{social_media}}", "operation": "equals", "value2": "TikTok" }] 
+      }
+    },
+    {
+      "type": "socialPost",
+      "settings": { 
+        "platform": "{{platform}}", 
+        "content": "{{ai_content}} + affiliate link" 
+      }
+    }
+  ],
+  "connections": { ... }
+}
