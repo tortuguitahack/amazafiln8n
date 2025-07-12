@@ -1,0 +1,92 @@
+{
+  "name": "Automation_Amazon_Affiliate_Global",
+  "nodes": [
+    // 1. Trigger programado cada 15 min
+    {
+      "type": "scheduleTrigger",
+      "settings": { "interval": "minutes", "value": 15 }
+    },
+    // 2. Extracción de productos con Amazon SP-API [citation:6]
+    {
+      "type": "httpRequest",
+      "settings": {
+        "url": "https://sellingpartnerapi.amazon.com/listings/items",
+        "authentication": "oAuth2",
+        "parameters": {
+          "marketplaceIds": "US,UK,DE,FR,ES,IT,CA,JP,BR,MX", // 10 países
+          "asin": "{{item_asin}}"
+        }
+      }
+    },
+    // 3. Geo-targeting con Geniuslink API [citation:7]
+    {
+      "type": "httpRequest",
+      "settings": {
+        "url": "https://api.geniuslink.com/geo-links",
+        "method": "POST",
+        "body": {
+          "affiliate_id": "diegoedgard0f-20",
+          "base_url": "{{amazon_product_url}}",
+          "countries": "US,UK,DE,FR,ES,IT,CA,JP,BR,MX"
+        }
+      }
+    },
+    // 4. Generación de contenido con IA (multiplataforma)
+    {
+      "type": "openAi",
+      "settings": {
+        "model": "gpt-4-turbo",
+        "prompt": "Crea un post para {{social_media}} sobre {{product_title}} ({{features}}). Incluye 3 hashtags, emoji y adapta al público de {{country}}. #ad"
+      }
+    },
+    // 5. Actualización de Google Sheets con links geo-localizados
+    {
+      "type": "googleSheets",
+      "settings": {
+        "operation": "append",
+        "sheetId": "tu_sheet_id",
+        "range": "A:C",
+        "values": "={{ [$json.genius_link, $json.country, $json.social_platform] }}"
+      }
+    },
+    // 6. Publicación en redes sociales (Facebook, Instagram, Twitter, LinkedIn, TikTok)
+    {
+      "type": "n8n-nodes-base.if",
+      "settings": {
+        "conditions": [{ 
+          "value1": "{{platform}}", 
+          "operation": "equals", 
+          "value2": "TikTok" 
+        }],
+        "options": {}
+      }
+    },
+    {
+      "type": "socialPost",
+      "settings": {
+        "platform": "{{platform}}",
+        "text": "{{ai_content}}",
+        "mediaUrls": "{{product_image}}"
+      }
+    },
+    // 7. Monitoreo de comisiones con Amazon S3 Data Feed [citation:4]
+    {
+      "type": "s3",
+      "settings": {
+        "operation": "get",
+        "bucketName": "amazon-associates-reports",
+        "fileKey": "activity-report.csv"
+      }
+    }
+  ],
+  "connections": {
+    "ScheduleTrigger": ["Amazon_SP_API"],
+    "Amazon_SP_API": ["Geniuslink_API"],
+    "Geniuslink_API": ["OpenAI_Content"],
+    "OpenAI_Content": ["GoogleSheets_Update"],
+    "GoogleSheets_Update": ["Social_Media_Router"],
+    "Social_Media_Router": ["SocialPost_Facebook", "SocialPost_TikTok"],
+    "SocialPost_Facebook": ["S3_Monitoring"],
+    "SocialPost_TikTok": ["S3_Monitoring"]
+  }
+}
