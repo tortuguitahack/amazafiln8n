@@ -1,0 +1,74 @@
+{
+  "name": "Amazon Afiliados Max 2025",
+  "nodes": [
+    {
+      "parameters": {
+        "sheetId": "1VTZ3HNNndZgl7SKuZmgV6iHCDatjSdHNTzXFClgZKQ4",
+        "range": "A1:Z1000",
+        "options": {
+          "valueRenderOption": "FORMATTED_VALUE",
+          "dateTimeRenderOption": "FORMATTED_STRING"
+        }
+      },
+      "name": "Google Sheets Trigger",
+      "type": "n8n-nodes-base.googleSheetsTrigger",
+      "typeVersion": 1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Añade ID de afiliado si falta\nreturn items.map(item => {\n  const data = item.json;\n  for (const key in data) {\n    if (typeof data[key] === 'string' && data[key].includes('amazon.') && !data[key].includes('tag=diegoedgard0f-20')) {\n      data[key] += (data[key].includes('?') ? '&' : '?') + 'tag=diegoedgard0f-20';\n    }\n  }\n  return { json: data };\n});"
+      },
+      "name": "Añadir ID Afiliado",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "prompt": "Escribe un copy persuasivo y breve para promocionar el siguiente producto de Amazon: {{$json[\"Nombre Producto\"]}}. Hazlo en tono conversacional, con llamada a la acción y usando técnicas de hipnosis conversacional.",
+        "model": "gpt-4-turbo"
+      },
+      "name": "Generar Copy IA",
+      "type": "n8n-nodes-base.openai",
+      "typeVersion": 1,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "resource": "tweet",
+        "operation": "create",
+        "text": "{{$json[\"copy\"]}} {{$json[\"URL Amazon\"]}}"
+      },
+      "name": "Publicar en Twitter",
+      "type": "n8n-nodes-base.twitter",
+      "typeVersion": 1,
+      "position": [850, 250]
+    },
+    {
+      "parameters": {
+        "toEmail": "tucorreo@dominio.com",
+        "subject": "Nuevo producto Amazon Afiliado",
+        "text": "{{$json[\"copy\"]}} {{$json[\"URL Amazon\"]}}"
+      },
+      "name": "Enviar Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 1,
+      "position": [850, 350]
+    }
+  ],
+  "connections": {
+    "Google Sheets Trigger": {
+      "main": [[{"node": "Añadir ID Afiliado", "type": "main", "index": 0}]]
+    },
+    "Añadir ID Afiliado": {
+      "main": [[{"node": "Generar Copy IA", "type": "main", "index": 0}]]
+    },
+    "Generar Copy IA": {
+      "main": [
+        [{"node": "Publicar en Twitter", "type": "main", "index": 0}],
+        [{"node": "Enviar Email", "type": "main", "index": 0}]
+      ]
+    }
+  }
+}
