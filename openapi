@@ -1,0 +1,108 @@
+openapi: 3.1.0
+info:
+  title: Stripe Customers API
+  description: >
+    API para listar clientes de Stripe. 
+    Utiliza autenticación HTTP Basic con la clave secreta como nombre de usuario.
+    Este endpoint permite obtener una lista paginada de clientes.
+  version: 1.0.0
+
+servers:
+  - url: https://api.stripe.com/v1
+    description: Servidor de producción de Stripe API
+
+paths:
+  /customers:
+    get:
+      operationId: listCustomers
+      summary: Obtiene una lista de clientes
+      description: >
+        Recupera una lista paginada de clientes registrados en Stripe.  
+        Es posible limitar el número de clientes devueltos usando el parámetro `limit`.
+      parameters:
+        - name: limit
+          in: query
+          description: Número máximo de clientes a devolver (entre 1 y 100).
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            example: 3
+      security:
+        - basicAuth: []
+      responses:
+        '200':
+          description: Respuesta exitosa con la lista de clientes.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  object:
+                    type: string
+                    example: list
+                  url:
+                    type: string
+                    example: /v1/customers
+                  has_more:
+                    type: boolean
+                    description: Indica si hay más resultados paginados.
+                  data:
+                    type: array
+                    description: Lista de objetos cliente.
+                    items:
+                      $ref: '#/components/schemas/Customer'
+        '400':
+          description: Solicitud incorrecta (Bad Request).
+        '401':
+          description: No autorizado. Verifica tu clave secreta.
+        '500':
+          description: Error interno del servidor.
+
+components:
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+
+  schemas:
+    Customer:
+      type: object
+      properties:
+        id:
+          type: string
+          example: cus_123456789
+        object:
+          type: string
+          example: customer
+        email:
+          type: string
+          format: email
+          nullable: true
+          example: "example@domain.com"
+        name:
+          type: string
+          nullable: true
+          example: "Juan Pérez"
+        description:
+          type: string
+          nullable: true
+          example: "Cliente frecuente"
+        created:
+          type: integer
+          description: Timestamp UNIX de creación.
+          example: 1628172824
+        metadata:
+          type: object
+          description: Diccionario con datos adicionales configurables.
+          additionalProperties:
+            type: string
+        livemode:
+          type: boolean
+          description: Indica si el objeto pertenece al modo live o test.
+        currency:
+          type: string
+          nullable: true
+          description: Moneda predeterminada del cliente.
+          example: "usd"
