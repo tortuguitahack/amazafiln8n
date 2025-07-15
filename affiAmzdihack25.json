@@ -1,0 +1,186 @@
+{
+  "name": "AI Social Media Content Flow",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "generate-post",
+        "options": {}
+      },
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "model": "gpt-4o",
+        "messages": [
+          {
+            "role": "system",
+            "content": "Eres un creador de contenido creativo."
+          },
+          {
+            "role": "user",
+            "content": "Genera texto e imagen para hablar sobre {{ $json[\"theme\"] }} en tono {{ $json[\"tone\"] }}."
+          }
+        ],
+        "options": {}
+      },
+      "name": "Generate with OpenAI",
+      "type": "n8n-nodes-base.openai",
+      "typeVersion": 1,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "return [ { json: { text: $json[\"choices\"][0].message.content.split(\"---IMAGE---\")[0].trim() } } ];"
+      },
+      "name": "Extract Text",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [650, 260]
+    },
+    {
+      "parameters": {
+        "functionCode": "return [ { json: { imagePrompt: $json[\"choices\"][0].message.content.split(\"---IMAGE---\")[1].trim() } } ];"
+      },
+      "name": "Extract Image Prompt",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [650, 340]
+    },
+    {
+      "parameters": {
+        "prompt": "{{ $json[\"imagePrompt\"] }}",
+        "size": "512x512"
+      },
+      "name": "Generate Image",
+      "type": "n8n-nodes-base.openai",
+      "typeVersion": 1,
+      "position": [850, 340]
+    },
+    {
+      "parameters": {
+        "mode": "passThrough",
+        "options": {}
+      },
+      "name": "Approval Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 1,
+      "position": [850, 160]
+    },
+    {
+      "parameters": {
+        "rules": [
+          {
+            "value1": "={{ $json[\"emailResponse\"] }}",
+            "operation": "equal",
+            "value2": "aprobar"
+          }
+        ]
+      },
+      "name": "Check Approval",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [1050, 160]
+    },
+    {
+      "parameters": {
+        "resource": "tweet",
+        "operation": "create",
+        "text": "={{ $node[\"Extract Text\"].json[\"text\"] }}",
+        "media": ["={{ $node[\"Generate Image\"].json[\"url\"] }}"]
+      },
+      "name": "Publish on X",
+      "type": "n8n-nodes-base.twitter",
+      "typeVersion": 1,
+      "position": [1250, 100]
+    },
+    {
+      "parameters": {
+        "resource": "post",
+        "operation": "create",
+        "text": "={{ $node[\"Extract Text\"].json[\"text\"] }}",
+        "mediaUrls": ["={{ $node[\"Generate Image\"].json[\"url\"] }}"],
+        "author": ""
+      },
+      "name": "Publish on LinkedIn",
+      "type": "n8n-nodes-base.linkedin",
+      "typeVersion": 1,
+      "position": [1250, 300]
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {
+      "main": [
+        [
+          {
+            "node": "Generate with OpenAI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate with OpenAI": {
+      "main": [
+        [
+          {
+            "node": "Extract Text",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Extract Image Prompt",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Approval Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Image Prompt": {
+      "main": [
+        [
+          {
+            "node": "Generate Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Approval Email": {
+      "main": [
+        [
+          {
+            "node": "Check Approval",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Approval": {
+      "main": [
+        [
+          {
+            "node": "Publish on X",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Publish on LinkedIn",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    }
+  }
+}
