@@ -1,0 +1,46 @@
+{
+  "affiliateConfig": {
+    "affiliateId": "dieg0edhgard0f-20",
+    "googleSheetUrl": "https://docs.google.com/spreadsheets/d/1VTZ3HNNndZgl7SKuZmgV6iHCDatjSdHNTzXFClgZKQ4/edit?gid=0#gid=0",
+    "countries": [
+      "US", "CA", "UK", "DE", "FR", "IT", "ES", "JP", "IN", "BR"
+    ],
+    "apis": [
+      {
+        "name": "Amazon Product Advertising API",
+        "description": "Permite obtener detalles de productos, precios, y enlaces con ID de afiliado.",
+        "integration": {
+          "affiliateId": "dieg0edhgard0f-20",
+          "regions": ["US", "CA", "UK", "DE", "FR", "IT", "ES", "JP", "IN", "BR"]
+        }
+      },
+      {
+        "name": "Google Sheets API",
+        "description": "Permite acceder y actualizar la hoja con los 500 enlaces de afiliado.",
+        "integration": {
+          "sheetUrl": "https://docs.google.com/spreadsheets/d/1VTZ3HNNndZgl7SKuZmgV6iHCDatjSdHNTzXFClgZKQ4/edit?gid=0#gid=0"
+        }
+      },
+      {
+        "name": "OpenAI GPT-4.5 API",
+        "description": "Generación de textos persuasivos e hipnosis conversacional para maximizar ventas.",
+        "integration": {
+          "languageModel": "gpt-4.5-turbo",
+          "promptStyle": "Venta persuasiva con enfoque en necesidades específicas por país."
+        }
+      },
+      {
+        "name": "Metricool API",
+        "description": "Automatización y análisis de publicaciones en redes sociales.",
+        "integration": {
+          "socialPlatforms": ["Instagram", "Facebook", "TikTok", "X"]
+        }
+      }
+    ],
+    "contentGeneration": {
+      "strategy": "Mensajes de persuasión altamente efectiva",
+      "tone": "Hipnosis conversacional enfocada en necesidades y ventas",
+      "languages": ["en", "es", "de", "fr", "it", "ja", "pt", "hi"]
+    }
+  }
+}
