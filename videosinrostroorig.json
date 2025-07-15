@@ -1,0 +1,71 @@
+{
+  "workflow": {
+    "steps": [
+      {
+        "step": 1,
+        "name": "Identificación del gasto actual",
+        "description": "Definir APIs usadas, costos asociados y funcionalidades ofrecidas."
+      },
+      {
+        "step": 2,
+        "name": "Evaluación de la alternativa gratuita",
+        "description": "Analizar capacidades, limitaciones y condiciones de uso de la alternativa gratuita presentada."
+      },
+      {
+        "step": 3,
+        "name": "Configuración inicial",
+        "description": "Crear cuenta, configurar parámetros y plantillas según necesidades de producción de videos."
+      },
+      {
+        "step": 4,
+        "name": "Prueba piloto",
+        "description": "Generar video corto, evaluar calidad visual, sincronización de audio y eficiencia."
+      },
+      {
+        "step": 5,
+        "name": "Validación interna",
+        "description": "Obtener feedback de equipo o público clave, ajustar parámetros según observaciones."
+      },
+      {
+        "step": 6,
+        "name": "Integración en pipeline",
+        "description": "Incorporar la alternativa gratuita en el flujo de trabajo habitual y ajustar procesos."
+      },
+      {
+        "step": 7,
+        "name": "Formación / Guía interna",
+        "description": "Preparar tutorial o guía de uso interno, definir roles y tiempos para cada fase."
+      },
+      {
+        "step": 8,
+        "name": "Monitoreo y ajuste continuo",
+        "description": "Hacer seguimiento de métricas y feedback para ajustar el flujo y parámetros."
+      },
+      {
+        "step": 9,
+        "name": "Escalado y estandarización",
+        "description": "Definir plantillas estándar por tipo de contenido, documentar el flujo para producción masiva."
+      },
+      {
+        "step": 10,
+        "name": "Evaluación continua",
+        "description": "Revisar trimestralmente la eficacia, calidad y condiciones de la alternativa gratuita."
+      },
+      {
+        "step": 11,
+        "name": "Integración de Redes Sociales",
+        "description": "Crear variantes de contenido adaptadas a Instagram, Facebook, TikTok o X para cada producto afiliado de Amazon, asegurando formatos, tamaños y tono adecuados."
+      },
+      {
+        "step": 12,
+        "name": "Calendarización y Automatización",
+        "description": "Programar publicaciones usando herramientas como Buffer, Hootsuite o Metricool para mantener una distribución constante en redes sociales."
+      },
+      {
+        "step": 13,
+        "name": "Seguimiento de Rendimiento",
+        "description": "Combinar datos de clics y conversiones de Amazon con métricas de interacción y alcance en redes sociales para ajustar la estrategia."
+      }
+    ]
+  }
+}
