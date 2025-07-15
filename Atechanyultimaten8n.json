@@ -1,0 +1,101 @@
+{
+  "name": "Amazon Affiliate Multinational Broadcast",
+  "nodes": [
+    {
+      "parameters": {
+        "cronExpression": "0 */6 * * *"
+      },
+      "name": "Trigger",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "functionCode": "return [\n  { json: { marketplace: 'amazon.com', country: 'US', affiliateId: 'diegodgardof-20' } },\n  { json: { marketplace: 'amazon.co.uk', country: 'UK', affiliateId: 'diegodgardof-20' } },\n  { json: { marketplace: 'amazon.de', country: 'Germany', affiliateId: 'diegodgardof-20' } },\n  { json: { marketplace: 'amazon.fr', country: 'France', affiliateId: 'diegodgardof-20' } },\n  { json: { marketplace: 'amazon.it', country: 'Italy', affiliateId: 'diegodgardof-20' } },\n  { json: { marketplace: 'amazon.es', country: 'Spain', affiliateId: 'diegodgardof-20' } },\n  { json: { marketplace: 'amazon.ca', country: 'Canada', affiliateId: 'diegodgardof-20' } },\n  { json: { marketplace: 'amazon.co.jp', country: 'Japan', affiliateId: 'diegodgardof-20' } },\n  { json: { marketplace: 'amazon.com.au', country: 'Australia', affiliateId: 'diegodgardof-20' } },\n  { json: { marketplace: 'amazon.in', country: 'India', affiliateId: 'diegodgardof-20' } }\n];"
+      },
+      "name": "Define Marketplaces",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "url": "={{$json[\"marketplace\"]}}/products",
+        "options": {
+          "queryParameters": [
+            {
+              "name": "tag",
+              "value": "={{$json[\"affiliateId\"]}}"
+            }
+          ]
+        }
+      },
+      "name": "Get Products",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "functionCode": "const hypnoTemplates = [\n  \"Imagine effortlessly owning {{product}}... Now click and make it yours.\",\n  \"Feel the excitement as {{product}} becomes part of your life today.\",\n  \"Let {{product}} transform your everyday routine. One click away.\",\n  \"Close your eyes, picture {{product}}, open them, and click now.\",\n  \"Every detail of {{product}} crafted for you. Why wait?\"\n];\n\nreturn items.map(item => {\n  const product = item.json.productName || 'this product';\n  const message = hypnoTemplates[Math.floor(Math.random() * hypnoTemplates.length)].replace('{{product}}', product);\n  return {\n    json: {\n      ...item.json,\n      hypnoMessage: message\n    }\n  };\n});"
+      },
+      "name": "Generate Hypnotic Message",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "chatId": "YOUR_TELEGRAM_CHAT_ID",
+        "text": "={{$json[\"hypnoMessage\"]}} \nLink: {{$json[\"affiliateLink\"]}}",
+        "additionalFields": {}
+      },
+      "name": "Send to Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1
+    }
+  ],
+  "connections": {
+    "Trigger": {
+      "main": [
+        [
+          {
+            "node": "Define Marketplaces",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Define Marketplaces": {
+      "main": [
+        [
+          {
+            "node": "Get Products",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Products": {
+      "main": [
+        [
+          {
+            "node": "Generate Hypnotic Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Hypnotic Message": {
+      "main": [
+        [
+          {
+            "node": "Send to Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}
