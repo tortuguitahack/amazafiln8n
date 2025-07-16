@@ -1,0 +1,122 @@
+{
+  "name": "Social Affiliates + AI Video Short Workflow + Slack Alert",
+  "nodes": [
+    {
+      "id": "SheetsTrigger",
+      "name": "Disparador: Google Sheets",
+      "type": "n8n-nodes-base.googleSheetsTrigger",
+      "parameters": {
+        "sheetId": "TU_SHEET_ID",
+        "range": "Hoja1!A2:D",
+        "options": { "watch": true }
+      },
+      "position": [0, 0]
+    },
+    {
+      "id": "SetFields",
+      "name": "Mapear campos afiliados",
+      "type": "n8n-nodes-base.set",
+      "parameters": {
+        "values": [
+          { "key": "platform", "value": "all" },
+          { "key": "link", "value": "={{ $json[\"Link\"] }}" },
+          { "key": "title", "value": "={{ $json[\"Título\"] }}" },
+          { "key": "isVideo", "value": "={{ $json[\"Tipo\"] === \"video\" }}" }
+        ]
+      },
+      "position": [250, 0]
+    },
+    {
+      "id": "GenerateVideo",
+      "name": "Generar AI Video corto",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://your-ai-video-api.endpoint/create",
+        "method": "POST",
+        "jsonParameters": true,
+        "bodyParametersJson": "{ \"link\": \"{{$json[\"link\"]}}\", \"title\": \"{{$json[\"title\"]}}\" }"
+      },
+      "position": [500, -150]
+    },
+    {
+      "id": "DownloadVideo",
+      "name": "Descargar video generado",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "={{ $json[\"videoUrl\"] }}",
+        "responseFormat": "file"
+      },
+      "position": [750, -150]
+    },
+    {
+      "id": "DownloadImage",
+      "name": "Obtener imagen de vista previa",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "={{ $json[\"link\"] }}?thumbnail=true",
+        "responseFormat": "file"
+      },
+      "position": [500, 150]
+    },
+    {
+      "id": "MergeMedia",
+      "name": "Fusionar contenido audiovisual",
+      "type": "n8n-nodes-base.merge",
+      "parameters": { "mode": "append", "keepAllData": true },
+      "position": [1000, 0]
+    },
+    {
+      "id": "SlackNotification",
+      "name": "Notificar a Slack",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "webhookUrl": "TU_WEBHOOK_URL",
+        "text": "Nueva publicación procesada: {{$json[\"title\"]}}"
+      },
+      "position": [1250, -200]
+    },
+    {
+      "id": "SocialRouter",
+      "name": "Enrutador de redes sociales",
+      "type": "n8n-nodes-base.switch",
+      "parameters": {
+        "propertyName": "platform",
+        "rules": [{ "value": "all" }]
+      },
+      "position": [1250, 0]
+    },
+    {
+      "id": "PostX",
+      "name": "Publicación X",
+      "type": "n8n-nodes-base.twitter",
+      "position": [1500, -200]
+    },
+    {
+      "id": "PostInstagram",
+      "name": "Publicación Instagram",
+      "type": "n8n-nodes-base.facebookGraphApi",
+      "position": [1500, 0]
+    },
+    {
+      "id": "PostFacebook",
+      "name": "Publicación Facebook",
+      "type": "n8n-nodes-base.facebookGraphApi",
+      "position": [1500, 200]
+    },
+    {
+      "id": "PostLinkedIn",
+      "name": "Publicación LinkedIn",
+      "type": "n8n-nodes-base.linkedin",
+      "position": [1500, 400]
+    }
+  ],
+  "connections": {
+    "SheetsTrigger": { "main": [[{ "node": "SetFields", "type": "main", "index": 0 }]] },
+    "SetFields": { "main": [[{ "node": "GenerateVideo", "type": "main", "index": 0 }]] },
+    "GenerateVideo": { "main": [[{ "node": "DownloadVideo", "type": "main", "index": 0 }]] },
+    "DownloadVideo": { "main": [[{ "node": "MergeMedia", "type": "main", "index": 0 }]] },
+    "DownloadImage": { "main": [[{ "node": "MergeMedia", "type": "main", "index": 0 }]] },
+    "MergeMedia": { "main": [[{ "node": "SlackNotification", "type": "main", "index": 0 }, { "node": "SocialRouter", "type": "main", "index": 0 }]] },
+    "SocialRouter": { "main": [[{ "node": "PostX", "type": "main", "index": 0 }, { "node": "PostInstagram", "type": "main", "index": 1 }, { "node": "PostFacebook", "type": "main", "index": 2 }, { "node": "PostLinkedIn", "type": "main", "index": 3 }]] }
+  }
+}
