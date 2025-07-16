@@ -1,0 +1,212 @@
+{
+  "name": "Social Media AI Workflow",
+  "nodes": [
+    {
+      "id": "ChatTrigger",
+      "name": "Disparador de chat",
+      "type": "n8n-nodes-base.webhook",
+      "description": "Recibe mensaje de chat LangChain",
+      "parameters": {
+        "path": "chat-trigger",
+        "method": "POST"
+      },
+      "position": [0, 0]
+    },
+    {
+      "id": "BufferMemory",
+      "name": "Memoria de búfer de ventana",
+      "type": "n8n-nodes-base.set",
+      "description": "Mantiene contexto de chat",
+      "parameters": {
+        "values": [
+          { "key": "buffer", "value": "={{ $json[\"body\"].message }}" }
+        ]
+      },
+      "position": [250, 0]
+    },
+    {
+      "id": "DriveDownload",
+      "name": "Obtener publicaciones desde Drive",
+      "type": "n8n-nodes-base.googleDrive",
+      "description": "Descarga archivo de publicación aprobado",
+      "parameters": {
+        "operation": "download",
+        "fileId": "={{ $json[\"body\"].fileId }}"
+      },
+      "position": [500, 0]
+    },
+    {
+      "id": "ParseJSON",
+      "name": "Extraer como JSON",
+      "type": "n8n-nodes-base.jsonParse",
+      "description": "Parses the downloaded file as JSON",
+      "parameters": {
+        "dataPropertyName": "data"
+      },
+      "position": [750, 0]
+    },
+    {
+      "id": "DownloadImage",
+      "name": "Obtener imagen de publicación",
+      "type": "n8n-nodes-base.httpRequest",
+      "description": "Descarga imagen desde URL en JSON",
+      "parameters": {
+        "url": "={{ $json[\"data\"].imageUrl }}",
+        "responseFormat": "file"
+      },
+      "position": [1000, 0]
+    },
+    {
+      "id": "MergeContent",
+      "name": "Fusionar imagen y contenido",
+      "type": "n8n-nodes-base.merge",
+      "description": "Une datos e imagen para publicación",
+      "parameters": {
+        "mode": "append",
+        "keepAllData": true
+      },
+      "position": [1250, 0]
+    },
+    {
+      "id": "SocialRouter",
+      "name": "Enrutador de redes sociales",
+      "type": "n8n-nodes-base.switch",
+      "description": "Rutea publicaciones a cada plataforma",
+      "parameters": {
+        "propertyName": "platform",
+        "rules": [
+          { "value": "x" },
+          { "value": "instagram" },
+          { "value": "facebook" },
+          { "value": "linkedin" },
+          { "value": "threads" },
+          { "value": "youtubeShorts" }
+        ]
+      },
+      "position": [1500, 0]
+    },
+    {
+      "id": "PostX",
+      "name": "Publicación X",
+      "type": "n8n-nodes-base.twitter",
+      "description": "Publica en X",
+      "parameters": { /* configuración API */ },
+      "position": [1750, -200]
+    },
+    {
+      "id": "InstagramMedia",
+      "name": "Imagen de Instagram",
+      "type": "n8n-nodes-base.httpRequest",
+      "description": "Crea objeto multimedia de Instagram",
+      "parameters": {
+        "url": "={{ $json[\"data\"].imageUrl }}",
+        "responseFormat": "file"
+      },
+      "position": [1750, 0]
+    },
+    {
+      "id": "PostInstagram",
+      "name": "Publicación de Instagram",
+      "type": "n8n-nodes-base.facebookGraphApi",
+      "description": "Publica en Instagram",
+      "parameters": { /* configuración Graph API */ },
+      "position": [2000, 0]
+    },
+    {
+      "id": "PostFacebook",
+      "name": "Publicación de Facebook",
+      "type": "n8n-nodes-base.facebookGraphApi",
+      "description": "Publica foto en Facebook",
+      "parameters": { /* configuración Graph API */ },
+      "position": [1750, 200]
+    },
+    {
+      "id": "PostLinkedIn",
+      "name": "Publicación de LinkedIn",
+      "type": "n8n-nodes-base.linkedin",
+      "description": "Publica en LinkedIn",
+      "parameters": { /* configuración LinkedIn */ },
+      "position": [2000, 200]
+    },
+    {
+      "id": "ThreadsPlaceholder",
+      "name": "Implementar subprocesos aquí",
+      "type": "n8n-nodes-base.noOp",
+      "description": "Placeholder para hilos",
+      "position": [1750, 400]
+    },
+    {
+      "id": "ShortsPlaceholder",
+      "name": "Implementa YouTube Shorts aquí",
+      "type": "n8n-nodes-base.noOp",
+      "description": "Placeholder para Shorts de YouTube",
+      "position": [2000, 400]
+    },
+    {
+      "id": "PrepareEmail",
+      "name": "Preparar correo aprobación",
+      "type": "n8n-nodes-base.htmlToText",
+      "description": "Convierte contenido a HTML para email",
+      "parameters": {
+        "html": "={{ `<h1>Publicación para aprobación</h1><img src='${$json[\"data\"].imageUrl}'/><p>${$json[\"data\"].text}</p>`}}"
+      },
+      "position": [1250, 300]
+    },
+    {
+      "id": "SendApprovalEmail",
+      "name": "Enviar email aprobación",
+      "type": "n8n-nodes-base.gmail",
+      "description": "Envía correo y espera respuesta",
+      "parameters": {
+        "resource": "message",
+        "operation": "send",
+        "to": "approver@example.com",
+        "subject": "Aprobación de publicación",
+        "html": "={{ $node.PrepareEmail.output.html }}"
+      },
+      "position": [1500, 300]
+    },
+    {
+      "id": "CheckApproval",
+      "name": "¿Está aprobado?",
+      "type": "n8n-nodes-base.switch",
+      "description": "Verifica aprobación",
+      "parameters": {
+        "propertyName": "approved",
+        "rules": [
+          { "value": true },
+          { "value": false }
+        ]
+      },
+      "position": [1750, 300]
+    }
+  ],
+  "connections": {
+    "ChatTrigger": { "main": [[{ "node": "BufferMemory", "type": "main", "index": 0 }]] },
+    "BufferMemory": { "main": [[{ "node": "DriveDownload", "type": "main", "index": 0 }]] },
+    "DriveDownload": { "main": [[{ "node": "ParseJSON", "type": "main", "index": 0 }]] },
+    "ParseJSON": { "main": [[{ "node": "DownloadImage", "type": "main", "index": 0 }, { "node": "PrepareEmail", "type": "main", "index": 0 }]] },
+    "DownloadImage": { "main": [[{ "node": "MergeContent", "type": "main", "index": 0 }]] },
+    "MergeContent": { "main": [[{ "node": "SocialRouter", "type": "main", "index": 0 }]] },
+    "SocialRouter": {
+      "main": [
+        [{ "node": "PostX", "type": "main", "index": 0 }],
+        [{ "node": "InstagramMedia", "type": "main", "index": 0 }],
+        [{ "node": "PostFacebook", "type": "main", "index": 0 }],
+        [{ "node": "PostLinkedIn", "type": "main", "index": 0 }],
+        [{ "node": "ThreadsPlaceholder", "type": "main", "index": 0 }],
+        [{ "node": "ShortsPlaceholder", "type": "main", "index": 0 }]
+      ]
+    },
+    "InstagramMedia": { "main": [[{ "node": "PostInstagram", "type": "main", "index": 0 }]] },
+    "ParseJSON": { "main": [[{ "node": "PrepareEmail", "type": "main", "index": 0 }]] },
+    "PrepareEmail": { "main": [[{ "node": "SendApprovalEmail", "type": "main", "index": 0 }]] },
+    "SendApprovalEmail": { "main": [[{ "node": "CheckApproval", "type": "main", "index": 0 }]] },
+    "CheckApproval": {
+      "main": [
+        [{ "node": "DownloadImage", "type": "main", "index": 0 }],
+        [{ "node": "ChatTrigger", "type": "main", "index": 0 }]
+      ]
+    }
+  }
+}
