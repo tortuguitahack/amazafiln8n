@@ -1,0 +1,229 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "interval": 15,
+        "unit": "minutes"
+      },
+      "name": "Start",
+      "type": "n8n-nodes-base.schedule",
+      "typeVersion": 1,
+      "position": [100, 100],
+      "notes": "Ejecuta cada 15 minutos"
+    },
+    {
+      "parameters": {
+        "operation": "lookup",
+        "spreadsheetId": "={{$credentials.googleSheetsApi.spreadsheetId}}",
+        "range": "'Productos'!A:D",
+        "options": {
+          "valueRenderOption": "FORMATTED_VALUE",
+          "lookupColumn": "D",
+          "lookupValue": "FALSE",
+          "returnAllMatches": false
+        }
+      },
+      "name": "Get Next Product",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 1,
+      "position": [300, 100],
+      "credentials": {
+        "googleSheetsApi": {
+          "id": "your_google_sheets_credential_id",
+          "name": "Google Sheets account"
+        }
+      },
+      "notes": "Busca el primer producto no publicado"
+    },
+    {
+      "parameters": {
+        "functionCode": "// Si no hay producto, marca un flag para IF\nconst data = $json[\"values\"] ?? [];\nif (!data.length || !data[0] || data[0].length < 3) {\n  return [{ empty: true }];\n}\nreturn [{\n  empty: false,\n  link: data[0][0] ?? '',\n  product: data[0][1] ?? '',\n  image: data[0][2] ?? '',\n  rowIndex: $json[\"rowIndex\"]\n}];"
+      },
+      "name": "Prepare Data",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [500, 100],
+      "notes": "Verifica si hay producto pendiente y prepara datos"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{$json[\"empty\"]}}",
+              "value2": false
+            }
+          ]
+        }
+      },
+      "name": "IF Product Exists",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [700, 100],
+      "notes": "¿Hay producto pendiente?"
+    },
+    {
+      "parameters": {
+        "resource": "chat",
+        "model": "gpt-3.5-turbo",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Write a persuasive social media post (max 280 characters) for {{$json[\"product\"]}} with this link: {{$json[\"link\"]}}. Use urgency and a clear call to action."
+          }
+        ]
+      },
+      "name": "Generate Post",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 1,
+      "position": [900, 100],
+      "credentials": {
+        "openAiApi": {
+          "id": "your_openai_credential_id",
+          "name": "OpenAI account"
+        }
+      },
+      "notes": "Crea el copy para redes sociales"
+    },
+    {
+      "parameters": {
+        "operation": "createUpdate",
+        "profileIds": [
+          "your_x_profile_id",
+          "your_facebook_profile_id",
+          "your_instagram_profile_id"
+        ],
+        "text": "={{$json[\"choices\"][0][\"message\"][\"content\"]}}",
+        "media": [
+          {
+            "url": "={{$node[\"Prepare Data\"].json[\"image\"]}}",
+            "content_type": "image/jpeg"
+          }
+        ]
+      },
+      "name": "Post to Buffer",
+      "type": "n8n-nodes-base.buffer",
+      "typeVersion": 1,
+      "position": [1100, 100],
+      "credentials": {
+        "bufferApi": {
+          "id": "your_buffer_credential_id",
+          "name": "Buffer account"
+        }
+      },
+      "notes": "Publica en tus redes sociales"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "spreadsheetId": "={{$credentials.googleSheetsApi.spreadsheetId}}",
+        "range": "'Productos'!D{{$node[\"Prepare Data\"].json[\"rowIndex\"] + 1}}",
+        "valueInputOption": "RAW",
+        "values": [
+          [
+            "TRUE"
+          ]
+        ]
+      },
+      "name": "Mark Published",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 1,
+      "position": [1300, 100],
+      "credentials": {
+        "googleSheetsApi": {
+          "id": "your_google_sheets_credential_id",
+          "name": "Google Sheets account"
+        }
+      },
+      "notes": "Marca el producto como publicado"
+    },
+    {
+      "parameters": {
+        "functionCode": "// Si no hubo producto, loguea\nreturn [{\n  message: 'No hay productos pendientes para publicar.'\n}];"
+      },
+      "name": "Log Empty",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [900, 300],
+      "notes": "Log si no hay productos"
+    }
+  ],
+  "connections": {
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "Get Next Product",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Next Product": {
+      "main": [
+        [
+          {
+            "node": "Prepare Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Data": {
+      "main": [
+        [
+          {
+            "node": "IF Product Exists",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF Product Exists": {
+      "main": [
+        [
+          {
+            "node": "Generate Post",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Log Empty",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Post": {
+      "main": [
+        [
+          {
+            "node": "Post to Buffer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Post to Buffer": {
+      "main": [
+        [
+          {
+            "node": "Mark Published",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {},
+  "name": "Social Media Affiliate Automation PRO",
+  "active": true
+}
