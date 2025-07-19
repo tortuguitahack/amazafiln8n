@@ -1,0 +1,539 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "interval": "15",
+        "unit": "minutes"
+      },
+      "name": "Schedule",
+      "type": "n8n-nodes-base.schedule",
+      "typeVersion": 1,
+      "position": [100, 100]
+    },
+    {
+      "parameters": {
+        "method": "executeQuery",
+        "spreadsheet": "{{ $credentials.googleSheetsApi.spreadsheet }}",
+        "query": "SELECT A AS ASIN, B AS Title, C AS Description, D AS Country, E AS TextImagePublished, F AS VideoPublished, ROW() AS Row FROM '[sheet name]' WHERE E IS FALSE LIMIT 1"
+      },
+      "name": "Get Next Product",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 1,
+      "position": [300, 100],
+      "credentials": {
+        "googleSheetsApi": {
+          "type": "googleSheetsApi",
+          "value": "your_google_sheets_credential_id"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const country = $json.Country;\nlet language;\nswitch (country) {\n  case 'US': language = 'EN-US'; break;\n  case 'ES': language = 'ES'; break;\n  case 'DE': language = 'DE'; break;\n  case 'FR': language = 'FR'; break;\n  case 'IT': language = 'IT'; break;\n  case 'JP': language = 'JA'; break;\n  case 'CN': language = 'ZH'; break;\n  case 'BR': language = 'PT-BR'; break;\n  case 'IN': language = 'HI'; break;\n  case 'RU': language = 'RU'; break;\n  default: language = 'EN-US';\n}\nreturn { json: { ...$json, language } };"
+      },
+      "name": "Map Country to Language",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [500, 100]
+    },
+    {
+      "parameters": {
+        "model": "text-davinci-003",
+        "prompt": "Write a persuasive social media post (max 280 characters) to promote {{ $json.Title }} on Amazon. Use conversational hypnosis, highlight benefits, create urgency, and include a call to action with a placeholder link."
+      },
+      "name": "Generate Social Media Text",
+      "type": "n8n-nodes-base.openai",
+      "typeVersion": 1,
+      "position": [700, 100],
+      "credentials": {
+        "openAiApi": {
+          "type": "openAiApi",
+          "value": "your_openai_credential_id"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "text": "{{ $json.response }}",
+        "targetLanguage": "{{ $json.language }}"
+      },
+      "name": "Translate Social Media Text",
+      "type": "n8n-nodes-base.deepl",
+      "typeVersion": 1,
+      "position": [900, 100],
+      "credentials": {
+        "deeplApi": {
+          "type": "deeplApi",
+          "value": "your_deepl_credential_id"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "prompt": "Create an attractive image for promoting {{ $json.Title }} on Amazon. The image should be visually appealing and relevant to the product."
+      },
+      "name": "Generate Image",
+      "type": "n8n-nodes-base.dalle",
+      "typeVersion": 1,
+      "position": [1100, 100],
+      "credentials": {
+        "dalleApi": {
+          "type": "dalleApi",
+          "value": "your_dalle_credential_id"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const asin = $json.ASIN;\nconst timestamp = new Date().toISOString().replace(/[-:T.]/g, '').slice(0, 14);\nconst links = {\n  x: `https://www.amazon.com/dp/${asin}/?tag=yourtag-x&clickref=textimage_x_${timestamp}`,\n  facebook: `https://www.amazon.com/dp/${asin}/?tag=yourtag-facebook&clickref=textimage_facebook_${timestamp}`,\n  instagram: `https://www.amazon.com/dp/${asin}/?tag=yourtag-instagram&clickref=textimage_instagram_${timestamp}`\n};\nreturn { json: { ...$json, links } };"
+      },
+      "name": "Construct Affiliate Links",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [1300, 100]
+    },
+    {
+      "parameters": {
+        "operation": "createUpdate",
+        "profileIds": ["x_profile", "facebook_profile", "instagram_profile"],
+        "customContent": {
+          "x_profile": {
+            "text": "{{ $json.translatedText }} {{ $json.links.x }}"
+          },
+          "facebook_profile": {
+            "text": "{{ $json.translatedText }} {{ $json.links.facebook }}"
+          },
+          "instagram_profile": {
+            "caption": "{{ $json.translatedText }} {{ $json.links.instagram }}"
+          }
+        },
+        "media": [{ "url": "{{ $json.imageUrl }}", "content_type": "image/jpeg" }]
+      },
+      "name": "Post to Social Media",
+      "type": "n8n-nodes-base.buffer",
+      "typeVersion": 1,
+      "position": [1500, 100],
+      "credentials": {
+        "bufferApi": {
+          "type": "bufferApi",
+          "value": "your_buffer_credential_id"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "update",
+        "spreadsheet": "{{ $credentials.googleSheetsApi.spreadsheet }}",
+        "range": "[sheet name]!E{{ $json.Row }}",
+        "body": [[true]]
+      },
+      "name": "Mark TextImage Published",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 1,
+      "position": [1700, 100],
+      "credentials": {
+        "googleSheetsApi": {
+          "type": "googleSheetsApi",
+          "value": "your_google_sheets_credential_id"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "text-davinci-003",
+        "prompt": "Write a 60-second video script to promote {{ $json.Title }} on Amazon. Use conversational hypnosis, highlight benefits, create urgency, and end with a call to action with a placeholder link."
+      },
+      "name": "Generate Video Script",
+      "type": "n8n-nodes-base.openai",
+      "typeVersion": 1,
+      "position": [1900, 100],
+      "credentials": {
+        "openAiApi": {
+          "type": "openAiApi",
+          "value": "your_openai_credential_id"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "text": "{{ $json.response }}",
+        "targetLanguage": "{{ $json.language }}"
+      },
+      "name": "Translate Video Script",
+      "type": "n8n-nodes-base.deepl",
+      "typeVersion": 1,
+      "position": [2100, 100],
+      "credentials": {
+        "deeplApi": {
+          "type": "deeplApi",
+          "value": "your_deepl_credential_id"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.synthesia.io/v2/videos",
+        "headers": {
+          "Authorization": "Bearer {{ $credentials.synthesiaApi.apiKey }}"
+        },
+        "body": {
+          "template_id": "your_template_id",
+          "variables": {
+            "script": "{{ $json.translatedText }}"
+          }
+        }
+      },
+      "name": "Create Video",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [2300, 100],
+      "credentials": {
+        "synthesiaApi": {
+          "type": "synthesiaApi",
+          "value": "your_synthesia_credential_id"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://api.synthesia.io/v2/videos/{{ $json.id }}",
+        "headers": {
+          "Authorization": "Bearer {{ $credentials.synthesiaApi.apiKey }}"
+        }
+      },
+      "name": "Check Video Status",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [2500, 100]
+    },
+    {
+      "parameters": {
+        "options": {
+          "condition": {
+            "key": "status",
+            "operator": "equals",
+            "value": "completed"
+          }
+        }
+      },
+      "name": "Split",
+      "type": "n8n-nodes-base.split",
+      "typeVersion": 1,
+      "position": [2700, 100]
+    },
+    {
+      "parameters": {
+        "waitTime": 300000
+      },
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1,
+      "position": [2900, 200]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "{{ $json.download }}",
+        "responseFormat": "binary"
+      },
+      "name": "Get Video File",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [2900, 100]
+    },
+    {
+      "parameters": {
+        "jsCode": "const asin = $json.ASIN;\nconst timestamp = new Date().toISOString().replace(/[-:T.]/g, '').slice(0, 14);\nconst videoLinks = {\n  youtube: `https://www.amazon.com/dp/${asin}/?tag=yourtag-youtube&clickref=video_youtube_${timestamp}`,\n  tiktok: `https://www.amazon.com/dp/${asin}/?tag=yourtag-tiktok&clickref=video_tiktok_${timestamp}`\n};\nreturn { json: { ...$json, videoLinks } };"
+      },
+      "name": "Construct Video Links",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [3100, 100]
+    },
+    {
+      "parameters": {
+        "operation": "uploadVideo",
+        "videoFile": {
+          "type": "binary",
+          "value": "{{ $binary.data.data }}"
+        },
+        "title": "{{ $json.Title }}",
+        "description": "Discover {{ $json.Title }} on Amazon: {{ $json.videoLinks.youtube }}"
+      },
+      "name": "Upload to YouTube",
+      "type": "n8n-nodes-base.youtube",
+      "typeVersion": 1,
+      "position": [3300, 100],
+      "credentials": {
+        "youtubeApi": {
+          "type": "youtubeApi",
+          "value": "your_youtube_credential_id"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.upload-post.com/v1/upload",
+        "headers": {
+          "Authorization": "Bearer your_upload_post_api_key"
+        },
+        "body": {
+          "platform": "tiktok",
+          "video": "{{ $binary.data.data }}",
+          "description": "Check out this amazing product on Amazon! {{ $json.videoLinks.tiktok }}"
+        }
+      },
+      "name": "Upload to TikTok",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [3300, 200]
+    },
+    {
+      "parameters": {},
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 1,
+      "position": [3500, 150]
+    },
+    {
+      "parameters": {
+        "method": "update",
+        "spreadsheet": "{{ $credentials.googleSheetsApi.spreadsheet }}",
+        "range": "[sheet name]!F{{ $json.Row }}",
+        "body": [[true]]
+      },
+      "name": "Mark Video Published",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 1,
+      "position": [3700, 150],
+      "credentials": {
+        "googleSheetsApi": {
+          "type": "googleSheetsApi",
+          "value": "your_google_sheets_credential_id"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "execute",
+        "jsCode": "if ($json.error) {\n  console.log('Error occurred:', $json.error);\n  // Optionally send notification or retry\n  return { json: { handled: true } };\n}\nreturn { json: { handled: false } };"
+      },
+      "name": "Handle Errors",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [3900, 150]
+    }
+  ],
+  "connections": {
+    "n8n-nodes-base.schedule.Schedule": {
+      "main": [
+        {
+          "node": "n8n-nodes-base.googleSheets.Get Next Product",
+          "type": "main",
+          "index": 0
+        }
+      ]
+    },
+    "n8n-nodes-base.googleSheets.Get Next Product": {
+      "main": [
+        {
+          "node": "n8n-nodes-base.function.Map Country to Language",
+          "type": "main",
+          "index": 0
+        }
+      ]
+    },
+    "n8n-nodes-base.function.Map Country to Language": {
+      "main": [
+        {
+          "node": "n8n-nodes-base.openai.Generate Social Media Text",
+          "type": "main",
+          "index": 0
+        }
+      ]
+    },
+    "n8n-nodes-base.openai.Generate Social Media Text": {
+      "main": [
+        {
+          "node": "n8n-nodes-base.deepl.Translate Social Media Text",
+          "type": "main",
+          "index": 0
+        }
+      ]
+    },
+    "n8n-nodes-base.deepl.Translate Social Media Text": {
+      "main": [
+        {
+          "node": "n8n-nodes-base.dalle.Generate Image",
+          "type": "main",
+          "index": 0
+        }
+      ]
+    },
+    "n8n-nodes-base.dalle.Generate Image": {
+      "main": [
+        {
+          "node": "n8n-nodes-base.function.Construct Affiliate Links",
+          "type": "main",
+          "index": 0
+        }
+      ]
+    },
+    "n8n-nodes-base.function.Construct Affiliate Links": {
+      "main": [
+        {
+          "node": "n8n-nodes-base.buffer.Post to Social Media",
+          "type": "main",
+          "index": 0
+        }
+      ]
+    },
+    "n8n-nodes-base.buffer.Post to Social Media": {
+      "main": [
+        {
+          "node": "n8n-nodes-base.googleSheets.Mark TextImage Published",
+          "type": "main",
+          "index": 0
+        }
+      ]
+    },
+    "n8n-nodes-base.googleSheets.Mark TextImage Published": {
+      "main": [
+        {
+          "node": "n8n-nodes-base.openai.Generate Video Script",
+          "type": "main",
+          "index": 0
+        }
+      ]
+    },
+    "n8n-nodes-base.openai.Generate Video Script": {
+      "main": [
+        {
+          "node": "n8n-nodes-base.deepl.Translate Video Script",
+          "type": "main",
+          "index": 0
+        }
+      ]
+    },
+    "n8n-nodes-base.deepl.Translate Video Script": {
+      "main": [
+        {
+          "node": "n8n-nodes-base.httpRequest.Create Video",
+          "type": "main",
+          "index": 0
+        }
+      ]
+    },
+    "n8n-nodes-base.httpRequest.Create Video": {
+      "main": [
+        {
+          "node": "n8n-nodes-base.httpRequest.Check Video Status",
+          "type": "main",
+          "index": 0
+        }
+      ]
+    },
+    "n8n-nodes-base.httpRequest.Check Video Status": {
+      "main": [
+        {
+          "node": "n8n-nodes-base.split.Split",
+          "type": "main",
+          "index": 0
+        }
+      ]
+    },
+    "n8n-nodes-base.split.Split": {
+      "0": [
+        {
+          "node": "n8n-nodes-base.httpRequest.Get Video File",
+          "type": "main",
+          "index": 0
+        }
+      ],
+      "1": [
+        {
+          "node": "n8n-nodes-base.wait.Wait",
+          "type": "main",
+          "index": 0
+        }
+      ]
+    },
+    "n8n-nodes-base.wait.Wait": {
+      "main": [
+        {
+          "node": "n8n-nodes-base.httpRequest.Check Video Status",
+          "type": "main",
+          "index": 0
+        }
+      ]
+    },
+    "n8n-nodes-base.httpRequest.Get Video File": {
+      "main": [
+        {
+          "node": "n8n-nodes-base.function.Construct Video Links",
+          "type": "main",
+          "index": 0
+        }
+      ]
+    },
+    "n8n-nodes-base.function.Construct Video Links": {
+      "main": [
+        {
+          "node": "n8n-nodes-base.youtube.Upload to YouTube",
+          "type": "main",
+          "index": 0
+        },
+        {
+          "node": "n8n-nodes-base.httpRequest.Upload to TikTok",
+          "type": "main",
+          "index": 0
+        }
+      ]
+    },
+    "n8n-nodes-base.youtube.Upload to YouTube": {
+      "main": [
+        {
+          "node": "n8n-nodes-base.merge.Merge",
+          "type": "main",
+          "index": 0
+        }
+      ]
+    },
+    "n8n-nodes-base.httpRequest.Upload to TikTok": {
+      "main": [
+        {
+          "node": "n8n-nodes-base.merge.Merge",
+          "type": "main",
+          "index": 0
+        }
+      ]
+    },
+    "n8n-nodes-base.merge.Merge": {
+      "main": [
+        {
+          "node": "n8n-nodes-base.googleSheets.Mark Video Published",
+          "type": "main",
+          "index": 0
+        }
+      ]
+    },
+    "n8n-nodes-base.googleSheets.Mark Video Published": {
+      "main": [
+        {
+          "node": "n8n-nodes-base.function.Handle Errors",
+          "type": "main",
+          "index": 0
+        }
+      ]
+    }
+  ],
+  "settings": {
+    "executionConcurrency": 5
+  },
+  "waitForExecution": false,
+  "name": "Ultimate Affiliate Marketing Automation",
+  "active": true
+}
