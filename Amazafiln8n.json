@@ -1,0 +1,357 @@
+{
+  "name": "Amazon Afiliados Multiredes PRO",
+  "nodes": [
+    {
+      "parameters": {
+        "interval": 60,
+        "unit": "minutes"
+      },
+      "id": "1",
+      "name": "Start",
+      "type": "n8n-nodes-base.schedule",
+      "typeVersion": 1,
+      "position": [100, 100],
+      "notes": "Ejecuta el flujo cada hora"
+    },
+    {
+      "parameters": {
+        "sheetId": "1VTZ3HNNndZgl7SKuZmgV6iHCDatjSdHNTzXFClgZKQ4",
+        "range": "Afiliados!A:C"
+      },
+      "id": "2",
+      "name": "Get Next Link",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [350, 100],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "your_google_sheets_credential_id",
+          "name": "Google Sheets OAuth2"
+        }
+      },
+      "notes": "Lee el siguiente link de afiliado NO publicado"
+    },
+    {
+      "parameters": {
+        "functionCode": "// Solo toma el primer link no publicado\nconst data = items.filter(item => item.json.Publicado !== 'TRUE');\nif (!data.length) {\n  return [{ empty: true }];\n}\nconst producto = data[0].json.Producto || '';\nconst link = data[0].json.Link || '';\nreturn [{\n  empty: false,\n  producto,\n  link,\n  rowIndex: data[0].json.rowIndex || 2 // asume header en la fila 1\n}];"
+      },
+      "id": "3",
+      "name": "Prepare Data",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [600, 100],
+      "notes": "Prepara datos y verifica si hay algo pendiente"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{$json[\"empty\"]}}",
+              "value2": false
+            }
+          ]
+        }
+      },
+      "id": "4",
+      "name": "IF Product Exists",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [850, 100],
+      "notes": "¿Hay producto pendiente?"
+    },
+    {
+      "parameters": {
+        "model": "gpt-4",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Create a short, highly persuasive social media post (max 280 characters) promoting this Amazon product: {{$json[\"producto\"]}}. Link: {{$json[\"link\"]}}. Use urgency, scarcity, social proof, and a strong call to action. Write in a friendly, hypnotic tone inspired by Cialdini. Language: English."
+          }
+        ]
+      },
+      "id": "5",
+      "name": "Generate Post Copy",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 1,
+      "position": [1100, 50],
+      "credentials": {
+        "openAiApi": {
+          "id": "your_openai_credential_id",
+          "name": "OpenAI"
+        }
+      },
+      "notes": "Genera el copy para post"
+    },
+    {
+      "parameters": {
+        "model": "gpt-4",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Write a short persuasive video script (max 60 seconds) for this Amazon product: {{$json[\"producto\"]}}. Link: {{$json[\"link\"]}}. Use hypnotic language patterns, social proof, and emotional triggers. Make it sound conversational and highly engaging. Language: English."
+          }
+        ]
+      },
+      "id": "6",
+      "name": "Generate Video Script",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 1,
+      "position": [1100, 150],
+      "credentials": {
+        "openAiApi": {
+          "id": "your_openai_credential_id",
+          "name": "OpenAI"
+        }
+      },
+      "notes": "Genera el guión para video/reel"
+    },
+    {
+      "parameters": {
+        "functionCode": "return [\n  {\n    prompt: `High-quality, realistic social media marketing image for an Amazon product: ${$json[\"producto\"]}`\n  }\n];"
+      },
+      "id": "7",
+      "name": "Image Prompt",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [1350, 50],
+      "notes": "Prompt para imagen IA"
+    },
+    {
+      "parameters": {
+        "engine": "stable-diffusion-v1-5",
+        "prompt": "={{$json[\"prompt\"]}}",
+        "num_images": 1,
+        "width": 768,
+        "height": 768
+      },
+      "id": "8",
+      "name": "Generate Image",
+      "type": "n8n-nodes-base.stabilityAi",
+      "typeVersion": 1,
+      "position": [1600, 50],
+      "credentials": {
+        "stabilityAiApi": {
+          "id": "your_stability_ai_key_id",
+          "name": "Stability AI"
+        }
+      },
+      "notes": "Imagen IA para el producto"
+    },
+    {
+      "parameters": {
+        "text": "={{$node[\"Generate Video Script\"].json[\"choices\"][0][\"message\"][\"content\"]}}",
+        "voice": "en-US-Wavenet-D"
+      },
+      "id": "9",
+      "name": "Generate Voice",
+      "type": "n8n-nodes-base.elevenLabs",
+      "typeVersion": 1,
+      "position": [1850, 150],
+      "credentials": {
+        "elevenLabsApi": {
+          "id": "your_elevenlabs_api_key_id",
+          "name": "ElevenLabs"
+        }
+      },
+      "notes": "Crea voz IA para video"
+    },
+    {
+      "parameters": {
+        "image_url": "={{$node[\"Generate Image\"].json[\"image_url\"]}}",
+        "audio_url": "={{$node[\"Generate Voice\"].json[\"audio_url\"]}}"
+      },
+      "id": "10",
+      "name": "Create Video",
+      "type": "n8n-nodes-base.flikiAi",
+      "typeVersion": 1,
+      "position": [2100, 150],
+      "credentials": {
+        "flikiAiApi": {
+          "id": "your_flikiai_api_key_id",
+          "name": "Fliki"
+        }
+      },
+      "notes": "Genera video/reel"
+    },
+    {
+      "parameters": {
+        "profileIds": [
+          "your_x_profile_id",
+          "your_facebook_profile_id",
+          "your_instagram_profile_id"
+        ],
+        "text": "={{$node[\"Generate Post Copy\"].json[\"choices\"][0][\"message\"][\"content\"]}}",
+        "media": [
+          {
+            "url": "={{$node[\"Generate Image\"].json[\"image_url\"]}}",
+            "content_type": "image/jpeg"
+          }
+        ]
+      },
+      "id": "11",
+      "name": "Post to Buffer",
+      "type": "n8n-nodes-base.buffer",
+      "typeVersion": 1,
+      "position": [2400, 50],
+      "credentials": {
+        "bufferApi": {
+          "id": "your_buffer_credential_id",
+          "name": "Buffer"
+        }
+      },
+      "notes": "Publica post en Buffer (FB, IG, X)"
+    },
+    {
+      "parameters": {
+        "chatId": "your_telegram_chat_id",
+        "text": "={{$node[\"Generate Post Copy\"].json[\"choices\"][0][\"message\"][\"content\"]}}",
+        "image": "={{$node[\"Generate Image\"].json[\"image_url\"]}}"
+      },
+      "id": "12",
+      "name": "Post to Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [2400, 200],
+      "credentials": {
+        "telegramApi": {
+          "id": "your_telegram_api_key_id",
+          "name": "Telegram"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "subreddit": "your_subreddit",
+        "title": "={{$node[\"Generate Post Copy\"].json[\"choices\"][0][\"message\"][\"content\"]}}",
+        "image_url": "={{$node[\"Generate Image\"].json[\"image_url\"]}}"
+      },
+      "id": "13",
+      "name": "Post to Reddit",
+      "type": "n8n-nodes-base.reddit",
+      "typeVersion": 1,
+      "position": [2400, 350],
+      "credentials": {
+        "redditApi": {
+          "id": "your_reddit_api_key_id",
+          "name": "Reddit"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "video_url": "={{$node[\"Create Video\"].json[\"video_url\"]}}",
+        "title": "={{$node[\"Generate Post Copy\"].json[\"choices\"][0][\"message\"][\"content\"]}}",
+        "description": "Auto-generated Amazon affiliate video"
+      },
+      "id": "14",
+      "name": "Post to YouTube Shorts",
+      "type": "n8n-nodes-base.youtube",
+      "typeVersion": 1,
+      "position": [2400, 500],
+      "credentials": {
+        "youtubeOAuth2Api": {
+          "id": "your_youtube_api_key_id",
+          "name": "YouTube"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "sheetId": "1VTZ3HNNndZgl7SKuZmgV6iHCDatjSdHNTzXFClgZKQ4",
+        "range": "Afiliados!C{{$node[\"Prepare Data\"].json[\"rowIndex\"]}}",
+        "valueInputOption": "USER_ENTERED",
+        "values": [
+          [
+            "TRUE"
+          ]
+        ]
+      },
+      "id": "15",
+      "name": "Mark as Published",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [2700, 100],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "your_google_sheets_credential_id",
+          "name": "Google Sheets OAuth2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toEmail": "your_email@mail.com",
+        "subject": "Amazon Afiliados: Publicación realizada",
+        "text": "Se ha publicado el producto {{$json[\"producto\"]}} en todas las redes sociales."
+      },
+      "id": "16",
+      "name": "Send Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 1,
+      "position": [2950, 100],
+      "credentials": {
+        "smtp": {
+          "id": "your_smtp_id",
+          "name": "SMTP"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "webhookUrl": "your_slack_webhook_url",
+        "bodyParametersUi": {
+          "parameter": [
+            {
+              "name": "text",
+              "value": "Amazon Afiliados: Publicado {{$json[\"producto\"]}}"
+            }
+          ]
+        }
+      },
+      "id": "17",
+      "name": "Send Slack",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [2950, 200]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Si no hay productos pendientes\nreturn [{\n  message: 'No hay productos pendientes para publicar.'\n}];"
+      },
+      "id": "18",
+      "name": "Log Empty",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [1100, 350],
+      "notes": "Log si no hay productos"
+    }
+  ],
+  "connections": {
+    "Start": { "main": [[{ "node": "Get Next Link", "type": "main", "index": 0 }]] },
+    "Get Next Link": { "main": [[{ "node": "Prepare Data", "type": "main", "index": 0 }]] },
+    "Prepare Data": { "main": [[{ "node": "IF Product Exists", "type": "main", "index": 0 }]] },
+    "IF Product Exists": {
+      "main": [
+        [{ "node": "Generate Post Copy", "type": "main", "index": 0 }],
+        [{ "node": "Log Empty", "type": "main", "index": 0 }]
+      ]
+    },
+    "Generate Post Copy": { "main": [[{ "node": "Generate Video Script", "type": "main", "index": 0 }, { "node": "Image Prompt", "type": "main", "index": 0 }]] },
+    "Generate Video Script": { "main": [[{ "node": "Generate Voice", "type": "main", "index": 0 }]] },
+    "Image Prompt": { "main": [[{ "node": "Generate Image", "type": "main", "index": 0 }]] },
+    "Generate Image": { "main": [[{ "node": "Post to Buffer", "type": "main", "index": 0 }, { "node": "Post to Telegram", "type": "main", "index": 0 }, { "node": "Post to Reddit", "type": "main", "index": 0 }]] },
+    "Generate Voice": { "main": [[{ "node": "Create Video", "type": "main", "index": 0 }]] },
+    "Create Video": { "main": [[{ "node": "Post to YouTube Shorts", "type": "main", "index": 0 }]] },
+    "Post to Buffer": { "main": [[{ "node": "Mark as Published", "type": "main", "index": 0 }]] },
+    "Post to Telegram": { "main": [[{ "node": "Mark as Published", "type": "main", "index": 0 }]] },
+    "Post to Reddit": { "main": [[{ "node": "Mark as Published", "type": "main", "index": 0 }]] },
+    "Post to YouTube Shorts": { "main": [[{ "node": "Mark as Published", "type": "main", "index": 0 }]] },
+    "Mark as Published": { "main": [[{ "node": "Send Email", "type": "main", "index": 0 }, { "node": "Send Slack", "type": "main", "index": 0 }]] }
+  },
+  "active": false,
+  "settings": {
+    "timezone": "America/New_York"
+  }
+}
