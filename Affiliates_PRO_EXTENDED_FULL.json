@@ -1,0 +1,211 @@
+{
+  "name": "Unified_Affiliates_PRO_EXTENDED_FULL",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "manualTrigger",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [100, 300]
+    },
+    {
+      "parameters": {
+        "url": "https://serpapi.com/search.json?engine=amazon&amazon_domain=amazon.com&type=search&q=smartphone&api_key=REEMPLAZAR_SERPAPI_KEY",
+        "method": "GET"
+      },
+      "id": "get_amazon",
+      "name": "Get Amazon Products",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [300, 100]
+    },
+    {
+      "parameters": {
+        "url": "https://api-sec-vlc.hotmart.com/security/oauth/token",
+        "method": "POST",
+        "jsonParameters": true,
+        "bodyParametersJson": "{ \"client_id\": \"REEMPLAZAR_HOTMART_CLIENT_ID\", \"client_secret\": \"REEMPLAZAR_HOTMART_CLIENT_SECRET\", \"grant_type\": \"client_credentials\" }"
+      },
+      "id": "hotmart_auth",
+      "name": "Get Hotmart Token",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [300, 200]
+    },
+    {
+      "parameters": {
+        "url": "https://api.clickbank.com/rest/1.3/products/list",
+        "method": "GET",
+        "headers": {
+          "Authorization": "Bearer REEMPLAZAR_CLICKBANK_API_KEY"
+        }
+      },
+      "id": "get_clickbank",
+      "name": "Get ClickBank Products",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [300, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "let allProducts = [];\nif(items[0].json.search_results) {\n  allProducts = allProducts.concat(items[0].json.search_results.map(item => ({\n    source: 'Amazon',\n    title: item.title,\n    price: item.price ? item.price.value : '',\n    image: item.thumbnail,\n    link: item.link + '?tag=diegodgard0-20'\n  })));\n}\nif(items[1].json.items) {\n  allProducts = allProducts.concat(items[1].json.items.map(item => ({\n    source: 'Hotmart',\n    title: item.name,\n    price: item.price,\n    image: item.image,\n    link: item.salesPageUrl\n  })));\n}\nif(items[2].json.products) {\n  allProducts = allProducts.concat(items[2].json.products.map(item => ({\n    source: 'ClickBank',\n    title: item.name,\n    price: item.price,\n    image: item.imageUrl,\n    link: item.affiliateUrl\n  })));\n}\nreturn allProducts.map(p => ({ json: p }));"
+      },
+      "id": "unify_products",
+      "name": "Unify Products",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [600, 200]
+    },
+    {
+      "parameters": {
+        "functionCode": "let best = items[0];\nfor(const item of items) {\n  if(Number(item.json.price) < Number(best.json.price)) best = item;\n}\nreturn [best];"
+      },
+      "id": "select_best_offer",
+      "name": "Select Best Offer",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [800, 200]
+    },
+    {
+      "parameters": {
+        "functionCode": "const p = items[0].json;\nreturn [{\n  json: {\n    title: p.title,\n    price: p.price,\n    image: p.image,\n    offer_link: p.link,\n    source: p.source,\n    markdown: `[![${p.title}](${p.image})](${p.link})\\n\\n**${p.title}**\\nPrecio: ${p.price}`\n  }\n}];"
+      },
+      "id": "format_output",
+      "name": "Format Final Output",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [1000, 200]
+    },
+    {
+      "parameters": {
+        "chatId": "REEMPLAZAR_TELEGRAM_CHAT_ID",
+        "text": "={{ $json.markdown }}",
+        "additionalFields": {
+          "parse_mode": "Markdown",
+          "disable_web_page_preview": false
+        }
+      },
+      "id": "publish_telegram",
+      "name": "Publish on Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [1200, 200],
+      "credentials": {
+        "telegramApi": "REEMPLAZAR_TELEGRAM_CREDENCIAL"
+      }
+    },
+    {
+      "parameters": {
+        "resource": "tweet",
+        "operation": "create",
+        "text": "={{ $json.title }} - ${{ $json.price }}\n{{ $json.offer_link }}"
+      },
+      "id": "publish_twitter",
+      "name": "Publish on Twitter",
+      "type": "n8n-nodes-base.twitter",
+      "typeVersion": 1,
+      "position": [1200, 100],
+      "credentials": {
+        "twitterOAuth1Api": "REEMPLAZAR_TWITTER_CREDENCIAL"
+      }
+    },
+    {
+      "parameters": {
+        "url": "REEMPLAZAR_DISCORD_WEBHOOK_URL",
+        "jsonParameters": true,
+        "options": {},
+        "bodyParametersJson": "{ \"content\": \"{{$json.markdown}}\" }"
+      },
+      "id": "publish_discord",
+      "name": "Publish on Discord",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [1200, 300]
+    },
+    {
+      "parameters": {
+        "resource": "submission",
+        "operation": "submit",
+        "subreddit": "REEMPLAZAR_SUBREDDIT",
+        "title": "={{ $json.title }}",
+        "url": "={{ $json.offer_link }}"
+      },
+      "id": "publish_reddit",
+      "name": "Publish on Reddit",
+      "type": "n8n-nodes-base.reddit",
+      "typeVersion": 1,
+      "position": [1200, 400],
+      "credentials": {
+        "redditApi": "REEMPLAZAR_REDDIT_CREDENCIAL"
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "sheetId": "REEMPLAZAR_SHEET_ID_PUBLICATIONS",
+        "range": "A1:D1",
+        "options": {},
+        "valueInputMode": "USER_ENTERED",
+        "data": {
+          "columns": ["title", "price", "source", "offer_link"]
+        }
+      },
+      "id": "log_sheets",
+      "name": "Log to Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 1,
+      "position": [1200, 500],
+      "credentials": {
+        "googleSheetsOAuth2Api": "REEMPLAZAR_GOOGLE_SHEETS_CREDENCIAL"
+      }
+    }
+  ],
+  "connections": {
+    "manualTrigger": {
+      "main": [
+        [{ "node": "get_amazon", "type": "main", "index": 0 }],
+        [{ "node": "hotmart_auth", "type": "main", "index": 0 }],
+        [{ "node": "get_clickbank", "type": "main", "index": 0 }]
+      ]
+    },
+    "get_amazon": {
+      "main": [[{ "node": "unify_products", "type": "main", "index": 0 }]]
+    },
+    "hotmart_auth": {
+      "main": [[{ "node": "unify_products", "type": "main", "index": 1 }]]
+    },
+    "get_clickbank": {
+      "main": [[{ "node": "unify_products", "type": "main", "index": 2 }]]
+    },
+    "unify_products": {
+      "main": [[{ "node": "select_best_offer", "type": "main", "index": 0 }]]
+    },
+    "select_best_offer": {
+      "main": [[{ "node": "format_output", "type": "main", "index": 0 }]]
+    },
+    "format_output": {
+      "main": [
+        [{ "node": "publish_telegram", "type": "main", "index": 0 }],
+        [{ "node": "publish_twitter", "type": "main", "index": 0 }],
+        [{ "node": "publish_discord", "type": "main", "index": 0 }],
+        [{ "node": "publish_reddit", "type": "main", "index": 0 }],
+        [{ "node": "log_sheets", "type": "main", "index": 0 }]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "versionId": "v1_pro_extended_affiliates",
+  "tags": [
+    {
+      "name": "afiliados"
+    },
+    {
+      "name": "marketing"
+    },
+    {
+      "name": "publicaciones"
+    }
+  ]
+}
