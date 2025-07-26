@@ -1,18 +1,17 @@
 {
-  "name": "Unified_Affiliates_Full_Auto",
+  "name": "Unified_Affiliates_PRO",
   "nodes": [
     {
       "parameters": {},
-      "id": "trigger",
+      "id": "manualTrigger",
       "name": "Manual Trigger",
       "type": "n8n-nodes-base.manualTrigger",
       "typeVersion": 1,
-      "position": [100, 400]
+      "position": [100, 300]
     },
-    // ---- AMAZON (via SerpApi) ----
     {
       "parameters": {
-        "url": "https://serpapi.com/search.json?engine=amazon&amazon_domain={{ $env.AMAZON_DOMAIN }}&type=search&q={{ $env.AMAZON_QUERY }}&api_key={{ $env.SERPAPI_KEY }}",
+        "url": "https://serpapi.com/search.json?engine=amazon&amazon_domain=amazon.com&type=search&q=smartphone&api_key=REEMPLAZAR_SERPAPI_KEY",
         "method": "GET"
       },
       "id": "get_amazon",
@@ -21,13 +20,12 @@
       "typeVersion": 2,
       "position": [300, 100]
     },
-    // ---- HOTMART ----
     {
       "parameters": {
         "url": "https://api-sec-vlc.hotmart.com/security/oauth/token",
         "method": "POST",
         "jsonParameters": true,
-        "bodyParametersJson": "{ \"client_id\": \"{{ $env.HOTMART_CLIENT_ID }}\", \"client_secret\": \"{{ $env.HOTMART_CLIENT_SECRET }}\", \"grant_type\": \"client_credentials\" }"
+        "bodyParametersJson": "{ \"client_id\": \"REEMPLAZAR_HOTMART_CLIENT_ID\", \"client_secret\": \"REEMPLAZAR_HOTMART_CLIENT_SECRET\", \"grant_type\": \"client_credentials\" }"
       },
       "id": "hotmart_auth",
       "name": "Get Hotmart Token",
@@ -37,25 +35,10 @@
     },
     {
       "parameters": {
-        "url": "https://developers.hotmart.com/payments/api/v1/products",
-        "method": "GET",
-        "headers": {
-          "Authorization": "Bearer {{ $json.access_token }}"
-        }
-      },
-      "id": "get_hotmart",
-      "name": "Get Hotmart Products",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 2,
-      "position": [500, 200]
-    },
-    // ---- CLICKBANK ----
-    {
-      "parameters": {
         "url": "https://api.clickbank.com/rest/1.3/products/list",
         "method": "GET",
         "headers": {
-          "Authorization": "Bearer {{ $env.CLICKBANK_API_KEY }}"
+          "Authorization": "Bearer REEMPLAZAR_CLICKBANK_API_KEY"
         }
       },
       "id": "get_clickbank",
@@ -64,148 +47,40 @@
       "typeVersion": 2,
       "position": [300, 300]
     },
-    // ---- UNIFICAR Y FORMATEAR ----
     {
       "parameters": {
-        "functionCode": "// Unifica productos de Amazon, Hotmart y ClickBank\nlet allProducts = [];\nif(items[0].json.search_results) {\n  allProducts = allProducts.concat(items[0].json.search_results.map(item => ({\n    source: 'Amazon',\n    title: item.title,\n    price: item.price ? item.price.value : '',\n    image: item.thumbnail,\n    link: item.link\n  })));\n}\nif(items[1].json.items) {\n  allProducts = allProducts.concat(items[1].json.items.map(item => ({\n    source: 'Hotmart',\n    title: item.name,\n    price: item.price,\n    image: item.image,\n    link: item.salesPageUrl\n  })));\n}\nif(items[2].json.products) {\n  allProducts = allProducts.concat(items[2].json.products.map(item => ({\n    source: 'ClickBank',\n    title: item.name,\n    price: item.price,\n    image: item.imageUrl,\n    link: item.affiliateUrl\n  })));\n}\nreturn allProducts.map(p => ({ json: p }));"
+        "functionCode": "let allProducts = [];\nif(items[0].json.search_results) {\n  allProducts = allProducts.concat(items[0].json.search_results.map(item => ({\n    source: 'Amazon',\n    title: item.title,\n    price: item.price ? item.price.value : '',\n    image: item.thumbnail,\n    link: item.link + '?tag=diegodgard0-20'\n  })));\n}\nif(items[1].json.items) {\n  allProducts = allProducts.concat(items[1].json.items.map(item => ({\n    source: 'Hotmart',\n    title: item.name,\n    price: item.price,\n    image: item.image,\n    link: item.salesPageUrl\n  })));\n}\nif(items[2].json.products) {\n  allProducts = allProducts.concat(items[2].json.products.map(item => ({\n    source: 'ClickBank',\n    title: item.name,\n    price: item.price,\n    image: item.imageUrl,\n    link: item.affiliateUrl\n  })));\n}\nreturn allProducts.map(p => ({ json: p }));"
       },
       "id": "unify_products",
       "name": "Unify Products",
       "type": "n8n-nodes-base.function",
       "typeVersion": 1,
-      "position": [700, 200]
+      "position": [600, 200]
     },
     {
       "parameters": {
-        "functionCode": "// Selecciona el producto con menor precio\nlet best = items[0];\nfor(const item of items) {\n  if(Number(item.json.price) < Number(best.json.price)) best = item;\n}\nreturn [best];"
+        "functionCode": "let best = items[0];\nfor(const item of items) {\n  if(Number(item.json.price) < Number(best.json.price)) best = item;\n}\nreturn [best];"
       },
       "id": "select_best_offer",
       "name": "Select Best Offer",
       "type": "n8n-nodes-base.function",
       "typeVersion": 1,
-      "position": [900, 200]
+      "position": [800, 200]
     },
     {
       "parameters": {
-        "functionCode": "// Prepara datos para publicar en redes y guardar en Sheets\nconst p = items[0].json;\nreturn [{\n  json: {\n    title: p.title,\n    price: p.price,\n    image: p.image,\n    offer_link: p.link,\n    source: p.source,\n    markdown: `[![${p.title}](${p.image})](${p.link})\\n\\n**${p.title}**\\nPrecio: ${p.price}`\n  }\n}];"
+        "functionCode": "const p = items[0].json;\nreturn [{\n  json: {\n    title: p.title,\n    price: p.price,\n    image: p.image,\n    offer_link: p.link,\n    source: p.source,\n    markdown: `[![${p.title}](${p.image})](${p.link})\\n\\n**${p.title}**\\nPrecio: ${p.price}`\n  }\n}];"
       },
-      "id": "final_format",
+      "id": "format_output",
       "name": "Format Final Output",
       "type": "n8n-nodes-base.function",
       "typeVersion": 1,
-      "position": [1100, 200]
+      "position": [1000, 200]
     },
-    // ---- GOOGLE SHEETS (Credencial: Google Sheets OAuth2, variable: SHEET_ID_PUBLICATIONS) ----
     {
       "parameters": {
-        "operation": "append",
-        "sheetId": "{{ $env.SHEET_ID_PUBLICATIONS }}",
-        "range": "Publicaciones!A:E",
-        "values": "={{ [$json.title, $json.price, $json.offer_link, $json.source, $json.image] }}"
-      },
-      "id": "register_publication",
-      "name": "Register Publication",
-      "type": "n8n-nodes-base.googleSheets",
-      "typeVersion": 1,
-      "position": [1300, 100],
-      "credentials": { "googleSheetsOAuth2Api": "PON_AQUI_CREDENCIAL_GOOGLE" }
-    },
-    // ---- REDES SOCIALES ----
-    // Twitter/X (HTTP Bearer Auth)
-    {
-      "parameters": {
-        "url": "https://api.twitter.com/2/tweets",
-        "method": "POST",
-        "jsonParameters": true,
-        "bodyParametersJson": "{ \"text\": \"{{ $json.markdown }}\" }"
-      },
-      "id": "publish_twitter",
-      "name": "Publish on Twitter",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 2,
-      "position": [1300, 200],
-      "credentials": { "httpBearerAuth": "PON_AQUI_CREDENCIAL_TWITTER" }
-    },
-    // Facebook (HTTP Bearer Auth, token de página o usuario)
-    {
-      "parameters": {
-        "url": "https://graph.facebook.com/v18.0/me/feed",
-        "method": "POST",
-        "jsonParameters": true,
-        "bodyParametersJson": "{ \"message\": \"{{ $json.markdown }}\" }"
-      },
-      "id": "publish_facebook",
-      "name": "Publish on Facebook",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 2,
-      "position": [1300, 300],
-      "credentials": { "httpBearerAuth": "PON_AQUI_CREDENCIAL_FACEBOOK" }
-    },
-    // Instagram (token Graph API, IG_USER_ID)
-    {
-      "parameters": {
-        "url": "https://graph.facebook.com/v18.0/{{ $env.IG_USER_ID }}/media",
-        "method": "POST",
-        "jsonParameters": true,
-        "bodyParametersJson": "{ \"caption\": \"{{ $json.markdown }}\", \"image_url\": \"{{ $json.image }}\" }"
-      },
-      "id": "publish_instagram",
-      "name": "Publish on Instagram",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 2,
-      "position": [1300, 400],
-      "credentials": { "httpBearerAuth": "PON_AQUI_CREDENCIAL_INSTAGRAM" }
-    },
-    // LinkedIn (token OAuth2, LINKEDIN_USER_ID)
-    {
-      "parameters": {
-        "url": "https://api.linkedin.com/v2/ugcPosts",
-        "method": "POST",
-        "jsonParameters": true,
-        "bodyParametersJson": "{ \"author\": \"urn:li:person:{{ $env.LINKEDIN_USER_ID }}\", \"lifecycleState\": \"PUBLISHED\", \"specificContent\": { \"com.linkedin.ugc.ShareContent\": { \"shareCommentary\": { \"text\": \"{{ $json.markdown }}\" }, \"shareMediaCategory\": \"IMAGE\" } }, \"visibility\": { \"com.linkedin.ugc.MemberNetworkVisibility\": \"PUBLIC\" } }"
-      },
-      "id": "publish_linkedin",
-      "name": "Publish on LinkedIn",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 2,
-      "position": [1300, 500],
-      "credentials": { "httpBearerAuth": "PON_AQUI_CREDENCIAL_LINKEDIN" }
-    },
-    // TikTok (requiere integración de terceros o API oficial, pon tu token)
-    {
-      "parameters": {
-        "url": "https://api.tiktok.com/share/video/upload/",
-        "method": "POST",
-        "jsonParameters": true,
-        "bodyParametersJson": "{ \"caption\": \"{{ $json.markdown }}\", \"video_url\": \"{{ $json.video_url }}\" }"
-      },
-      "id": "publish_tiktok",
-      "name": "Publish on TikTok",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 2,
-      "position": [1300, 600],
-      "credentials": { "httpBearerAuth": "PON_AQUI_CREDENCIAL_TIKTOK" }
-    },
-    // Pinterest (token OAuth, PINTEREST_BOARD_ID)
-    {
-      "parameters": {
-        "url": "https://api.pinterest.com/v5/pins",
-        "method": "POST",
-        "jsonParameters": true,
-        "bodyParametersJson": "{ \"title\": \"{{ $json.title }}\", \"description\": \"{{ $json.markdown }}\", \"link\": \"{{ $json.offer_link }}\", \"media_source\": { \"source_type\": \"image_url\", \"url\": \"{{ $json.image }}\" }, \"board_id\": \"{{ $env.PINTEREST_BOARD_ID }}\" }"
-      },
-      "id": "publish_pinterest",
-      "name": "Publish on Pinterest",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 2,
-      "position": [1300, 700],
-      "credentials": { "httpBearerAuth": "PON_AQUI_CREDENCIAL_PINTEREST" }
-    },
-    // Telegram (Bot Token, TELEGRAM_CHAT_ID)
-    {
-      "parameters": {
-        "chatId": "{{ $env.TELEGRAM_CHAT_ID }}",
-        "text": "{{ $json.markdown }}",
+        "chatId": "REEMPLAZAR_TELEGRAM_CHAT_ID",
+        "text": "={{ $json.markdown }}",
         "additionalFields": {
           "parse_mode": "Markdown",
           "disable_web_page_preview": false
@@ -215,81 +90,25 @@
       "name": "Publish on Telegram",
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1,
-      "position": [1300, 800],
-      "credentials": { "telegramApi": "PON_AQUI_CREDENCIAL_TELEGRAM" }
-    },
-    // Discord (Webhook URL, DISCORD_WEBHOOK_URL)
-    {
-      "parameters": {
-        "webhookUri": "{{ $env.DISCORD_WEBHOOK_URL }}",
-        "content": "{{ $json.markdown }}"
-      },
-      "id": "publish_discord",
-      "name": "Publish on Discord",
-      "type": "n8n-nodes-base.discord",
-      "typeVersion": 1,
-      "position": [1300, 900],
-      "credentials": { "discordApi": "PON_AQUI_CREDENCIAL_DISCORD" }
-    },
-    // Reddit (token OAuth, REDDIT_SUBREDDIT)
-    {
-      "parameters": {
-        "url": "https://oauth.reddit.com/api/submit",
-        "method": "POST",
-        "jsonParameters": true,
-        "bodyParametersJson": "{ \"title\": \"{{ $json.title }}\", \"text\": \"{{ $json.markdown }}\", \"sr\": \"{{ $env.REDDIT_SUBREDDIT }}\", \"kind\": \"self\" }"
-      },
-      "id": "publish_reddit",
-      "name": "Publish on Reddit",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 2,
-      "position": [1300, 1000],
-      "credentials": { "httpBearerAuth": "PON_AQUI_CREDENCIAL_REDDIT" }
-    },
-    // Medium (token integración, MEDIUM_USER_ID)
-    {
-      "parameters": {
-        "url": "https://api.medium.com/v1/users/{{ $env.MEDIUM_USER_ID }}/posts",
-        "method": "POST",
-        "jsonParameters": true,
-        "bodyParametersJson": "{ \"title\": \"{{ $json.title }}\", \"contentFormat\": \"markdown\", \"content\": \"{{ $json.markdown }}\", \"tags\": [\"afiliados\", \"ofertas\"], \"publishStatus\": \"public\" }"
-      },
-      "id": "publish_medium",
-      "name": "Publish on Medium",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 2,
-      "position": [1300, 1100],
-      "credentials": { "httpBearerAuth": "PON_AQUI_CREDENCIAL_MEDIUM" }
+      "position": [1200, 200],
+      "credentials": {
+        "telegramApi": "REEMPLAZAR_TELEGRAM_CREDENCIAL"
+      }
     }
   ],
   "connections": {
-    "trigger": {
+    "manualTrigger": {
       "main": [
         [{ "node": "get_amazon", "type": "main", "index": 0 }],
         [{ "node": "hotmart_auth", "type": "main", "index": 0 }],
         [{ "node": "get_clickbank", "type": "main", "index": 0 }]
       ]
     },
-    "hotmart_auth": { "main": [[{ "node": "get_hotmart", "type": "main", "index": 0 }]] },
     "get_amazon": { "main": [[{ "node": "unify_products", "type": "main", "index": 0 }]] },
-    "get_hotmart": { "main": [[{ "node": "unify_products", "type": "main", "index": 1 }]] },
+    "hotmart_auth": { "main": [[{ "node": "unify_products", "type": "main", "index": 1 }]] },
     "get_clickbank": { "main": [[{ "node": "unify_products", "type": "main", "index": 2 }]] },
     "unify_products": { "main": [[{ "node": "select_best_offer", "type": "main", "index": 0 }]] },
-    "select_best_offer": { "main": [[{ "node": "final_format", "type": "main", "index": 0 }]] },
-    "final_format": {
-      "main": [
-        [{ "node": "register_publication", "type": "main", "index": 0 }],
-        [{ "node": "publish_twitter", "type": "main", "index": 0 }],
-        [{ "node": "publish_facebook", "type": "main", "index": 0 }],
-        [{ "node": "publish_instagram", "type": "main", "index": 0 }],
-        [{ "node": "publish_linkedin", "type": "main", "index": 0 }],
-        [{ "node": "publish_tiktok", "type": "main", "index": 0 }],
-        [{ "node": "publish_pinterest", "type": "main", "index": 0 }],
-        [{ "node": "publish_telegram", "type": "main", "index": 0 }],
-        [{ "node": "publish_discord", "type": "main", "index": 0 }],
-        [{ "node": "publish_reddit", "type": "main", "index": 0 }],
-        [{ "node": "publish_medium", "type": "main", "index": 0 }]
-      ]
-    }
+    "select_best_offer": { "main": [[{ "node": "format_output", "type": "main", "index": 0 }]] },
+    "format_output": { "main": [[{ "node": "publish_telegram", "type": "main", "index": 0 }]] }
   }
 }
