@@ -1,0 +1,19 @@
+{
+  "name": "Unified_Affiliates_PRO_ULTIMATE",
+  "nodes": [],
+  "connections": {},
+  "active": false,
+  "settings": {},
+  "versionId": "v1_pro_ultimate",
+  "tags": [
+    {
+      "name": "afiliados"
+    },
+    {
+      "name": "marketing"
+    },
+    {
+      "name": "publicaciones"
+    }
+  ]
+}
