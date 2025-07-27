@@ -181,7 +181,7 @@
     {
       "parameters": {
         "operation": "append",
-        "sheetId": "REEMPLAZAR_SHEET_ID_PUBLICATIONS",
+        "sheetId": "1053365797432-1bnld6e54g8djlkpu30j0e6lnmc2mp64",
         "range": "A1:D1",
         "data": { "columns": ["title", "price", "source", "offer_link"] },
         "valueInputMode": "USER_ENTERED"
