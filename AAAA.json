@@ -1,0 +1,222 @@
+{
+  "name": "Affiliates_PRO",
+  "active": false,
+  "versionId": "v1_pro_ultimate",
+  "tags": [
+    { "name": "afiliados" },
+    { "name": "marketing" },
+    { "name": "publicaciones" }
+  ],
+  "settings": {},
+  "nodes": [
+    {
+      "parameters": { "triggerTimes": [{ "mode": "everyHour" }] },
+      "id": "cronTrigger",
+      "name": "Cron Trigger",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [100, 100]
+    },
+    {
+      "parameters": {},
+      "id": "manualTrigger",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [100, 300]
+    },
+    {
+      "parameters": {
+        "url": "https://serpapi.com/search.json?engine=amazon&amazon_domain=amazon.com&type=search&q=smartphone&api_key=70cc1e3917ff5c14fa2a3747ce2fdcc38f0d9b83cad079ff0585c963a62344d8",
+        "method": "GET"
+      },
+      "id": "get_amazon",
+      "name": "Get Amazon Products",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [300, 100]
+    },
+    {
+      "parameters": {
+        "url": "https://api-sec-vlc.hotmart.com/security/oauth/token",
+        "method": "POST",
+        "jsonParameters": true,
+        "bodyParametersJson": "{ \"client_id\": \"9465090b-11d1-46fb-8ef9-f02a9a23897b\", \"client_secret\": \"5e9c3f52-df62-460d-a709-601d053a354e\", \"grant_type\": \"client_credentials\" }"
+      },
+      "id": "hotmart_auth",
+      "name": "Get Hotmart Token",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [300, 200]
+    },
+    {
+      "parameters": {
+        "url": "https://api.clickbank.com/rest/1.3/products/list",
+        "method": "GET",
+        "headers": { "Authorization": "API-W282WLR5F22TRIES6FE1ZIVOOXSHR04UG5M9" }
+      },
+      "id": "get_clickbank",
+      "name": "Get ClickBank Products",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [300, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "let allProducts = [];\nif(items[0].json.search_results) {\n  allProducts = allProducts.concat(items[0].json.search_results.map(item => ({\n    source: 'Amazon', title: item.title, price: item.price ? item.price.value : '', image: item.thumbnail, link: item.link + '?tag=diegoedgard0f-20'\n  })));\n}\nif(items[1].json.items) {\n  allProducts = allProducts.concat(items[1].json.items.map(item => ({\n    source: 'Hotmart', title: item.name, price: item.price, image: item.image, link: item.salesPageUrl\n  })));\n}\nif(items[2].json.products) {\n  allProducts = allProducts.concat(items[2].json.products.map(item => ({\n    source: 'ClickBank', title: item.name, price: item.price, image: item.imageUrl, link: item.affiliateUrl\n  })));\n}\nreturn allProducts.map(p => ({ json: p }));"
+      },
+      "id": "unify_products",
+      "name": "Unify Products",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [600, 200]
+    },
+    {
+      "parameters": {
+        "functionCode": "let best = items[0]; for(const item of items) { if(Number(item.json.price) < Number(best.json.price)) best = item; } return [best];"
+      },
+      "id": "select_best_offer",
+      "name": "Select Best Offer",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [800, 200]
+    },
+    {
+      "parameters": {
+        "functionCode": "const p = items[0].json; return [{ json: { title: p.title, price: p.price, image: p.image, offer_link: p.link, source: p.source, markdown: `[![${p.title}](${p.image})](${p.link})\\n\\n**${p.title}**\\nPrecio: ${p.price}` } }];"
+      },
+      "id": "format_output",
+      "name": "Format Final Output",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [1000, 200]
+    },
+    {
+      "parameters": {
+        "operation": "lookup",
+        "sheetId": "1VTZ3HNNndZgl7SKuZmgV6iHCDatjSdHNTzXFClgZKQ4",
+        "range": "A1:D1000",
+        "lookupColumn": "offer_link",
+        "lookupValue": "={{ $json.offer_link }}"
+      },
+      "id": "check_existing_offer",
+      "name": "Check Existing Offer",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 1,
+      "position": [1200, 100],
+      "credentials": { "googleSheetsOAuth2Api": "1053365797432-1bnld6e54g8djlkpu30j0e6lnmc2mp64.apps.googleusercontent.com" }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.offer_link }}",
+              "operation": "notEqual",
+              "value2": "={{ $item(1).json.offer_link }}"
+            }
+          ]
+        }
+      },
+      "id": "check_if_duplicate",
+      "name": "Is New Offer?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [1400, 200]
+    },
+    {
+      "parameters": {
+        "chatId": "REEMPLAZAR_TELEGRAM_CHAT_ID",
+        "text": "={{ $json.markdown }}",
+        "additionalFields": { "parse_mode": "Markdown", "disable_web_page_preview": false }
+      },
+      "id": "publish_telegram",
+      "name": "Publish on Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [1600, 200],
+      "credentials": { "telegramApi": "REEMPLAZAR_TELEGRAM_CREDENCIAL" }
+    },
+    {
+      "parameters": {
+        "resource": "tweet",
+        "operation": "create",
+        "text": "={{ $json.title }} - ${{ $json.price }}\n{{ $json.offer_link }}"
+      },
+      "id": "publish_twitter",
+      "name": "Publish on Twitter",
+      "type": "n8n-nodes-base.twitter",
+      "typeVersion": 1,
+      "position": [1600, 100],
+      "credentials": { "twitterOAuth1Api": "GM3gc02cRkfK7a8O8lr2YqQyO" }
+    },
+    {
+      "parameters": {
+        "url": "https://discord.com/channels/@me/11034162992067137546",
+        "jsonParameters": true,
+        "options": {},
+        "bodyParametersJson": "{ \"content\": \"{{$json.markdown}}\" }"
+      },
+      "id": "publish_discord",
+      "name": "Publish on Discord",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [1600, 300]
+    },
+    {
+      "parameters": {
+        "resource": "submission",
+        "operation": "submit",
+        "subreddit": "REEMPLAZAR_SUBREDDIT",
+        "title": "={{ $json.title }}",
+        "url": "={{ $json.offer_link }}"
+      },
+      "id": "publish_reddit",
+      "name": "Publish on Reddit",
+      "type": "n8n-nodes-base.reddit",
+      "typeVersion": 1,
+      "position": [1600, 400],
+      "credentials": { "redditApi": "REEMPLAZAR_REDDIT_CREDENCIAL" }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "sheetId": "REEMPLAZAR_SHEET_ID_PUBLICATIONS",
+        "range": "A1:D1",
+        "data": { "columns": ["title", "price", "source", "offer_link"] },
+        "valueInputMode": "USER_ENTERED"
+      },
+      "id": "log_sheets",
+      "name": "Log to Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 1,
+      "position": [1600, 500],
+      "credentials": { "googleSheetsOAuth2Api": "1053365797432-1bnld6e54g8djlkpu30j0e6lnmc2mp64.apps.googleusercontent.com" }
+    }
+  ],
+  "connections": {
+    "cronTrigger": {
+      "main": [
+        [{ "node": "get_amazon", "type": "main", "index": 0 }],
+        [{ "node": "hotmart_auth", "type": "main", "index": 0 }],
+        [{ "node": "get_clickbank", "type": "main", "index": 0 }]
+      ]
+    },
+    "get_amazon": { "main": [[{ "node": "unify_products", "type": "main", "index": 0 }]] },
+    "hotmart_auth": { "main": [[{ "node": "unify_products", "type": "main", "index": 1 }]] },
+    "get_clickbank": { "main": [[{ "node": "unify_products", "type": "main", "index": 2 }]] },
+    "unify_products": { "main": [[{ "node": "select_best_offer", "type": "main", "index": 0 }]] },
+    "select_best_offer": { "main": [[{ "node": "format_output", "type": "main", "index": 0 }]] },
+    "format_output": { "main": [[{ "node": "check_existing_offer", "type": "main", "index": 0 }]] },
+    "check_existing_offer": { "main": [[{ "node": "check_if_duplicate", "type": "main", "index": 0 }]] },
+    "check_if_duplicate": {
+      "main": [
+        [{ "node": "publish_telegram", "type": "main", "index": 0 }],
+        [{ "node": "publish_twitter", "type": "main", "index": 0 }],
+        [{ "node": "publish_discord", "type": "main", "index": 0 }],
+        [{ "node": "publish_reddit", "type": "main", "index": 0 }],
+        [{ "node": "log_sheets", "type": "main", "index": 0 }]
+      ]
+    }
+  }
+}
