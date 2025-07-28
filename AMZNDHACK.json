@@ -1,0 +1,337 @@
+{
+  "search_metadata": {
+    "id": "688706fc392e0b486d64f623",
+    "status": "Success",
+    "json_endpoint": "https://serpapi.com/searches/68ab9643e145bbd6/688706fc392e0b486d64f623.json",
+    "created_at": "2025-07-28 05:13:32 UTC",
+    "processed_at": "2025-07-28 05:13:32 UTC",
+    "amazon_url": "https://www.amazon.com/s?k=oferts+best+ELECTRONICS",
+    "raw_html_file": "https://serpapi.com/searches/68ab9643e145bbd6/688706fc392e0b486d64f623.html",
+    "total_time_taken": 2.44
+  },
+  "search_parameters": {
+    "engine": "amazon",
+    "k": "oferts best ELECTRONICS",
+    "amazon_domain": "amazon.com",
+    "device": "desktop"
+  },
+  "search_information": {
+    "total_results": 1,
+    "query_displayed": "ofertas best electronics",
+    "store": "gateway",
+    "page": 1,
+    "spelling_fix": "ofertas best electronics",
+    "organic_results_state": "Some results for exact spelling but showing fixed spelling"
+  },
+  "product_ads": {
+    "image": "https://m.media-amazon.com/images/S/al-na-9d5791cf-3faf/94f1e26d-49cb-4bd5-83e8-86c28a0c137d._CR0,0,1200,628_SX507_CB1169409_QL70_.jpg",
+    "headline": "Portable Charger With Plug",
+    "link": "https://aax-us-iad.amazon.com/x/c/JG9FP4WYcyjSS-5rrM2SpJAAAAGYT3NRMAEAAAH2AQBvbm9fdHhuX2JpZDIgICBvbm9fdHhuX2ltcDIgICCSAvxx/clv1_CEuOPUxokZA0iHrVUL8QhSLiQGJYdJgR65Ia7i641OB24X8k3VLLEf018nHz9hvWjq0yzpNb3XTPsunPgmYceUI7CmeRJMrhMGcvQh50VkCzLqV_vhYOLZEdHEepkoemXJOUalC7tdMeWEwmgVz7bV1AckwCRMN0CRVmUax7QwuP3u3MgFIzS1q5d5TuNOspGHpbasDVlJ1bT2hxC9tUMuUFm8yvmtV0DgjzOKVy-i0Vs7d2vLK7GWsuqRqJ-0hcN3jpMffPnUdL6EdDGtZGNDOIT2mUuBLNCd7m6b_pSZUgD1ig-I6A-jeRfQnwGqCd4_YY9ehIVfXklIP8KKPtUM4szehNBCUolpU4wfVsPpln11Z5KUuB8SGczM4iUWTgag9FnmC_rH8ppSr1AoykS24BZM7zucVmVbcmG3VHnlJ_MfhRt19KAG1Hvpd3Q2koAbq8evbnn_GxbxExYg_Kn70VX1StqmboahZTe71PmfuZLCxb7pGA7hrdSE5MLrCipM5S7DNDS7Ionz7duH-61DaGbSBPKWsOCjGfXQ7KLqTGTjOsGilVx0pHVA_-S3nobPwhsfpEbza9o6hUmfw9OzvwFgNqqHxj6MAkuKaqhUorvqew4oY_dGXA7VqmU4vnLlwyEPc8AEN_8edUEpJy4xAK3KDFACt7cUUzu9p_4JknGmMwXTCgyEklrDH4YNwC4Fwa12l44pUcodIlFHKXAGUw2un4Gtrn7JnpN30jOhrjqzLhTfkhmAJ7t9sbetiZo6F0EhLKhUTS9gnoEFjHJCJWmhLAUlFpnv5ucdoIeC-z_GotM-t07QpzjLSKFWK4fuKZHQFm-RPt4vlIfM4cnLqjl0g4kay3HMiumdyftmaC72GR4ioyxzLqiUCihSf7r_87lucitxn5I_orU-QMMdCj-siwzjlePxk8Fj6TljrXiQ9pPDYhaGpqQh3H7VqZohmhdf_q-o-99cX60G6_R7VzJc62R4Lh81nBDiV5CM4VQRFvbkpSEZ740gzzBkZGERelrZtk-Qo9e708xZeAkj9yph5NHeGFhn9XlI1BnDF-eF2_ZtqGKTzLR5hMeYhlWVy_epbMNSwiOpSoerGDjcvKdjP6x7hdU8kbCiZqH6-qJVi_Db1UulVtGaWKv8f1md8IQNnnni4LMNVbq18oe2x_YsnOXCfeL6ktqbyikaOU7DOj2lny8rwBkRdMfeM2JVKVNVn64GaJRnsCrHCEENC019BSkKlWywqS265hFDDRDQpvRUSgolqDkRMNJ47jSJsDgtydSmj0cphaVLQ5q1sWhZ51ibiA3Q-Xh0CxPezAT_9qbsToxNwAiDyI3Zs4JvERYSSI4lv60L8HXQMBup7L6MMXxmFbdMN8JdR5moUct1-GN2-zoeSyXnazfK8-IzTyTnvyXCX0dSQXd4miZaKQugWablBJ9YIp3MzkgGVwXD1hw_YmL9B3MTXaMx2hzxNfBnzHmIG8xWrmKSvOYW_n1CuGaPZq_KwOnOwC0XwslW_dFm6-MX177rkFu_WGqlDvRyB5VfpjM8Daf9sCFz28l5f0EmSDMGnTNq41ksOY2uOawKaXO4lnN9EmnupudOjRJkDMzpX2SsrDKGwhdSQS8uX00agz7rbt92P46diaT3HjFAmugTNDq1ZHQaHleS3tRVP2z-AtaEeHtiBP3YkgWSvgLG8jMppXpfwPb_WfBIUksIrwQnEI69yJn9m4nMdPeYybtgRTiDGbu6wJLyzr9SBTjzedoKgbIj-mxkWdjrna4ecXbqdl-3ntHdoijNIf9jCBjo9GE9VOQq1C72srMZjN-HLIWPCYfQT9j8mWB7iF4Igf3tsIIKSigOVjngchR_l2F88AnNrXCEfuGbqmmoNnKc2NTpkNMy1fhEVOk9bVDO27k3YKdoa899AdpPH5cQxb6Juh6Bw-KP86ijvR75SwGGzBkJG8IjW-FsfAGV2UIG9wgsbnjwfiYB1b58a-DSFkU5brjsfaC-SSKRiZhMRcJX2AQ7tMaQzYC_LtITsUaJmkWZmajhD7qy5hWMxhVB4DQJFRqll5kr2a_oXQpd5Wddm7TOx0XrJCZOE7srJEN0ZNW-Ao0HQgLqmr0zY-dVxw0KaG8A7rZF_VPUU6La2L1o_Uf6-UpSF0ftkBJL-uNqqQ5pH-maPPxwA/https://www.amazon.com/stores/page/BA6A423B-E969-4A32-9201-7E7C131B2B96/?_encoding=UTF8&store_ref=SB_A04081922FYGDH6B5MH33-A018729935A5A461VYMOZ&pd_rd_plhdr=t&aaxitk=9bc00e433a9098b129c8f3b1ff2eea0f&hsa_cr_id=0&lp_asins=B0BZBZY8KP%2CB0CDBQLK85%2CB0BZC1HC3Y&lp_query=ofertas%20best%20electronics&lp_slot=auto-sparkle-hsa-tetris&ref_=sbx_be_s_sparkle_lsi4d_hl&pd_rd_w=shTuS&content-id=amzn1.sym.9f2b2b9e-47e9-4764-a4dc-2be2f6fca36d%3Aamzn1.sym.9f2b2b9e-47e9-4764-a4dc-2be2f6fca36d&pf_rd_p=9f2b2b9e-47e9-4764-a4dc-2be2f6fca36d&pf_rd_r=4C4JWBTWSBS9QDSWPVN2&pd_rd_wg=pDx5J&pd_rd_r=de439645-7756-4b78-b556-a178e8368334",
+    "store_page": "Shop Home",
+    "store_page_link": "https://aax-us-iad.amazon.com/x/c/JG9FP4WYcyjSS-5rrM2SpJAAAAGYT3NRMAEAAAH2AQBvbm9fdHhuX2JpZDIgICBvbm9fdHhuX2ltcDIgICCSAvxx/clv1_CEuOPUxokZA0iHrVUL8QhSLiQGJYdJgR65Ia7i641OB24X8k3VLLEf018nHz9hvWjq0yzpNb3XTPsunPgmYceUI7CmeRJMrhMGcvQh50VkCzLqV_vhYOLZEdHEepkoemXJOUalC7tdMeWEwmgVz7bV1AckwCRMN0CRVmUax7QwuP3u3MgFIzS1q5d5TuNOspGHpbasDVlJ1bT2hxC9tUMuUFm8yvmtV0DgjzOKVy-i0Vs7d2vLK7GWsuqRqJ-0hcN3jpMffPnUdL6EdDGtZGNDOIT2mUuBLNCd7m6b_pSZUgD1ig-I6A-jeRfQnwGqCd4_YY9ehIVfXklIP8KKPtUM4szehNBCUolpU4wfVsPpln11Z5KUuB8SGczM4iUWTgag9FnmC_rH8ppSr1AoykS24BZM7zucVmVbcmG3VHnlJ_MfhRt19KAG1Hvpd3Q2koAbq8evbnn_GxbxExYg_Kn70VX1StqmboahZTe71PmfuZLCxb7pGA7hrdSE5MLrCipM5S7DNDS7Ionz7duH-61DaGbSBPKWsOCjGfXQ7KLqTGTjOsGilVx0pHVA_-S3nobPwhsfpEbza9o6hUmfw9OzvwFgNqqHxj6MAkuKaqhUorvqew4oY_dGXA7VqmU4vnLlwyEPc8AEN_8edUEpJy4xAK3KDFACt7cUUzu9p_4JknGmMwXTCgyEklrDH4YNwC4Fwa12l44pUcodIlFHKXAGUw2un4Gtrn7JnpN30jOhrjqzLhTfkhmAJ7t9sbetiZo6F0EhLKhUTS9gnoEFjHJCJWmhLAUlFpnv5ucdoIeC-z_GotM-t07QpzjLSKFWK4fuKZHQFm-RPt4vlIfM4cnLqjl0g4kay3HMiumdyftmaC72GR4ioyxzLqiUCihSf7r_87lucitxn5I_orU-QMMdCj-siwzjlePxk8Fj6TljrXiQ9pPDYhaGpqQh3H7VqZohmhdf_q-o-99cX60G6_R7VzJc62R4Lh81nBDiV5CM4VQRFvbkpSEZ740gzzBkZGERelrZtk-Qo9e708xZeAkj9yph5NHeGFhn9XlI1BnDF-eF2_ZtqGKTzLR5hMeYhlWVy_epbMNSwiOpSoerGDjcvKdjP6x7hdU8kbCiZqH6-qJVi_Db1UulVtGaWKv8f1md8IQNnnni4LMNVbq18oe2x_YsnOXCfeL6ktqbyikaOU7DOj2lny8rwBkRdMfeM2JVKVNVn64GaJRnsCrHCEENC019BSkKlWywqS265hFDDRDQpvRUSgolqDkRMNJ47jSJsDgtydSmj0cphaVLQ5q1sWhZ51ibiA3Q-Xh0CxPezAT_9qbsToxNwAiDyI3Zs4JvERYSSI4lv60L8HXQMBup7L6MMXxmFbdMN8JdR5moUct1-GN2-zoeSyXnazfK8-IzTyTnvyXCX0dSQXd4miZaKQugWablBJ9YIp3MzkgGVwXD1hw_YmL9B3MTXaMx2hzxNfBnzHmIG8xWrmKSvOYW_n1CuGaPZq_KwOnOwC0XwslW_dFm6-MX177rkFu_WGqlDvRyB5VfpjM8Daf9sCFz28l5f0EmSDMGnTNq41ksOY2uOawKaXO4lnN9EmnupudOjRJkDMzpX2SsrDKGwhdSQS8uX00agz7rbt92P46diaT3HjFAmugTNDq1ZHQaHleS3tRVP2z-AtaEeHtiBP3YkgWSvgLG8jMppXpfwPb_WfBIUksIrwQnEI69yJn9m4nMdPeYybtgRTiDGbu6wJLyzr9SBTjzedoKgbIj-mxkWdjrna4ecXbqdl-3ntHdoijNIf9jCBjo9GE9VOQq1C72srMZjN-HLIWPCYfQT9j8mWB7iF4Igf3tsIIKSigOVjngchR_l2F88AnNrXCEfuGbqmmoNnKc2NTpkNMy1fhEVOk9bVDO27k3YKdoa899AdpPH5cQxb6Juh6Bw-KP86ijvR75SwGGzBkJG8IjW-FsfAGV2UIG9wgsbnjwfiYB1b58a-DSFkU5brjsfaC-SSKRiZhMRcJX2AQ7tMaQzYC_LtITsUaJmkWZmajhD7qy5hWMxhVB4DQJFRqll5kr2a_oXQpd5Wddm7TOx0XrJCZOE7srJEN0ZNW-Ao0HQgLqmr0zY-dVxw0KaG8A7rZF_VPUU6La2L1o_Uf6-UpSF0ftkBJL-uNqqQ5pH-maPPxwA/https://www.amazon.com/stores/page/BA6A423B-E969-4A32-9201-7E7C131B2B96/?_encoding=UTF8&store_ref=SB_A04081922FYGDH6B5MH33-A018729935A5A461VYMOZ&pd_rd_plhdr=t&aaxitk=9bc00e433a9098b129c8f3b1ff2eea0f&hsa_cr_id=0&lp_asins=B0BZBZY8KP%2CB0CDBQLK85%2CB0BZC1HC3Y&lp_query=ofertas%20best%20electronics&lp_slot=auto-sparkle-hsa-tetris&ref_=sbx_be_s_sparkle_lsi4d_cta&pd_rd_w=shTuS&content-id=amzn1.sym.9f2b2b9e-47e9-4764-a4dc-2be2f6fca36d%3Aamzn1.sym.9f2b2b9e-47e9-4764-a4dc-2be2f6fca36d&pf_rd_p=9f2b2b9e-47e9-4764-a4dc-2be2f6fca36d&pf_rd_r=4C4JWBTWSBS9QDSWPVN2&pd_rd_wg=pDx5J&pd_rd_r=de439645-7756-4b78-b556-a178e8368334",
+    "products": [
+      {
+        "position": 1,
+        "asin": "B0BZBZY8KP",
+        "sponsored": true,
+        "title": "Exclusive Prime price",
+        "link": "https://aax-us-iad.amazon.com/x/c/JG9FP4WYcyjSS-5rrM2SpJAAAAGYT3NRMAEAAAH2AQBvbm9fdHhuX2JpZDIgICBvbm9fdHhuX2ltcDIgICCSAvxx/clv1_CEuOPUxokZA0iHrVUL8QhSLiQGJYdJgR65Ia7i641OB24X8k3VLLEf018nHz9hvWjq0yzpNb3XTPsunPgmYceUI7CmeRJMrhMGcvQh50VkCzLqV_vhYOLZEdHEepkoemXJOUalC7tdMeWEwmgVz7bV1AckwCRMN0CRVmUax7QwuP3u3MgFIzS1q5d5TuNOspGHpbasDVlJ1bT2hxC9tUMuUFm8yvmtV0DgjzOKVy-i0Vs7d2vLK7GWsuqRqJ-0hcN3jpMffPnUdL6EdDGtZGNDOIT2mUuBLNCd7m6b_pSZUgD1ig-I6A-jeRfQnwGqCd4_YY9ehIVfXklIP8KKPtUM4szehNBCUolpU4wfVsPpln11Z5KUuB8SGczM4iUWTgag9FnmC_rH8ppSr1AoykS24BZM7zucVmVbcmG3VHnlJ_MfhRt19KAG1Hvpd3Q2koAbq8evbnn_GxbxExYg_Kn70VX1StqmboahZTe71PmfuZLCxb7pGA7hrdSE5MLrCipM5S7DNDS7Ionz7duH-61DaGbSBPKWsOCjGfXQ7KLqTGTjOsGilVx0pHVA_-S3nobPwhsfpEbza9o6hUmfw9OzvwFgNqqHxj6MAkuKaqhUorvqew4oY_dGXA7VqmU4vnLlwyEPc8AEN_8edUEpJy4xAK3KDFACt7cUUzu9p_4JknGmMwXTCgyEklrDH4YNwC4Fwa12l44pUcodIlFHKXAGUw2un4Gtrn7JnpN30jOhrjqzLhTfkhmAJ7t9sbetiZo6F0EhLKhUTS9gnoEFjHJCJWmhLAUlFpnv5ucdoIeC-z_GotM-t07QpzjLSKFWK4fuKZHQFm-RPt4vlIfM4cnLqjl0g4kay3HMiumdyftmaC72GR4ioyxzLqiUCihSf7r_87lucitxn5I_orU-QMMdCj-siwzjlePxk8Fj6TljrXiQ9pPDYhaGpqQh3H7VqZohmhdf_q-o-99cX60G6_R7VzJc62R4Lh81nBDiV5CM4VQRFvbkpSEZ740gzzBkZGERelrZtk-Qo9e708xZeAkj9yph5NHeGFhn9XlI1BnDF-eF2_ZtqGKTzLR5hMeYhlWVy_epbMNSwiOpSoerGDjcvKdjP6x7hdU8kbCiZqH6-qJVi_Db1UulVtGaWKv8f1md8IQNnnni4LMNVbq18oe2x_YsnOXCfeL6ktqbyikaOU7DOj2lny8rwBkRdMfeM2JVKVNVn64GaJRnsCrHCEENC019BSkKlWywqS265hFDDRDQpvRUSgolqDkRMNJ47jSJsDgtydSmj0cphaVLQ5q1sWhZ51ibiA3Q-Xh0CxPezAT_9qbsToxNwAiDyI3Zs4JvERYSSI4lv60L8HXQMBup7L6MMXxmFbdMN8JdR5moUct1-GN2-zoeSyXnazfK8-IzTyTnvyXCX0dSQXd4miZaKQugWablBJ9YIp3MzkgGVwXD1hw_YmL9B3MTXaMx2hzxNfBnzHmIG8xWrmKSvOYW_n1CuGaPZq_KwOnOwC0XwslW_dFm6-MX177rkFu_WGqlDvRyB5VfpjM8Daf9sCFz28l5f0EmSDMGnTNq41ksOY2uOawKaXO4lnN9EmnupudOjRJkDMzpX2SsrDKGwhdSQS8uX00agz7rbt92P46diaT3HjFAmugTNDq1ZHQaHleS3tRVP2z-AtaEeHtiBP3YkgWSvgLG8jMppXpfwPb_WfBIUksIrwQnEI69yJn9m4nMdPeYybtgRTiDGbu6wJLyzr9SBTjzedoKgbIj-mxkWdjrna4ecXbqdl-3ntHdoijNIf9jCBjo9GE9VOQq1C72srMZjN-HLIWPCYfQT9j8mWB7iF4Igf3tsIIKSigOVjngchR_l2F88AnNrXCEfuGbqmmoNnKc2NTpkNMy1fhEVOk9bVDO27k3YKdoa899AdpPH5cQxb6Juh6Bw-KP86ijvR75SwGGzBkJG8IjW-FsfAGV2UIG9wgsbnjwfiYB1b58a-DSFkU5brjsfaC-SSKRiZhMRcJX2AQ7tMaQzYC_LtITsUaJmkWZmajhD7qy5hWMxhVB4DQJFRqll5kr2a_oXQpd5Wddm7TOx0XrJCZOE7srJEN0ZNW-Ao0HQgLqmr0zY-dVxw0KaG8A7rZF_VPUU6La2L1o_Uf6-UpSF0ftkBJL-uNqqQ5pH-maPPxwA/https://www.amazon.com/gp/aw/d/B0BZBZY8KP/?_encoding=UTF8&pd_rd_plhdr=t&aaxitk=9bc00e433a9098b129c8f3b1ff2eea0f&hsa_cr_id=0&qid=1753679613&sr=1-1-9e67e56a-6f64-441f-a281-df67fc737124&ref_=sbx_be_s_sparkle_lsi4d_asin_0_bkgd&pd_rd_w=shTuS&content-id=amzn1.sym.9f2b2b9e-47e9-4764-a4dc-2be2f6fca36d%3Aamzn1.sym.9f2b2b9e-47e9-4764-a4dc-2be2f6fca36d&pf_rd_p=9f2b2b9e-47e9-4764-a4dc-2be2f6fca36d&pf_rd_r=4C4JWBTWSBS9QDSWPVN2&pd_rd_wg=pDx5J&pd_rd_r=de439645-7756-4b78-b556-a178e8368334",
+        "link_clean": "https://www.amazon.com/dp/B0BZBZY8KP/",
+        "thumbnail": "https://m.media-amazon.com/images/I/71+mB8CElyL._AC_SR160,134_CB1169409_QL70_.jpg",
+        "price": "$24.99",
+        "extracted_price": 24.99,
+        "old_price": "$34.99",
+        "extracted_old_price": 34.99
+      },
+      {
+        "position": 2,
+        "asin": "B0CDBQLK85",
+        "sponsored": true,
+        "title": "Exclusive Prime price",
+        "link": "https://aax-us-iad.amazon.com/x/c/JG9FP4WYcyjSS-5rrM2SpJAAAAGYT3NRMAEAAAH2AQBvbm9fdHhuX2JpZDIgICBvbm9fdHhuX2ltcDIgICCSAvxx/clv1_CEuOPUxokZA0iHrVUL8QhSLiQGJYdJgR65Ia7i641OB24X8k3VLLEf018nHz9hvWjq0yzpNb3XTPsunPgmYceUI7CmeRJMrhMGcvQh50VkCzLqV_vhYOLZEdHEepkoemXJOUalC7tdMeWEwmgVz7bV1AckwCRMN0CRVmUax7QwuP3u3MgFIzS1q5d5TuNOspGHpbasDVlJ1bT2hxC9tUMuUFm8yvmtV0DgjzOKVy-i0Vs7d2vLK7GWsuqRqJ-0hcN3jpMffPnUdL6EdDGtZGNDOIT2mUuBLNCd7m6b_pSZUgD1ig-I6A-jeRfQnwGqCd4_YY9ehIVfXklIP8KKPtUM4szehNBCUolpU4wfVsPpln11Z5KUuB8SGczM4iUWTgag9FnmC_rH8ppSr1AoykS24BZM7zucVmVbcmG3VHnlJ_MfhRt19KAG1Hvpd3Q2koAbq8evbnn_GxbxExYg_Kn70VX1StqmboahZTe71PmfuZLCxb7pGA7hrdSE5MLrCipM5S7DNDS7Ionz7duH-61DaGbSBPKWsOCjGfXQ7KLqTGTjOsGilVx0pHVA_-S3nobPwhsfpEbza9o6hUmfw9OzvwFgNqqHxj6MAkuKaqhUorvqew4oY_dGXA7VqmU4vnLlwyEPc8AEN_8edUEpJy4xAK3KDFACt7cUUzu9p_4JknGmMwXTCgyEklrDH4YNwC4Fwa12l44pUcodIlFHKXAGUw2un4Gtrn7JnpN30jOhrjqzLhTfkhmAJ7t9sbetiZo6F0EhLKhUTS9gnoEFjHJCJWmhLAUlFpnv5ucdoIeC-z_GotM-t07QpzjLSKFWK4fuKZHQFm-RPt4vlIfM4cnLqjl0g4kay3HMiumdyftmaC72GR4ioyxzLqiUCihSf7r_87lucitxn5I_orU-QMMdCj-siwzjlePxk8Fj6TljrXiQ9pPDYhaGpqQh3H7VqZohmhdf_q-o-99cX60G6_R7VzJc62R4Lh81nBDiV5CM4VQRFvbkpSEZ740gzzBkZGERelrZtk-Qo9e708xZeAkj9yph5NHeGFhn9XlI1BnDF-eF2_ZtqGKTzLR5hMeYhlWVy_epbMNSwiOpSoerGDjcvKdjP6x7hdU8kbCiZqH6-qJVi_Db1UulVtGaWKv8f1md8IQNnnni4LMNVbq18oe2x_YsnOXCfeL6ktqbyikaOU7DOj2lny8rwBkRdMfeM2JVKVNVn64GaJRnsCrHCEENC019BSkKlWywqS265hFDDRDQpvRUSgolqDkRMNJ47jSJsDgtydSmj0cphaVLQ5q1sWhZ51ibiA3Q-Xh0CxPezAT_9qbsToxNwAiDyI3Zs4JvERYSSI4lv60L8HXQMBup7L6MMXxmFbdMN8JdR5moUct1-GN2-zoeSyXnazfK8-IzTyTnvyXCX0dSQXd4miZaKQugWablBJ9YIp3MzkgGVwXD1hw_YmL9B3MTXaMx2hzxNfBnzHmIG8xWrmKSvOYW_n1CuGaPZq_KwOnOwC0XwslW_dFm6-MX177rkFu_WGqlDvRyB5VfpjM8Daf9sCFz28l5f0EmSDMGnTNq41ksOY2uOawKaXO4lnN9EmnupudOjRJkDMzpX2SsrDKGwhdSQS8uX00agz7rbt92P46diaT3HjFAmugTNDq1ZHQaHleS3tRVP2z-AtaEeHtiBP3YkgWSvgLG8jMppXpfwPb_WfBIUksIrwQnEI69yJn9m4nMdPeYybtgRTiDGbu6wJLyzr9SBTjzedoKgbIj-mxkWdjrna4ecXbqdl-3ntHdoijNIf9jCBjo9GE9VOQq1C72srMZjN-HLIWPCYfQT9j8mWB7iF4Igf3tsIIKSigOVjngchR_l2F88AnNrXCEfuGbqmmoNnKc2NTpkNMy1fhEVOk9bVDO27k3YKdoa899AdpPH5cQxb6Juh6Bw-KP86ijvR75SwGGzBkJG8IjW-FsfAGV2UIG9wgsbnjwfiYB1b58a-DSFkU5brjsfaC-SSKRiZhMRcJX2AQ7tMaQzYC_LtITsUaJmkWZmajhD7qy5hWMxhVB4DQJFRqll5kr2a_oXQpd5Wddm7TOx0XrJCZOE7srJEN0ZNW-Ao0HQgLqmr0zY-dVxw0KaG8A7rZF_VPUU6La2L1o_Uf6-UpSF0ftkBJL-uNqqQ5pH-maPPxwA/https://www.amazon.com/gp/aw/d/B0CDBQLK85/?_encoding=UTF8&pd_rd_plhdr=t&aaxitk=9bc00e433a9098b129c8f3b1ff2eea0f&hsa_cr_id=0&qid=1753679613&sr=1-2-9e67e56a-6f64-441f-a281-df67fc737124&ref_=sbx_be_s_sparkle_lsi4d_asin_1_bkgd&pd_rd_w=shTuS&content-id=amzn1.sym.9f2b2b9e-47e9-4764-a4dc-2be2f6fca36d%3Aamzn1.sym.9f2b2b9e-47e9-4764-a4dc-2be2f6fca36d&pf_rd_p=9f2b2b9e-47e9-4764-a4dc-2be2f6fca36d&pf_rd_r=4C4JWBTWSBS9QDSWPVN2&pd_rd_wg=pDx5J&pd_rd_r=de439645-7756-4b78-b556-a178e8368334",
+        "link_clean": "https://www.amazon.com/dp/B0CDBQLK85/",
+        "thumbnail": "https://m.media-amazon.com/images/I/71xmeohFRNL._AC_SR160,134_CB1169409_QL70_.jpg",
+        "price": "$23.99",
+        "extracted_price": 23.99,
+        "old_price": "$31.99",
+        "extracted_old_price": 31.99
+      },
+      {
+        "position": 3,
+        "asin": "B0BZC1HC3Y",
+        "sponsored": true,
+        "title": "Exclusive Prime price",
+        "link": "https://aax-us-iad.amazon.com/x/c/JG9FP4WYcyjSS-5rrM2SpJAAAAGYT3NRMAEAAAH2AQBvbm9fdHhuX2JpZDIgICBvbm9fdHhuX2ltcDIgICCSAvxx/clv1_CEuOPUxokZA0iHrVUL8QhSLiQGJYdJgR65Ia7i641OB24X8k3VLLEf018nHz9hvWjq0yzpNb3XTPsunPgmYceUI7CmeRJMrhMGcvQh50VkCzLqV_vhYOLZEdHEepkoemXJOUalC7tdMeWEwmgVz7bV1AckwCRMN0CRVmUax7QwuP3u3MgFIzS1q5d5TuNOspGHpbasDVlJ1bT2hxC9tUMuUFm8yvmtV0DgjzOKVy-i0Vs7d2vLK7GWsuqRqJ-0hcN3jpMffPnUdL6EdDGtZGNDOIT2mUuBLNCd7m6b_pSZUgD1ig-I6A-jeRfQnwGqCd4_YY9ehIVfXklIP8KKPtUM4szehNBCUolpU4wfVsPpln11Z5KUuB8SGczM4iUWTgag9FnmC_rH8ppSr1AoykS24BZM7zucVmVbcmG3VHnlJ_MfhRt19KAG1Hvpd3Q2koAbq8evbnn_GxbxExYg_Kn70VX1StqmboahZTe71PmfuZLCxb7pGA7hrdSE5MLrCipM5S7DNDS7Ionz7duH-61DaGbSBPKWsOCjGfXQ7KLqTGTjOsGilVx0pHVA_-S3nobPwhsfpEbza9o6hUmfw9OzvwFgNqqHxj6MAkuKaqhUorvqew4oY_dGXA7VqmU4vnLlwyEPc8AEN_8edUEpJy4xAK3KDFACt7cUUzu9p_4JknGmMwXTCgyEklrDH4YNwC4Fwa12l44pUcodIlFHKXAGUw2un4Gtrn7JnpN30jOhrjqzLhTfkhmAJ7t9sbetiZo6F0EhLKhUTS9gnoEFjHJCJWmhLAUlFpnv5ucdoIeC-z_GotM-t07QpzjLSKFWK4fuKZHQFm-RPt4vlIfM4cnLqjl0g4kay3HMiumdyftmaC72GR4ioyxzLqiUCihSf7r_87lucitxn5I_orU-QMMdCj-siwzjlePxk8Fj6TljrXiQ9pPDYhaGpqQh3H7VqZohmhdf_q-o-99cX60G6_R7VzJc62R4Lh81nBDiV5CM4VQRFvbkpSEZ740gzzBkZGERelrZtk-Qo9e708xZeAkj9yph5NHeGFhn9XlI1BnDF-eF2_ZtqGKTzLR5hMeYhlWVy_epbMNSwiOpSoerGDjcvKdjP6x7hdU8kbCiZqH6-qJVi_Db1UulVtGaWKv8f1md8IQNnnni4LMNVbq18oe2x_YsnOXCfeL6ktqbyikaOU7DOj2lny8rwBkRdMfeM2JVKVNVn64GaJRnsCrHCEENC019BSkKlWywqS265hFDDRDQpvRUSgolqDkRMNJ47jSJsDgtydSmj0cphaVLQ5q1sWhZ51ibiA3Q-Xh0CxPezAT_9qbsToxNwAiDyI3Zs4JvERYSSI4lv60L8HXQMBup7L6MMXxmFbdMN8JdR5moUct1-GN2-zoeSyXnazfK8-IzTyTnvyXCX0dSQXd4miZaKQugWablBJ9YIp3MzkgGVwXD1hw_YmL9B3MTXaMx2hzxNfBnzHmIG8xWrmKSvOYW_n1CuGaPZq_KwOnOwC0XwslW_dFm6-MX177rkFu_WGqlDvRyB5VfpjM8Daf9sCFz28l5f0EmSDMGnTNq41ksOY2uOawKaXO4lnN9EmnupudOjRJkDMzpX2SsrDKGwhdSQS8uX00agz7rbt92P46diaT3HjFAmugTNDq1ZHQaHleS3tRVP2z-AtaEeHtiBP3YkgWSvgLG8jMppXpfwPb_WfBIUksIrwQnEI69yJn9m4nMdPeYybtgRTiDGbu6wJLyzr9SBTjzedoKgbIj-mxkWdjrna4ecXbqdl-3ntHdoijNIf9jCBjo9GE9VOQq1C72srMZjN-HLIWPCYfQT9j8mWB7iF4Igf3tsIIKSigOVjngchR_l2F88AnNrXCEfuGbqmmoNnKc2NTpkNMy1fhEVOk9bVDO27k3YKdoa899AdpPH5cQxb6Juh6Bw-KP86ijvR75SwGGzBkJG8IjW-FsfAGV2UIG9wgsbnjwfiYB1b58a-DSFkU5brjsfaC-SSKRiZhMRcJX2AQ7tMaQzYC_LtITsUaJmkWZmajhD7qy5hWMxhVB4DQJFRqll5kr2a_oXQpd5Wddm7TOx0XrJCZOE7srJEN0ZNW-Ao0HQgLqmr0zY-dVxw0KaG8A7rZF_VPUU6La2L1o_Uf6-UpSF0ftkBJL-uNqqQ5pH-maPPxwA/https://www.amazon.com/gp/aw/d/B0BZC1HC3Y/?_encoding=UTF8&pd_rd_plhdr=t&aaxitk=9bc00e433a9098b129c8f3b1ff2eea0f&hsa_cr_id=0&qid=1753679613&sr=1-3-9e67e56a-6f64-441f-a281-df67fc737124&ref_=sbx_be_s_sparkle_lsi4d_asin_2_bkgd&pd_rd_w=shTuS&content-id=amzn1.sym.9f2b2b9e-47e9-4764-a4dc-2be2f6fca36d%3Aamzn1.sym.9f2b2b9e-47e9-4764-a4dc-2be2f6fca36d&pf_rd_p=9f2b2b9e-47e9-4764-a4dc-2be2f6fca36d&pf_rd_r=4C4JWBTWSBS9QDSWPVN2&pd_rd_wg=pDx5J&pd_rd_r=de439645-7756-4b78-b556-a178e8368334",
+        "link_clean": "https://www.amazon.com/dp/B0BZC1HC3Y/",
+        "thumbnail": "https://m.media-amazon.com/images/I/81AWuOQkW2L._AC_SR160,134_CB1169409_QL70_.jpg",
+        "price": "$26.99",
+        "extracted_price": 26.99,
+        "old_price": "$36.99",
+        "extracted_old_price": 36.99
+      }
+    ],
+    "logo": "https://m.media-amazon.com/images/S/al-na-9d5791cf-3faf/56326495-f25d-4d4f-bc55-84a19add9d22._CR0,0,1458,729_AC_SX130_SY60_CB1169409_QL70_.png"
+  },
+  "organic_results": [
+    {
+      "position": 1,
+      "asin": "B06XW41VB2",
+      "options": "See options",
+      "options_link": "https://www.amazon.com/BAGSMART-Travel-Electronics-Organizer-Charger/dp/B06XW41VB2/ref=sr_1_1_so_CARRIER_BAG_CASE?dib=eyJ2IjoiMSJ9.zqFO7GwPpfBn9Pt1Y6h6Nw.vpmq3OSV269JEq6WaRpDXQ1qNOmva9zspC3PWTm8TTw&dib_tag=se&keywords=ofertas+best+electronics&qid=1753679613&sr=8-1",
+      "brand": "BAGSMART",
+      "title": "Electronics Organizer Travel Case, Small Cord Bag, Tech Organizer as Travel Accessories for Men Women, Cable Essentials for Phone, SD Card, Black",
+      "link": "https://www.amazon.com/BAGSMART-Travel-Electronics-Organizer-Charger/dp/B06XW41VB2/ref=sr_1_1?dib=eyJ2IjoiMSJ9.zqFO7GwPpfBn9Pt1Y6h6Nw.vpmq3OSV269JEq6WaRpDXQ1qNOmva9zspC3PWTm8TTw&dib_tag=se&keywords=ofertas+best+electronics&qid=1753679613&sr=8-1",
+      "link_clean": "https://www.amazon.com/BAGSMART-Travel-Electronics-Organizer-Charger/dp/B06XW41VB2/",
+      "thumbnail": "https://m.media-amazon.com/images/I/718m2PT3LLL._AC_UY218_.jpg",
+      "rating": 4.6,
+      "reviews": 5262,
+      "bought_last_month": "500+ bought in past month",
+      "price": "$13.99",
+      "extracted_price": 13.99,
+      "old_price": "$16.99",
+      "extracted_old_price": 16.99,
+      "offers": [
+        "Exclusive Prime price"
+      ],
+      "delivery": [
+        "FREE delivery Sat, Aug 2 on $35 of items shipped by Amazon",
+        "Or fastest delivery Tomorrow, Jul 29"
+      ]
+    }
+  ],
+  "video_results": [
+    {
+      "block_position": "top",
+      "video_thumbnail": "https://m.media-amazon.com/images/S/al-na-9d5791cf-3faf/ff0d1aec-5dbb-4a92-abdf-46600134baf5.mp4/r/THUMBNAIL_360P_FRAME_3_CAPTURE_2.JPG",
+      "video_src": "https://m.media-amazon.com/images/S/al-na-9d5791cf-3faf/ff0d1aec-5dbb-4a92-abdf-46600134baf5.mp4/productVideoOptimized.mp4",
+      "video_link": "https://aax-us-iad.amazon.com/x/c/JIXeIyYlIj0NZr0z8T7z1J0AAAGYT3NRGgEAAAH2AQBvbm9fdHhuX2JpZDIgICBvbm9fdHhuX2ltcDEgICD8sLB_/clv1_CEuOPUxokZA0iHrVWutxwQDRfXFDa-Mwqqs_5QSUz95z8X8C3VLLEf018nHz9hvWjq0yzpNb3XTPsunPwGYceUhvayOzF_fyK3hUY19Nc0uZAr5BuwYOLZEdHEep3YamXJOUalC7tdMeWEwmgVz7bV1AckwCRMN0CRVmUax7QwuP3u3MgFIzS1q5d5TuNOspGHpbasDVlJ1bT2hxC9tUMuUFm8yvmtV0DgjzOKVy-i0Vs7d2vLK7GWsuqRqJ-0hcN3jpMffPnUdL6EdDGtZGNDOIT2mUuBLNCd7m6b_pSZUgD1ig-I6A-jeRfQnIN7P7zvAA5N9XSejlq7XFAv2OMMhZ_7tLcAcvkpU4wfVsPpln11Z5KUuB8SGc9skiUXyuaQ9F12GvsH8ppSr1AoykS24BZM7zucVmVbcmG3VHnlJ_MfhRt19KAG1Hvpd3Q2koAbqwPfPKm_u0cBUSbzW9h64seRWsqluyb3Ntfr0lnYSUFltD_aimrxjndUtzPorrnvZ40wtDKa0unBuDhQ2HzTTvcRl2QnddGximBg3wEK3_Lx68CwRd3khEWEv4Sj_iavomu_54Xjy4jKdeicYpBDSaDgNozSlg2fwasLeDvB86l6-_4pY7dnKm01qkU4OoLlw-FfQCAAtozMkZEZJ64xM027TGOTgmZkYvvdlS88MnGWMySXiGyEglnWjvTtgD9zkG12pF4todx-AkAHKDAGcO8Kb6CdLj76DtOGg2BAD3rg_yTIxg3jVp7sUbZebOsohNRwPjjlDD3Dj4AXXHMiM9mgf6U1Vonf5Ma8pQYAqY_FQxM-tOuhtjtp6VS0CZeMeZXz926QrElchTfuFSlqr4qV8Su9uvIr3VsuKQrlOC4DjI5U8PxSvOkl6uhR7XuNAFjO4Ntz_LG8Qme9pBOvuL_tCI0z1CPH0OFgvmtyr7jhhpK38ceHtDeBbUyVahkzGEbNCe25-Mkd3pwza8BqFgHL6ZRJWS33SfRgpTE94EaDR9e3cAV4vpyQvIOngfEwymq7dG9hETVIRn076qkT9MulVOM8fAhX1lzZl4sSNjaRugW7_1bQfPSN5bCIkcTVmwcJDLFC4LOYOpV5iuhNG8ZSHVn9hBSOgpGTY1A5iTDVihC8luuVNHGaWKv8P1meUIQNnnni4LMNVbq18oe20acpf-NlyFG7ZWsYHXkY-l2S-l3HDM14c1tBJbVOtzMFLrMnfSxWOJGSYCrVjjE-C2-cJv5ZNWyAX1h6AXGG7oNHUvSm6w8Um_lhcbGrfqSosxm_S3QnnMfYhjV6QbtFBzjYhzobjl2iWXnWq2PvDWX_9qe_HanN0lgBqm9rYnJ4AeIyL-00LCpbMpZmc35pDAzYIV01xeWcUEANkLp4A1uXqWNH2J5t-IKXmuJ5FqMh3IXlCsRALDWSQwatO2SbirnDaQGXF04YcXxvaUgH5wU1Ihw5wiD-d0cz_cNRqr0C0SF3r5hIW_xRn9LBbvTXvi6jG6bOogwrIKwNo30Wgr8WvEO0K5NWtBzKs9oMOJr3v0VBRpUd1abbPYf4UaHTrjrfH3d2CfMUOSBpYoisek3uzP7YStOrBaGd4jtfVvdsLFbEPc4JHEFeTvKRgpbA5J6vv3_Z4p7Jjh8GD39c6mRHa2BSCLyh9tgVlsVt6vexeeG2vm_qEdd1-SpQJ2zqElHyjbRm8lNbsouPwAUeyhBuI1n7DKWHcu-8OypsW3hvlleYyfl0NWvUfCh6gacxzR8S1-siCNiaxaOBOek1mdjdfJ97siN6Rq_139L_85h7gp0wGTjrZNE_djSapjg3cIRZjUxQvIWPOEJTqNkIyqJqCb574y_fYIT-OJreInngcLAsJXCMkQoN7KB0TAIo6Vhq9sT8b9e_5yQSdT3BxLuvPQOJeOvFwhYa23-OUQt9_LbyFiodGL-ixTQjOoTsSQuS9b09U9XLjI6r8EiSsKb0R36rvdBqsOwFu5FzpFmK_maEIGKMyTkaSfZ4m9c0zv3dAKSKpL73KptZJGjICYhc_igQd6c-5NDc5zGYIXVWbLtv6JIkh6pioRj-CG7ZC81rEoJZ_gH6x1dZAnGacAlZJXKlMOE6Y90GU_FImJ9GtDaF17T8P1PmTVTH7mKG8mR5m9nNnRPL8TkgFZPtKTOdZrSDrLMo0fvqVtmnqPXiIsxh4kOH42aCCeGSi32DWOHUrXqvtd_Ti-LYV9UZkPApW0BZjZxYY3QB8LPKWIHjMykJBgg8WxK9r8/https://www.amazon.com/dp/B0DL9GFDY1?pd_rd_i=B0DL9GFDY1&pf_rd_p=c8b39f81-ded8-4d75-80c2-6dfa03cbb699&pf_rd_r=4C4JWBTWSBS9QDSWPVN2&pd_rd_wg=GjWOw&pd_rd_w=wsIn4&pd_rd_r=cada616b-efaa-4444-9d18-2b044a591870",
+      "products": [
+        {
+          "position": 1,
+          "asin": "B0DL9GFDY1",
+          "sponsored": true,
+          "title": "Surge Protector Power Strip Tower with 5 USB Ports and Night Light,10FT Extension Cord with 12 AC Multiple Outlets (White)",
+          "link": "https://aax-us-iad.amazon.com/x/c/JIXeIyYlIj0NZr0z8T7z1J0AAAGYT3NRGgEAAAH2AQBvbm9fdHhuX2JpZDIgICBvbm9fdHhuX2ltcDEgICD8sLB_/clv1_CEuOPUxokZA0iHrVWutxwQDRfXFDa-Mwqqs_5QSUz95z8X8C3VLLEf018nHz9hvWjq0yzpNb3XTPsunPwGYceUhvayOzF_fyK3hUY19Nc0uZAr5BuwYOLZEdHEep3YamXJOUalC7tdMeWEwmgVz7bV1AckwCRMN0CRVmUax7QwuP3u3MgFIzS1q5d5TuNOspGHpbasDVlJ1bT2hxC9tUMuUFm8yvmtV0DgjzOKVy-i0Vs7d2vLK7GWsuqRqJ-0hcN3jpMffPnUdL6EdDGtZGNDOIT2mUuBLNCd7m6b_pSZUgD1ig-I6A-jeRfQnIN7P7zvAA5N9XSejlq7XFAv2OMMhZ_7tLcAcvkpU4wfVsPpln11Z5KUuB8SGc9skiUXyuaQ9F12GvsH8ppSr1AoykS24BZM7zucVmVbcmG3VHnlJ_MfhRt19KAG1Hvpd3Q2koAbqwPfPKm_u0cBUSbzW9h64seRWsqluyb3Ntfr0lnYSUFltD_aimrxjndUtzPorrnvZ40wtDKa0unBuDhQ2HzTTvcRl2QnddGximBg3wEK3_Lx68CwRd3khEWEv4Sj_iavomu_54Xjy4jKdeicYpBDSaDgNozSlg2fwasLeDvB86l6-_4pY7dnKm01qkU4OoLlw-FfQCAAtozMkZEZJ64xM027TGOTgmZkYvvdlS88MnGWMySXiGyEglnWjvTtgD9zkG12pF4todx-AkAHKDAGcO8Kb6CdLj76DtOGg2BAD3rg_yTIxg3jVp7sUbZebOsohNRwPjjlDD3Dj4AXXHMiM9mgf6U1Vonf5Ma8pQYAqY_FQxM-tOuhtjtp6VS0CZeMeZXz926QrElchTfuFSlqr4qV8Su9uvIr3VsuKQrlOC4DjI5U8PxSvOkl6uhR7XuNAFjO4Ntz_LG8Qme9pBOvuL_tCI0z1CPH0OFgvmtyr7jhhpK38ceHtDeBbUyVahkzGEbNCe25-Mkd3pwza8BqFgHL6ZRJWS33SfRgpTE94EaDR9e3cAV4vpyQvIOngfEwymq7dG9hETVIRn076qkT9MulVOM8fAhX1lzZl4sSNjaRugW7_1bQfPSN5bCIkcTVmwcJDLFC4LOYOpV5iuhNG8ZSHVn9hBSOgpGTY1A5iTDVihC8luuVNHGaWKv8P1meUIQNnnni4LMNVbq18oe20acpf-NlyFG7ZWsYHXkY-l2S-l3HDM14c1tBJbVOtzMFLrMnfSxWOJGSYCrVjjE-C2-cJv5ZNWyAX1h6AXGG7oNHUvSm6w8Um_lhcbGrfqSosxm_S3QnnMfYhjV6QbtFBzjYhzobjl2iWXnWq2PvDWX_9qe_HanN0lgBqm9rYnJ4AeIyL-00LCpbMpZmc35pDAzYIV01xeWcUEANkLp4A1uXqWNH2J5t-IKXmuJ5FqMh3IXlCsRALDWSQwatO2SbirnDaQGXF04YcXxvaUgH5wU1Ihw5wiD-d0cz_cNRqr0C0SF3r5hIW_xRn9LBbvTXvi6jG6bOogwrIKwNo30Wgr8WvEO0K5NWtBzKs9oMOJr3v0VBRpUd1abbPYf4UaHTrjrfH3d2CfMUOSBpYoisek3uzP7YStOrBaGd4jtfVvdsLFbEPc4JHEFeTvKRgpbA5J6vv3_Z4p7Jjh8GD39c6mRHa2BSCLyh9tgVlsVt6vexeeG2vm_qEdd1-SpQJ2zqElHyjbRm8lNbsouPwAUeyhBuI1n7DKWHcu-8OypsW3hvlleYyfl0NWvUfCh6gacxzR8S1-siCNiaxaOBOek1mdjdfJ97siN6Rq_139L_85h7gp0wGTjrZNE_djSapjg3cIRZjUxQvIWPOEJTqNkIyqJqCb574y_fYIT-OJreInngcLAsJXCMkQoN7KB0TAIo6Vhq9sT8b9e_5yQSdT3BxLuvPQOJeOvFwhYa23-OUQt9_LbyFiodGL-ixTQjOoTsSQuS9b09U9XLjI6r8EiSsKb0R36rvdBqsOwFu5FzpFmK_maEIGKMyTkaSfZ4m9c0zv3dAKSKpL73KptZJGjICYhc_igQd6c-5NDc5zGYIXVWbLtv6JIkh6pioRj-CG7ZC81rEoJZ_gH6x1dZAnGacAlZJXKlMOE6Y90GU_FImJ9GtDaF17T8P1PmTVTH7mKG8mR5m9nNnRPL8TkgFZPtKTOdZrSDrLMo0fvqVtmnqPXiIsxh4kOH42aCCeGSi32DWOHUrXqvtd_Ti-LYV9UZkPApW0BZjZxYY3QB8LPKWIHjMykJBgg8WxK9r8/https://www.amazon.com/Surge-Protector-Extension-Multiple-Outlets/dp/B0DL9GFDY1/ref=sxin_15_sbv_search_btf?content-id=amzn1.sym.c8b39f81-ded8-4d75-80c2-6dfa03cbb699%3Aamzn1.sym.c8b39f81-ded8-4d75-80c2-6dfa03cbb699&cv_ct_cx=ofertas+best+electronics&keywords=ofertas+best+electronics&pd_rd_i=B0DL9GFDY1&pd_rd_r=cada616b-efaa-4444-9d18-2b044a591870&pd_rd_w=wsIn4&pd_rd_wg=GjWOw&pf_rd_p=c8b39f81-ded8-4d75-80c2-6dfa03cbb699&pf_rd_r=4C4JWBTWSBS9QDSWPVN2&qid=1753679613&sbo=RZvfv%2F%2FHxDF%2BO5021pAnSA%3D%3D&sr=1-1-5190daf0-67e3-427c-bea6-c72c1df98776",
+          "link_clean": "https://www.amazon.com/dp/B0DL9GFDY1/",
+          "thumbnail": "https://m.media-amazon.com/images/I/614sbXitU8L._AC_UL640_QL65_.jpg",
+          "rating": 4.7,
+          "reviews": 100,
+          "bought_last_month": "1K+ bought in past month",
+          "price": "$31.99",
+          "extracted_price": 31.99,
+          "save_with_coupon": "Save 20% with coupon",
+          "delivery": [
+            "FREE delivery Sat, Aug 2 on $35 of items shipped by Amazon",
+            "Or fastest delivery Tomorrow, Jul 29"
+          ]
+        }
+      ]
+    },
+    {
+      "block_position": "bottom",
+      "video_thumbnail": "https://m.media-amazon.com/images/S/al-na-9d5791cf-3faf/1a130661-41c0-4a42-8c77-66d0e5d23ab3.mp4/r/THUMBNAIL_360P_FRAME_3_CAPTURE_2.JPG",
+      "video_src": "https://m.media-amazon.com/images/S/al-na-9d5791cf-3faf/1a130661-41c0-4a42-8c77-66d0e5d23ab3.mp4/productVideoOptimized.mp4",
+      "video_link": "https://aax-us-iad.amazon.com/x/c/JE3-46KXA3y3wQuA03GwT9cAAAGYT3NRLgEAAAH2AQBvbm9fdHhuX2JpZDIgICBvbm9fdHhuX2ltcDIgICBW3T3_/clv1_CEuOPUxokZA0iHrVZulywSXIS1x1drQfn8sryTeA3dss138c3VLLEf018nHz9hvWjq0yzpNb3XTPsunPyWYceXRtaCOWDsHfHWUDTGotZ2eqFqxE5CAOLZEdHEep2IamXJOUalC7tdMeWEwmgVz7bV1AckwCRMN0CRVmUax7QwuP3u3MgFIzS1q5d5TuNOspGHpbasDVlJ1bT2hxC9tUMuUFm8yvmtV0DgjzOKVy-i0Vs7d2vLK7GWsuqRqJ-0hcN3jpMffPnUdL6EdDGtZGNDOIT2mUuBLNCd7m6b_pSZUgD1ig-I6A-jeRfQn_N7v4zvZJ49Awd9TkuKnyN-uOJPtY8-BPWhAio784wfVsPpln11Z5KUuB8SGczIwib2jnajFj0GORrH8ppSr1AoykS24BZM7zucVmVbcmG3VHnlJ_MfhRt19KAG1Hvpd3Q2koAbqwOvPKm_u0cBUSbzW9h64seRWsqluyb3Ntfr0lnYSUFltD_aimrxnddUtzPorrnvZ40wtDKa0unBuDhQ2HzTTvcRl2QnddGximBg3wEK3_Lx68CwRd3khEWEv4Sj_iavomu_54Xjy4jKdeicYpBDSaDgNozSlg2fwasLeDvB86l6-_4pY7dnKm01qkU4OoLlw-FfQCAAtozMkZEZJ64xM027TGOTgmZkYvvdlS88MnGWMySXiGyEglnWjvTtgD9zkG12pF4todx-AkAHKDAGcO8Kb6CdLj76DtOGg2BAD3rg_yTIxg3jVp7sUbZebOsohNRwPjjlDD3Dj4AXXHMiM9mgf6U1Vonf5Ma8pQYAqY_FQxM-tOuhtjtp6VS0CZeMeZXz926QrElchTfuFSlqr4qV8Su9uvIr3VsuKQrlOC4DjI5U8PxSvOkl6uhR7XuNAFjO4Ntz_LG8Qme9pBOvuL_tCI0z1CPH0OFgvmtyr7jhhpK1EAeHtDeBbUyVahkzGEbNCe25-Mkd3pwza8BqFOFLyZapmW32S5RgtRLcQFGThjQWd3UIiMkC_wF2MdBCWi6rd49hwQepAt0ICMkT9yhBBODv6RgFZY1JpQmzxQDXyjW663NBDmQJ1YH_BcW1mCY7vIKjcME-C4V7Omm928Cj7t669TfPctBT1pH7epU0y7Dbw3rHhBAbuJv8PzjOU6U_LkoDcMGrZKq3dfYFwIYtnIKX7BI7k1tb_Vkdat1kD563PYtIQ7kRdMfeMwMFKnJnL6_GWzcwQGlHP3C-ymz8ZUgJNX9hf5ha58CHvqDW0zSGqvpFq4oAkhf5rjSJsDkuSNPWb3cqZlVJgxt2Jy5qdyv6i84SGIyG6fKeTTdN43ReH4xO0f8z2mqps4MK0jdg6i3F350MwwZWY444fv890XxyNUbf9zNcVTqIowkl-TClezvuSKXkGiVZY_IzTya02sWAvHAks8aoi-Z7movhOLNn5-5KxZ1vXwnHtOQyEh-5NJCt0FD2rNHCCFyBNfEHuimJO7sAnPNyngR37KzzS9GO4J_KwGneM3yTQQgXCRKEWPK1Ek4aI_sPGahSfaVyMTf9JaBrfOfe4OAQu8tdzMdlKaAmm8dZUmr8az8_eA7ZuyeLJKK9IzgNdscZ3RJkDR5I7Mf9L9EmguOQpg_e_y1rMo78fxqlme0N2xa0jpOQ6tkyRt60FtHYOgQHLTGUX56awcDUfVpnlx0JxUaDvYVmg6NYVfv8c5b_WmKIUmsdWxHk8XnJ-Ii96nl9NXYKG5kxtRl1ecuKoSLRfF6nh6jAqGnKxoLQOe8AGk0c_bys4ybKpq62rFReN7vqcDzDrmnpZNAOxhXoNojFwTPpjR6HHCS8qqeAL5gM-RTbjY14dr2vYcXKOlvth4sz0AWtRHC7sD-tbuA0fmIorOlqJxXM2Kff8IOj5umxxdodGMFLWv4loiVPWN4_pRnNvtaSd2rsum7ldXRDzLF_m6hyps3MkcW7jisoMGiWg5My9u67TaW4AkwymqTCIfmMfIZkkpMMmT5KSBW5LGc1Cr5VqJp7bvMkXI_6BR38WQ4YvNsi1Xc9Z1Nd9F2bRVHK4IUgoDBNJR_Q8n0aeG6JO_geU3PsKjXfspfpJ5Le0PgI9WIUAUbPdx3nMjXJia_XVeNR5kEM_0f32WUzb3KXRvW87r8P3oHK5M1UYOUN2KPeA2awz8fLAqxqQnu0ijUw4KvQ5uHG0wYM3KW8iehl3tOp-UxB4atkWBCtJcg9hMT_NCJV74I8GLwL2aqzkra42B/https://www.amazon.com/dp/B07MTCMHZX?pd_rd_i=B07MTCMHZX&pf_rd_p=37132d36-da68-4ed0-8d23-842f0825e4d6&pf_rd_r=4C4JWBTWSBS9QDSWPVN2&pd_rd_wg=1GueH&pd_rd_w=GBW8L&pd_rd_r=b6904443-1a15-4140-bad3-dc3719a28e38",
+      "products": [
+        {
+          "position": 1,
+          "asin": "B07MTCMHZX",
+          "sponsored": true,
+          "badges": [
+            "Limited time deal"
+          ],
+          "title": "AuKing Projector, 2025 Upgraded Mini Projector, Full HD 1080P Home Theater Video Projector, Compatible with HDMI/USB/AV/Smartphone/TV Box/Laptop",
+          "link": "https://aax-us-iad.amazon.com/x/c/JE3-46KXA3y3wQuA03GwT9cAAAGYT3NRLgEAAAH2AQBvbm9fdHhuX2JpZDIgICBvbm9fdHhuX2ltcDIgICBW3T3_/clv1_CEuOPUxokZA0iHrVZulywSXIS1x1drQfn8sryTeA3dss138c3VLLEf018nHz9hvWjq0yzpNb3XTPsunPyWYceXRtaCOWDsHfHWUDTGotZ2eqFqxE5CAOLZEdHEep2IamXJOUalC7tdMeWEwmgVz7bV1AckwCRMN0CRVmUax7QwuP3u3MgFIzS1q5d5TuNOspGHpbasDVlJ1bT2hxC9tUMuUFm8yvmtV0DgjzOKVy-i0Vs7d2vLK7GWsuqRqJ-0hcN3jpMffPnUdL6EdDGtZGNDOIT2mUuBLNCd7m6b_pSZUgD1ig-I6A-jeRfQn_N7v4zvZJ49Awd9TkuKnyN-uOJPtY8-BPWhAio784wfVsPpln11Z5KUuB8SGczIwib2jnajFj0GORrH8ppSr1AoykS24BZM7zucVmVbcmG3VHnlJ_MfhRt19KAG1Hvpd3Q2koAbqwOvPKm_u0cBUSbzW9h64seRWsqluyb3Ntfr0lnYSUFltD_aimrxnddUtzPorrnvZ40wtDKa0unBuDhQ2HzTTvcRl2QnddGximBg3wEK3_Lx68CwRd3khEWEv4Sj_iavomu_54Xjy4jKdeicYpBDSaDgNozSlg2fwasLeDvB86l6-_4pY7dnKm01qkU4OoLlw-FfQCAAtozMkZEZJ64xM027TGOTgmZkYvvdlS88MnGWMySXiGyEglnWjvTtgD9zkG12pF4todx-AkAHKDAGcO8Kb6CdLj76DtOGg2BAD3rg_yTIxg3jVp7sUbZebOsohNRwPjjlDD3Dj4AXXHMiM9mgf6U1Vonf5Ma8pQYAqY_FQxM-tOuhtjtp6VS0CZeMeZXz926QrElchTfuFSlqr4qV8Su9uvIr3VsuKQrlOC4DjI5U8PxSvOkl6uhR7XuNAFjO4Ntz_LG8Qme9pBOvuL_tCI0z1CPH0OFgvmtyr7jhhpK1EAeHtDeBbUyVahkzGEbNCe25-Mkd3pwza8BqFOFLyZapmW32S5RgtRLcQFGThjQWd3UIiMkC_wF2MdBCWi6rd49hwQepAt0ICMkT9yhBBODv6RgFZY1JpQmzxQDXyjW663NBDmQJ1YH_BcW1mCY7vIKjcME-C4V7Omm928Cj7t669TfPctBT1pH7epU0y7Dbw3rHhBAbuJv8PzjOU6U_LkoDcMGrZKq3dfYFwIYtnIKX7BI7k1tb_Vkdat1kD563PYtIQ7kRdMfeMwMFKnJnL6_GWzcwQGlHP3C-ymz8ZUgJNX9hf5ha58CHvqDW0zSGqvpFq4oAkhf5rjSJsDkuSNPWb3cqZlVJgxt2Jy5qdyv6i84SGIyG6fKeTTdN43ReH4xO0f8z2mqps4MK0jdg6i3F350MwwZWY444fv890XxyNUbf9zNcVTqIowkl-TClezvuSKXkGiVZY_IzTya02sWAvHAks8aoi-Z7movhOLNn5-5KxZ1vXwnHtOQyEh-5NJCt0FD2rNHCCFyBNfEHuimJO7sAnPNyngR37KzzS9GO4J_KwGneM3yTQQgXCRKEWPK1Ek4aI_sPGahSfaVyMTf9JaBrfOfe4OAQu8tdzMdlKaAmm8dZUmr8az8_eA7ZuyeLJKK9IzgNdscZ3RJkDR5I7Mf9L9EmguOQpg_e_y1rMo78fxqlme0N2xa0jpOQ6tkyRt60FtHYOgQHLTGUX56awcDUfVpnlx0JxUaDvYVmg6NYVfv8c5b_WmKIUmsdWxHk8XnJ-Ii96nl9NXYKG5kxtRl1ecuKoSLRfF6nh6jAqGnKxoLQOe8AGk0c_bys4ybKpq62rFReN7vqcDzDrmnpZNAOxhXoNojFwTPpjR6HHCS8qqeAL5gM-RTbjY14dr2vYcXKOlvth4sz0AWtRHC7sD-tbuA0fmIorOlqJxXM2Kff8IOj5umxxdodGMFLWv4loiVPWN4_pRnNvtaSd2rsum7ldXRDzLF_m6hyps3MkcW7jisoMGiWg5My9u67TaW4AkwymqTCIfmMfIZkkpMMmT5KSBW5LGc1Cr5VqJp7bvMkXI_6BR38WQ4YvNsi1Xc9Z1Nd9F2bRVHK4IUgoDBNJR_Q8n0aeG6JO_geU3PsKjXfspfpJ5Le0PgI9WIUAUbPdx3nMjXJia_XVeNR5kEM_0f32WUzb3KXRvW87r8P3oHK5M1UYOUN2KPeA2awz8fLAqxqQnu0ijUw4KvQ5uHG0wYM3KW8iehl3tOp-UxB4atkWBCtJcg9hMT_NCJV74I8GLwL2aqzkra42B/https://www.amazon.com/Projector-Video-Projector-Multimedia-Compatible-Smartphone/dp/B07MTCMHZX/ref=sxbs_sbv_search_btf?content-id=amzn1.sym.37132d36-da68-4ed0-8d23-842f0825e4d6%3Aamzn1.sym.37132d36-da68-4ed0-8d23-842f0825e4d6&cv_ct_cx=ofertas+best+electronics&keywords=ofertas+best+electronics&pd_rd_i=B07MTCMHZX&pd_rd_r=b6904443-1a15-4140-bad3-dc3719a28e38&pd_rd_w=GBW8L&pd_rd_wg=1GueH&pf_rd_p=37132d36-da68-4ed0-8d23-842f0825e4d6&pf_rd_r=4C4JWBTWSBS9QDSWPVN2&qid=1753679613&sbo=RZvfv%2F%2FHxDF%2BO5021pAnSA%3D%3D&sr=1-1-a61ee601-6e56-4862-a8a2-1d3da5a5406f",
+          "link_clean": "https://www.amazon.com/dp/B07MTCMHZX/",
+          "thumbnail": "https://m.media-amazon.com/images/I/61+CDKTXYgL._AC_UL640_QL65_.jpg",
+          "rating": 4.3,
+          "reviews": 14372,
+          "bought_last_month": "1K+ bought in past month",
+          "price": "$53.99",
+          "extracted_price": 53.99,
+          "old_price": "$87.99",
+          "extracted_old_price": 87.99,
+          "delivery": [
+            "FREE delivery Sat, Aug 2",
+            "Or fastest delivery Tomorrow, Jul 29"
+          ]
+        }
+      ]
+    }
+  ],
+  "sponsored_brands": {
+    "title": "Brands related to your search",
+    "brands": [
+      {
+        "position": 1,
+        "image": "https://m.media-amazon.com/images/S/al-na-9d5791cf-3faf/94f1e26d-49cb-4bd5-83e8-86c28a0c137d._CR0,0,1200,628_SX920_CB1169409_QL70_.jpg",
+        "name": "Home",
+        "headline": "Portable Charger With Plug",
+        "link": "https://aax-us-iad.amazon.com/x/c/JNyLrJbS3amis9UTFqn5hJ4AAAGYT3NRlwEAAAH2AQBvbm9fdHhuX2JpZDMgICBvbm9fdHhuX2ltcDEgICBtCQBW/clv1_CEuOPUxokZA0iHrVesM8wAj_BShfTYQPubAc0AeGr-Vv4X8M3lLLEf018nHz9hvWjq0yzpNb3XTPsunPyGYceRNCKjqVCu7_CkgudBhLbmS4EoNRuzAOLZEdHEep2IamXJOUalC7tdMeWEwmgVz7bV1AckwCRMN0CRVmUax7QwuP3u3MgFIzS1q5d5TuNOspGHpbasDVlJ1bT2hxC9tUMuUFm8yvmtV0DgjzOKVy-i0Vs7d2vLK7GWsuqRqJ-0hcN3jpMffPnUdL6EdDGtZGNDOIT2mUuBLNCd7m6b_pSZUgD1ig-I6A-jeRfQnkQI76zKkIpN1Hd8HpqoeHK8eWL_ss--R8Ywcvnb84wfVsPpln11Z5KUuB8SGczM4iUWTgag9FnmC_rH8ppSr1AoykS24BZM7zucVmVbcmG3VHnlJ_MfhRt19KAG1Hvpd3Q2koAbqwevbnn_GxbxExYg_Kn70VX1StqmboahZTe71PmfuZLCxb7pGA4RrdSE5MLrCipM5S7DNDS7Ionz7duH-61DaGbSBPKWsOCjGfXQ7KLqTGTjOsGilVx0pHVA_-S3nobPwhsfpEbza9o6hUmfw9OzvwFgNqqHxj6MAkuKaqhUorvqew4oY_dGXA7VqmU4vnLlwyEPc8AEN_8edUEpJy4xAK3KDFACt7cUUzu9p_4JknGmMwXTCgyEklrDH4YNwC4Fwa12l44pUcodIlFHKXAGUw2un4Gtrn7JnpN30jOhrjqzLhTfkhmAJ7t9sbetiZo6F0EhLKhUTS9gnoEFjHJCJWmhLAUlFpnv5ucdoIeC-z_GotM-t07Qo6gLeSYHqhUdeVbTFC2zb8hdNXf8lnnLqjl0g4kay3HMiumdyftmaC72GR4ioyxzLqiUCihSf7r_87lucitxn5I_orU-QMMdCj-siwzjlePxk8Fj6TljrXiQ9pPDYhaGpqQh3H7VqZohmhdf_q-o-99cX60G6_R7VzJc62R4Lh81nBDiV5CM4VQRFvbkp4WZ740gzzBkZGERelrZtk-Qo9e708xZeAkj9yph5NHeGFhn9XlI1BnDF-eF2_ZtqGKTzLR5hMeYhlWVy_epbMNSwiOpSoerGDjcvKdjP6x7hdU8kbCiZqH6-qJVi_Db1UulVtGaWKv8f1mcw5UMjJuCsNGdFOql9bYFsLes_1XCvAIKcloITHiYil7z-h5y3M9Lxf0x1Kfc0yMVeoLFrDhzqwcwQfl2LNNuyp6exV5JdS8AWGh65zEETvN2kqdG-s-mSSsBkLJ6DnXJ4-kd7oZHnNSJxgY7QHqVhz4oZNsN_g7VGbkkCyG_fAXt5gaMPCwecfviqeyJQyNq4ZfSWX5kPBte42bgJ28KzF1oEu10BRcsNSIcB8p4Ajp2XPDVeZntyyPWOiVZY_HkbPVHuHKyfPZQoYZqCbMLO-phygMz9L-PAXxtjhvWdwQzEj-5M-E9F3CD_cNRqr0Co8Gnv5gJW6xTvjLRboYmXi6jGSbcszwrMW1t0pzWgrmm_LERubO3t8xLw-pMOQvEXgTQhMd9FVFrPCRoUeAT29tdXKKXy9CjegM643oOymxfeR0Y-uPY5BK4wwi-VkXML_N3np-M7Mf9brGxkfZyQQy-_y0YY3-rPQ82DC4d6kX236BSCIzjNAsEZWbKWvfgjhHW3m_bsbanmPpwlpkp0lZC3hLGA6Na9PpcdlDO2fFoEnir_WXndynduz-sGtq_1xcJ-i6Alvh0eLhM0ZMhbo8SNvmwaGnKxoLQOe8AGk0c_bys4ybKpq62rFReN7vqcDzDrmnpZNAOxhXoNojFwTPpjR6HHCS8qqeAL5gM-RTbjY14dr2vYcXKOlvth4sz0AWtRHC7sD-tbuA0fmIorOlqJxXM2Kff8IOj5umxxdodGMFLWv4loiVPWN4_pRnNvtaSd2rsum7ldXRDzLF_m6hyps3MkcW7jisoMGiWg5My9u67TaW4AkwymqTCIfmMfIZkkpMMmT5KSBW5LGc1Cq5TGLtZToMgXfxoIU3MWQqZ6cy21Qc9YhQ-Zsdxf5c9YBJxNeGNNM4go9y6ae8ZGn0qhgc5njQPAvdYF7VqJ0wpZEPEEHe_M5wzAjH5TS8nwCawMmT9DiPWzICyC7P2ExHsH_k5nxDpNtxlEKGuHkJPJObXDsToY_moJtnUy-Xjg0th4VDjAPdhCo_2yOKkHvY_SS2xwjtGP3CdFcGbrkQfCPYPa-fJJZW8FtuMkhE2_4si8/https://www.amazon.com/stores/page/BA6A423B-E969-4A32-9201-7E7C131B2B96/?_encoding=UTF8&store_ref=SB_A04081922FYGDH6B5MH33-A018729935A5A461VYMOZ&pd_rd_plhdr=t&aaxitk=9bc00e433a9098b129c8f3b1ff2eea0f&hsa_cr_id=0&lp_asins=B0BZBZY8KP%2CB0CDBQLK85%2CB0BZC1HC3Y&lp_query=ofertas%20best%20electronics&lp_slot=desktop-hsa-3psl&ref_=sbx_be_s_3psl_mbd_mb0_bkgd&pd_rd_w=xc2H4&content-id=amzn1.sym.5594c86b-e694-4e3e-9301-a074f0faf98a%3Aamzn1.sym.5594c86b-e694-4e3e-9301-a074f0faf98a&pf_rd_p=5594c86b-e694-4e3e-9301-a074f0faf98a&pf_rd_r=4C4JWBTWSBS9QDSWPVN2&pd_rd_wg=aw8Sc&pd_rd_r=a1de7cf9-b93c-4192-8b49-10f3b4925d90",
+        "logo": "https://m.media-amazon.com/images/S/al-na-9d5791cf-3faf/56326495-f25d-4d4f-bc55-84a19add9d22._CR0,0,1458,729_AC_SX278_SY200_CB1169409_QL70_.png"
+      },
+      {
+        "position": 2,
+        "image": "https://m.media-amazon.com/images/S/al-na-9d5791cf-3faf/f1209313-1356-4273-9624-72f67308b369._CR0,74,1920,1006_SX920_CB1169409_QL70_.png",
+        "name": "VEGER",
+        "headline": "Travel Essential Portable Charger",
+        "link": "https://aax-us-iad.amazon.com/x/c/JNd_9t5v8Iy03B-qLXofg0EAAAGYT3NRmQEAAAH2AQBvbm9fdHhuX2JpZDMgICBvbm9fdHhuX2ltcDEgICDIWNZX/clv1_CEuOPUxokZA0iHrVesM8wAj_BShfTYQPubAc0AeGr-Vv4X8M3lLLEf018nHz9hvWjq0yzpNb3XTPsunPyGYceRE4cXvKE4zsEWUxbWEvTEesHMNQhAYOLZEdHEep2IamXJOUalC7tdMeWEwmgVz7bV1AckwCRMN0CRVmUax7QwuP3u3MgFIzS1q5d5TuNOspGHpbasDVlJ1bT2hxC9tUMuUFm8yvmtV0DgjzOKVy-i0Vs7d2vLK7GWsuqRqJ-0hcN3jpMffPnUdL6EdDGtZGNDOIT2mUuBLNCd7m6b_pSZUgD1ig-I6A-jeRfQnkJK--4vE-4MVuQcjkuaHbNdWGF8lY6-ZSYwMIkpU4wfVsPpln11Z5KUuB8SGc9skiUWDlajFVnGCvln8ppSr1AoykS24BZM7zucVmVbcmG3VHnlJ_MfhRt19KAG1Hvpd3Q2koAbqwevbnn_GxbxExYg_Kn70VX1StqmboahZTe71PmfuZLCxb7pGA4RrdSE5MLrCipM5S7DNDS7Ionz7duH-61DaGbSBPKWsOCjGfXQ7KLqTGTjOsGilVx0pHVA_-S3nobPwhsfpEbza9o6hUmfw9OzvwFgNqqHxj6MAkuKaqhUorvqew4oY_dGXA7VqmU4vnLlwyEPc8AEN_8edUEpJy4xAK3KDFACt7cUUzu9p_4JknGmMwXTCgyEklrDH4YNwC4Fwa12l44pUcodIlFHKXAGUw2un4Gtrn7JnpN30jOhrjqzLhTfkhmAJ7t9sbetiZo6F0EhLKgUTS9gnoEFjHJCJWmhLAUlFpnv5ucdoIeC-z_GotM-t07Qpzj82JbUyYUb2ZZAYd4VPHhM9XfpZVnLqjl0g4kay3HMiumdyftmaC72GR4ioyxzLqiUCihSf7r_87luQYlQv5R_orU-QMMdCj-siwzjlePxk8Fj6TljrXiQ9pPDYhaGpqQh3H7VqZohmhdf_q-o-99cX60G6_R7VzJc62R4Lh81nBDiV5CM4VQRFvbkpwWZ740gzzBkZGERelrZtk-Qo9e708xZeAkj9iiB1OHcuLhH953Y5RnDF-eF2_ZtqGKTzLR5hMeYhlWVy_epbMNSwiOpSoeI-xj8nKdjL616BdU8kbCiZqH6-qJVi_Db1UulVtGaWKv8P1mtwpUMjJuCsNGdFOql9bYFsLes_1XCvAIKcloITHiYil7z-h5y3M9Lxf0x1Kfc0yMVeoLFrDhzqwcwQfl2LNNuyp6exV5JdS8AWGh65zEETvN2kqdG-s-mSSsBkLJ6DnXJ4-kd7oZHnNSJxgY7QHqVhz4oZNsN_g7VGbkkCyG_fAXt5gaMPCwecfviqeyJQyNq4ZfSWX5kPBte42bgJ28KzF1oEu10BRcsNSIcB8p4Ajp2XPDVeZntyyPWOiVZY_HkbPVHuHKyfPZQoYZqCbMLO-phygMz9L-PAXxtjhvWdwQzEj-5M-E9F3CD_cNRqr0Co8Gnv5gJW6xTvjLRboYmXi6jGSbcszwrMW1t0pzWgrmm_LERubO3t8xLw-pMOQvEXgTQhMd9FVFrPCRoUeAT29tdXKKXy9CjegM643oOymxfeR0Y-uPY5BK4wwi-VkXML_N3np-M7Mf9brGxkfZyQQy-_y0YY3-rPQ82DC4d6kX236BSCIzjNAsEZWbKWvfgjhHW3m_bsbanmPpwlpkp0lZC3hLGA6Na9PpcdlDO2fFoEnir_WXndynduz-sGtq_1xcJ-i6Alvh0eLhM0ZMhbo8SNvmwaGnKxoLQOe8AGk0c_bys4ybKpq62rFReN7vqcDzDrmnpZNAOxhXoNojFwTPpjR6HHCS8qqeAL5gM-RTbjY14dr2vYcXKOlvth4sz0AWtRHC7sD-tbuA0fmIorOlqJxXM2Kff8IOj5umxxdodGMFLWv4loiVPWN4_pRnNvtaSd2rsum7ldXRDzLF_m6hyps3MkcW7jisoMGiWg5My9u67TaW4AkwymqTCIfmMfIZkkpMMmT5KSBW5LGc1Cq5Tzw05TsMjnq8P8LwsWQ-c3S_3FQc9ZFJvVpZxb5c9YBJxNeGNNM4go9y6ae8ZGn0qhgc5njQPAvdYF7VqJ0wpZEPEEHe_M5wzAjH5TS8nwCawMmT9DiPWzICyC7P2ExHsH_k5nxDpNtxlEKGuHkJPJObXDsToY_moJtnUy-Xjg0th4VDjAPdhCo_2yOKkHvY_SS2xwjtGP3CdFcGbrkQfCPYMbkGawB5YCDpEja0y6Gl3A/https://www.amazon.com/stores/page/BC864FD4-2689-4601-9FF7-A43E29E03B77/?_encoding=UTF8&store_ref=SB_A0655932KQ5E52IV5KGO-A04582033QUYC0QUQDDYI&pd_rd_plhdr=t&aaxitk=34d7243374e44cfe9a36717979a74f86&hsa_cr_id=0&lp_asins=B0DDPCZV5Z%2CB0DDPGVJSF%2CB0DDPBYR6R&lp_query=ofertas%20best%20electronics&lp_slot=desktop-hsa-3psl&ref_=sbx_be_s_3psl_mbd_mb1_bkgd&pd_rd_w=xc2H4&content-id=amzn1.sym.5594c86b-e694-4e3e-9301-a074f0faf98a%3Aamzn1.sym.5594c86b-e694-4e3e-9301-a074f0faf98a&pf_rd_p=5594c86b-e694-4e3e-9301-a074f0faf98a&pf_rd_r=4C4JWBTWSBS9QDSWPVN2&pd_rd_wg=aw8Sc&pd_rd_r=a1de7cf9-b93c-4192-8b49-10f3b4925d90",
+        "logo": "https://m.media-amazon.com/images/S/al-na-9d5791cf-3faf/f6158559-a2d9-452f-8ad0-94e1fb1eec2a._CR0,0,400,400_AC_SX278_SY200_CB1169409_QL70_.png"
+      },
+      {
+        "position": 3,
+        "image": "https://m.media-amazon.com/images/S/al-na-9d5791cf-3faf/9ccda6de-9069-4fc3-baf3-09b49845a6e5._CR0,0,1200,628_SX920_CB1169409_QL70_.png",
+        "name": "lightning ofertas",
+        "headline": "200W 8-Port Charging Station for Multiple Devices",
+        "link": "https://aax-us-iad.amazon.com/x/c/JPgb70VCdtQjDJ9oKpjsjKEAAAGYT3NRmgEAAAH2AQBvbm9fdHhuX2JpZDMgICBvbm9fdHhuX2ltcDEgICDUFI8o/clv1_CEuOPUxokZA0iHrVesM8wAj_BShfTYQPubAc0AeGr-Vv4X8M3lLLEf018nHz9hvWjq0yzpNb3XTPsunPzGYceQ1JKT-rK-ipSmooQ0crREKkO5dZugYOLZEdHEep2YamXJOUalC7tdMeWEwmgVz7bV1AckwCRMN0CRVmUax7QwuP3u3MgFIzS1q5d5TuNOspGHpbasDVlJ1bT2hxC9tUMuUFm8yvmtV0DgjzOKVy-i0Vs7d2vLK7GWsuqRqJ-0hcN3jpMffPnUdL6EdDGtZGNDOIT2mUuBLNCd7m6b_pSZUgD1ig-I6A-jeRfQnlJaj5y_c6wtpqbMHhz8L_BPuWD85IjNl7Y2AskpU4wfVsPpln11Z5KUuB8SGcwM4hf0LnaQ9N0GOvln8ppSr1AoykS24BZM7zucVmVbcmG3VHnlJ_MfhRt19KAG1Hvpd3Q2koAbqwevbnn_GxbxExYg_Kn70VX1StqmboahZTe71PmfuZLCxb7pGA4RrdSE5MLrCipM5S7DNDS7Ionz7duH-61DaGbSBPKWsOCjGfXQ7KLqTGTjOsGilVx0pHVA_-S3nobPwhsfpEbza9o6hUmfw9OzvwFgNqqHxj6MAkuKaqhUorvqew4oY_dGXA7VqmU4vnLlwyEPc8AEN_8edUEpJy4xAK3KDFACt7cUUzu9p_4JknGmMwXTCgyEklrDH4YNwC4Fwa12l44pUcodIlFHKXAGUw2un4Gtrn7JnpN30jOhrjqzLhTfkhmAJ7t9sbetiZo6F0EhLKjUTS9gnoEFjHJCJWmhLAUlFpnv5ucdoIeC-z_GotM-t07QpzoYe4YHrHfb60Hjd66VLz4Pl0a8ocnLqjl0g4kay3HMiumdyftmaC72GR4ioyxzLqiUCihSf7r_87lucitxn5I_orU-QMMdCj-siwzjlePxk8Fj6TljrXiQ9pPDYhaGpqQh3H7VqZohmhdf_q-o-99cX60G6_R7VzJc62R4Lh81nBDiV5CM4VQRFgbkpgU4r97w3wGU4YKCG97ZkO4R8NR4M01L6mlj9MulVOHceKhFFDl41RlDtqfWC8Zr_xKgbbbYZ0INFEW1mBJZTcOSwiOpjgeI-Dw8nKdnv56awYUeYUADZqObShNy-9C9k3_2loJ_qIlrb6mfUIQNnnni4LMNVbq18oe2x_YsnOXCfeL6ktqbyikaOU7DOj2lny8rwBkRdMfeM2JVKVNVn64GaJRnsCrHCEENC019BSkKlWywqS265hFDDRDQpvRUSgolqDkRMNJ47jSJsDgtydSmj0cphaVLQ5q1sWhZ51ibiA3Q-Xh0CxPezAT_9qbsToxNwAiDyI3Zs4JvERYSSI4lv60L8HXQMBup7L6MMXxmFbdMN8JdR5moUct1-GN2-zoeSyXnazfK8-IzTyTnvyXCX0dSQXd4miZaKQugWablBJ9YIp3MzkgGVwXD1hw_YmL9B3MTXaMx2hzxNfBnzHmIG8xWrmKSvOYW_n1CuGaPZq_KwOnOwC0XwslW_dFm6-MX177rkFu_WGqlDvRyB5VfpjM8Daf9sCFz28l5f0EmSDMGnTNq41ksOY2uOawKaXO4lnN9EmnupudOjRJkDMzpX2SsrDKGwhdSQS8uX00agz7rbt92P46diaT3HjFAmugjBDq1ZHQaHleS3tRVP2z-AtaEeHtiBQx4wLRjjbTRQ3DJVXuccADPWnLOYkt6DoWHcpmNWKkN3mrsdTdomplx9siEuYvLxPLyvB-S1-sTeWjYIbMgCd_Eqe0ceD9N42Sadl52H-L-c8v6c9zjmBpLdPBdI-XKEbjHMuRNLUxXHXS66YOjnmlImQEJ6n5r0Ewd0PZaKJqtQhjhMEBdJFD5EMnvzmB3rqJImrp99pT-uLfP8IajtEphlisejVErGsvEoXRLOnysMSmuLDaQl2k9Kl7lcSRCPfFsKQqRda-e9eZoLq7bdh_ms_Gis26r_CBIYmxwOiJBxjm6LYTl5hL9WE4L_RW5LHMAi_bzjUw_cR3SipS30HjgYF5-E1AnJc7GskcTG3WcfR02wCkXxEJ_4VvxU71r2Z642n0as0Jp3jTP1pPpp7Q6scj5ZJXhEDaP0v1G86FInS_ncBKlBxDsygYCWVDDzyd3UxR4mvwsidfukb4mIkLPa5HNZrERH4SpBxvKUHrlq-EAM9nS0oIEANUD3jHRj37PXnb1rXskNXsEX3FqV5bLl9I8Ljy66_Z4H7iJbArnB6pUB3lttgZZeT/https://www.amazon.com/stores/page/928028F3-88A5-418E-8A1A-B566293911DF/?_encoding=UTF8&store_ref=SB_A0344013LZIN373SFYWQ-A06876961SVYI23ISMP34&pd_rd_plhdr=t&aaxitk=19bcd2ae28e365c438119545c84614ac&hsa_cr_id=0&lp_asins=B0DDT74R65%2CB0DDT5F74M%2CB0DDT3H2HS&lp_query=ofertas%20best%20electronics&lp_slot=desktop-hsa-3psl&ref_=sbx_be_s_3psl_mbd_mb2_bkgd&pd_rd_w=xc2H4&content-id=amzn1.sym.5594c86b-e694-4e3e-9301-a074f0faf98a%3Aamzn1.sym.5594c86b-e694-4e3e-9301-a074f0faf98a&pf_rd_p=5594c86b-e694-4e3e-9301-a074f0faf98a&pf_rd_r=4C4JWBTWSBS9QDSWPVN2&pd_rd_wg=aw8Sc&pd_rd_r=a1de7cf9-b93c-4192-8b49-10f3b4925d90",
+        "logo": "https://m.media-amazon.com/images/S/al-na-9d5791cf-3faf/efe10c6e-d658-4bce-9191-e7d5e82492b4._CR0,0,400,400_AC_SX278_SY200_CB1169409_QL70_.jpg"
+      }
+    ]
+  },
+  "categories": [
+    {
+      "position": 1,
+      "name": "Gift Cards",
+      "link": "https://www.amazon.com/gift-cards/b/?ie=UTF8&node=2238192011&ref_=nav_cs_gc",
+      "node": "2238192011",
+      "serpapi_link": "https://serpapi.com/search.json?amazon_domain=amazon.com&device=desktop&engine=amazon&node=2238192011"
+    },
+    {
+      "position": 2,
+      "name": "Smart Home",
+      "link": "https://www.amazon.com/Smart-Home/b/?ie=UTF8&node=6563140011&ref_=nav_cs_smart_home",
+      "node": "6563140011",
+      "serpapi_link": "https://serpapi.com/search.json?amazon_domain=amazon.com&device=desktop&engine=amazon&node=6563140011"
+    },
+    {
+      "position": 3,
+      "name": "Sports & Outdoors",
+      "link": "https://www.amazon.com/sports-outdoors/b/?ie=UTF8&node=3375251&ref_=nav_cs_sports",
+      "node": "3375251",
+      "serpapi_link": "https://serpapi.com/search.json?amazon_domain=amazon.com&device=desktop&engine=amazon&node=3375251"
+    },
+    {
+      "position": 4,
+      "name": "Amazon Home",
+      "link": "https://www.amazon.com/home-garden-kitchen-furniture-bedding/b/?ie=UTF8&node=1055398&ref_=nav_cs_home",
+      "node": "1055398",
+      "serpapi_link": "https://serpapi.com/search.json?amazon_domain=amazon.com&device=desktop&engine=amazon&node=1055398"
+    },
+    {
+      "position": 5,
+      "name": "Fashion",
+      "link": "https://www.amazon.com/amazon-fashion/b/?ie=UTF8&node=7141123011&ref_=nav_cs_fashion",
+      "node": "7141123011",
+      "serpapi_link": "https://serpapi.com/search.json?amazon_domain=amazon.com&device=desktop&engine=amazon&node=7141123011"
+    },
+    {
+      "position": 6,
+      "name": "Books",
+      "link": "https://www.amazon.com/books-used-books-textbooks/b/?ie=UTF8&node=283155&ref_=nav_cs_books",
+      "node": "283155",
+      "serpapi_link": "https://serpapi.com/search.json?amazon_domain=amazon.com&device=desktop&engine=amazon&node=283155"
+    },
+    {
+      "position": 7,
+      "name": "Sell",
+      "link": "https://www.amazon.com/b/?_encoding=UTF8&ld=AZUSSOA-sell&node=12766669011&ref_=nav_cs_sell",
+      "node": "12766669011",
+      "serpapi_link": "https://serpapi.com/search.json?amazon_domain=amazon.com&device=desktop&engine=amazon&node=12766669011"
+    },
+    {
+      "position": 8,
+      "name": "Beauty & Personal Care",
+      "link": "https://www.amazon.com/Beauty-Makeup-Skin-Hair-Products/b/?ie=UTF8&node=3760911&ref_=nav_cs_beauty",
+      "node": "3760911",
+      "serpapi_link": "https://serpapi.com/search.json?amazon_domain=amazon.com&device=desktop&engine=amazon&node=3760911"
+    },
+    {
+      "position": 9,
+      "name": "Toys & Games",
+      "link": "https://www.amazon.com/toys/b/?ie=UTF8&node=165793011&ref_=nav_cs_toys",
+      "node": "165793011",
+      "serpapi_link": "https://serpapi.com/search.json?amazon_domain=amazon.com&device=desktop&engine=amazon&node=165793011"
+    },
+    {
+      "position": 10,
+      "name": "Automotive",
+      "link": "https://www.amazon.com/automotive-auto-truck-replacements-parts/b/?ie=UTF8&node=15684181&ref_=nav_cs_automotive",
+      "node": "15684181",
+      "serpapi_link": "https://serpapi.com/search.json?amazon_domain=amazon.com&device=desktop&engine=amazon&node=15684181"
+    },
+    {
+      "position": 11,
+      "name": "Home Improvement",
+      "link": "https://www.amazon.com/Tools-and-Home-Improvement/b/?ie=UTF8&node=228013&ref_=nav_cs_hi",
+      "node": "228013",
+      "serpapi_link": "https://serpapi.com/search.json?amazon_domain=amazon.com&device=desktop&engine=amazon&node=228013"
+    },
+    {
+      "position": 12,
+      "name": "Computers",
+      "link": "https://www.amazon.com/computer-pc-hardware-accessories-add-ons/b/?ie=UTF8&node=541966&ref_=nav_cs_pc",
+      "node": "541966",
+      "serpapi_link": "https://serpapi.com/search.json?amazon_domain=amazon.com&device=desktop&engine=amazon&node=541966"
+    }
+  ],
+  "filters": {
+    "department": [
+      {
+        "position": 1,
+        "name": "Electronics",
+        "rh": "n:172282",
+        "link": "https://www.amazon.com/s?k=ofertas+best+electronics&rh=n%3A172282&dc&qid=1753679613&rnid=2941120011&ref=sr_nr_n_1&ds=v1%3A%2BLiBHvLiQ2mIDtYUtvza2e5UqoOSGO0%2BOZEPrBRm0QU",
+        "serpapi_link": "https://serpapi.com/search.json?amazon_domain=amazon.com&device=desktop&engine=amazon&k=ofertas+best+electronics&rh=n%3A172282"
+      },
+      {
+        "position": 2,
+        "name": "Computers & Accessories",
+        "rh": "n:541966",
+        "link": "https://www.amazon.com/s?k=ofertas+best+electronics&rh=n%3A172282%2Cn%3A541966&dc&qid=1753679613&rnid=2941120011&ref=sr_nr_n_2&ds=v1%3A5%2Bb1PVSdOiIWYp3sREAyOiacCeDrCQdU8F5fM4YGU%2Bo",
+        "serpapi_link": "https://serpapi.com/search.json?amazon_domain=amazon.com&device=desktop&engine=amazon&k=ofertas+best+electronics&rh=n%3A172282%2Cn%3A541966"
+      },
+      {
+        "position": 3,
+        "name": "Portable Bluetooth Speakers",
+        "rh": "n:7073956011",
+        "link": "https://www.amazon.com/s?k=ofertas+best+electronics&rh=n%3A172282%2Cn%3A7073956011&dc&qid=1753679613&rnid=2941120011&ref=sr_nr_n_3&ds=v1%3A3yWZ7D7Th3okGZRsNjiFn34g%2BMWrWFZDu%2F8Nk3EGLzc",
+        "serpapi_link": "https://serpapi.com/search.json?amazon_domain=amazon.com&device=desktop&engine=amazon&k=ofertas+best+electronics&rh=n%3A172282%2Cn%3A7073956011"
+      },
+      {
+        "position": 4,
+        "name": "Earbud & In-Ear Headphones",
+        "rh": "n:12097478011",
+        "link": "https://www.amazon.com/s?k=ofertas+best+electronics&rh=n%3A172282%2Cn%3A12097478011&dc&qid=1753679613&rnid=2941120011&ref=sr_nr_n_4&ds=v1%3AH83wtHhOar7hTfdSnE83tOth%2F68ZNPdIwqWhhjfD6R4",
+        "serpapi_link": "https://serpapi.com/search.json?amazon_domain=amazon.com&device=desktop&engine=amazon&k=ofertas+best+electronics&rh=n%3A172282%2Cn%3A12097478011"
+      },
+      {
+        "position": 5,
+        "name": "Wearable Technology",
+        "rh": "n:10048700011",
+        "link": "https://www.amazon.com/s?k=ofertas+best+electronics&rh=n%3A172282%2Cn%3A10048700011&dc&qid=1753679613&rnid=2941120011&ref=sr_nr_n_5&ds=v1%3AWWO4JTKCisMkh7LALLGOOS0XDHJiUzb%2Bsiz7duN8iKc",
+        "serpapi_link": "https://serpapi.com/search.json?amazon_domain=amazon.com&device=desktop&engine=amazon&k=ofertas+best+electronics&rh=n%3A172282%2Cn%3A10048700011"
+      },
+      {
+        "position": 6,
+        "name": "Camera & Photo",
+        "rh": "n:502394",
+        "link": "https://www.amazon.com/s?k=ofertas+best+electronics&rh=n%3A172282%2Cn%3A502394&dc&qid=1753679613&rnid=2941120011&ref=sr_nr_n_6&ds=v1%3AhczCKX4ZOGa13N9koMFYqs1FmOWExqJdQ%2BjBAjdqDlU",
+        "serpapi_link": "https://serpapi.com/search.json?amazon_domain=amazon.com&device=desktop&engine=amazon&k=ofertas+best+electronics&rh=n%3A172282%2Cn%3A502394"
+      },
+      {
+        "position": 7,
+        "name": "Cell Phones & Accessories",
+        "rh": "n:2335752011",
+        "link": "https://www.amazon.com/s?k=ofertas+best+electronics&rh=n%3A2335752011&dc&qid=1753679613&rnid=2941120011&ref=sr_nr_n_7&ds=v1%3Arx2vpqYkB5fSOSReqVVdayPEjcGD1lKTVlZRUHQ7XM4",
+        "serpapi_link": "https://serpapi.com/search.json?amazon_domain=amazon.com&device=desktop&engine=amazon&k=ofertas+best+electronics&rh=n%3A2335752011"
+      },
+      {
+        "position": 8,
+        "name": "Clothing, Shoes & Jewelry",
+        "rh": "n:7141123011",
+        "link": "https://www.amazon.com/s?k=ofertas+best+electronics&rh=n%3A7141123011&dc&qid=1753679613&rnid=2941120011&ref=sr_nr_n_8&ds=v1%3AKitIcAqyOuUzfEUxUp%2BnLLR%2FOdhQhO2GMqpvvbLYDRw",
+        "serpapi_link": "https://serpapi.com/search.json?amazon_domain=amazon.com&device=desktop&engine=amazon&k=ofertas+best+electronics&rh=n%3A7141123011"
+      }
+    ]
+  }
+}
