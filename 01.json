@@ -1,0 +1,212 @@
+{
+  "name": "Amazon_Affiliates_Global_Mass_Posting",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "trigger",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [100, 300]
+    },
+    {
+      "parameters": {
+        "operation": "read",
+        "sheetId": "{{ $env.SHEET_ID_PRODUCTS }}",
+        "range": "Productos!A2:E"
+      },
+      "id": "get_products",
+      "name": "Get Products",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 1,
+      "position": [300, 300],
+      "credentials": { "googleSheetsOAuth2Api": "" }
+    },
+    {
+      "parameters": {
+        "functionCode": "// Limpieza y formato de datos\nreturn items.filter(item => item.json.Nombre && item.json.Categoria && item.json.Enlace).map(item => {\n  return {\n    json: {\n      name: item.json.Nombre.trim(),\n      category: item.json.Categoria.trim(),\n      links: {\n        US: item.json.AmazonUS.trim(),\n        ES: item.json.AmazonES.trim(),\n        CA: item.json.AmazonCA.trim(),\n        UK: item.json.AmazonUK.trim(),\n        AU: item.json.AmazonAU.trim(),\n        PL: item.json.AmazonPL.trim(),\n        FR: item.json.AmazonFR.trim()\n      }\n    }\n  };\n});"
+      },
+      "id": "prepare_links",
+      "name": "Prepare Affiliate Links",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [500, 300]
+    },
+    {
+      "parameters": {
+        "url": "https://ipapi.co/json/",
+        "method": "GET"
+      },
+      "id": "geoip",
+      "name": "Detect Country (GeoIP)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [700, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Asigna país, idioma y link por país\nconst geo = items[0].json;\nconst countryCodes = {\n  US: { code: 'US', lang: 'en', link: 'AmazonUS'},\n  ES: { code: 'ES', lang: 'es', link: 'AmazonES'},\n  CA: { code: 'CA', lang: 'en', link: 'AmazonCA'},\n  GB: { code: 'UK', lang: 'en', link: 'AmazonUK'},\n  AU: { code: 'AU', lang: 'en', link: 'AmazonAU'},\n  PL: { code: 'PL', lang: 'pl', link: 'AmazonPL'},\n  FR: { code: 'FR', lang: 'fr', link: 'AmazonFR'}\n};\nconst country = countryCodes[geo.country_code] || countryCodes['US'];\nreturn items.map(item => {\n  return {\n    json: {\n      ...item.json,\n      country: country.code,\n      language: country.lang,\n      selected_link: item.json.links[country.code]\n    }\n  };\n});"
+      },
+      "id": "assign_country_link",
+      "name": "Assign Country/Link",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [900, 300]
+    },
+    {
+      "parameters": {
+        "model": "gpt-4",
+        "prompt": "You are a world-class marketing expert. Write a high-conversion, hypnotic, emotional, viral social media post and short video script for {{ $json[\"name\"] }} ({{ $json[\"category\"] }}) to promote in {{ $json.country }} (language: {{ $json.language }}). The post must include urgency, local language and culture, and redirect to: {{ $json.selected_link }}. Avoid repetition and use advanced copywriting."
+      },
+      "id": "generate_text",
+      "name": "Generate AI Text",
+      "type": "n8n-nodes-base.openai",
+      "typeVersion": 1,
+      "position": [1100, 300],
+      "credentials": { "openAIApi": "" }
+    },
+    {
+      "parameters": {
+        "prompt": "Create a viral short video (15-30s, vertical) for product: {{ $json.name }} ({{ $json.category }}), for {{ $json.country }} in {{ $json.language }}. Use this script: {{ $json['choices'][0]['text'] }}. Output download link to MP4.",
+        "model": "pikalabs-v1"
+      },
+      "id": "generate_video",
+      "name": "Generate Video",
+      "type": "n8n-nodes-community.pikalabs",
+      "typeVersion": 1,
+      "position": [1300, 300]
+    },
+    // --- Publicar en cada red social, credenciales a completar ---
+    // YouTube Shorts
+    {
+      "parameters": {
+        "url": "https://www.googleapis.com/upload/youtube/v3/videos?uploadType=resumable&part=snippet,status",
+        "method": "POST",
+        "jsonParameters": true,
+        "bodyParametersJson": "{\n  \"snippet\": { \"title\": \"{{ $json.name }}\", \"description\": \"{{ $json['choices'][0]['text'] }}\", \"tags\": [\"Amazon\", \"{{ $json.category }}\"] },\n  \"status\": { \"privacyStatus\": \"public\" }\n}"
+      },
+      "id": "publish_youtube",
+      "name": "Publish on YouTube",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [1500, 100],
+      "credentials": { "httpBearerAuth": "" }
+    },
+    // Facebook
+    {
+      "parameters": {
+        "url": "https://graph.facebook.com/v18.0/me/feed",
+        "method": "POST",
+        "jsonParameters": true,
+        "bodyParametersJson": "{ \"message\": \"{{ $json['choices'][0]['text'] }}\\n{{ $json.selected_link }}\" }"
+      },
+      "id": "publish_facebook",
+      "name": "Publish on Facebook",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [1500, 200],
+      "credentials": { "httpBearerAuth": "" }
+    },
+    // Instagram
+    {
+      "parameters": {
+        "url": "https://graph.facebook.com/v18.0/{{ $env.IG_USER_ID }}/media",
+        "method": "POST",
+        "jsonParameters": true,
+        "bodyParametersJson": "{ \"caption\": \"{{ $json['choices'][0]['text'] }}\\n{{ $json.selected_link }}\", \"video_url\": \"{{ $json.video_url }}\" }"
+      },
+      "id": "publish_instagram",
+      "name": "Publish on Instagram",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [1500, 300],
+      "credentials": { "httpBearerAuth": "" }
+    },
+    // TikTok
+    {
+      "parameters": {
+        "url": "https://api.thirdparty-tiktok.com/upload",
+        "method": "POST",
+        "jsonParameters": true,
+        "bodyParametersJson": "{ \"caption\": \"{{ $json['choices'][0]['text'] }}\", \"video_url\": \"{{ $json.video_url }}\" }"
+      },
+      "id": "publish_tiktok",
+      "name": "Publish on TikTok",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [1500, 400],
+      "credentials": { "httpBearerAuth": "" }
+    },
+    // Twitter/X
+    {
+      "parameters": {
+        "url": "https://api.twitter.com/2/tweets",
+        "method": "POST",
+        "jsonParameters": true,
+        "bodyParametersJson": "{ \"text\": \"{{ $json['choices'][0]['text'] }}\\n{{ $json.selected_link }}\" }"
+      },
+      "id": "publish_twitter",
+      "name": "Publish on Twitter",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [1500, 500],
+      "credentials": { "httpBearerAuth": "" }
+    },
+    // LinkedIn
+    {
+      "parameters": {
+        "url": "https://api.linkedin.com/v2/ugcPosts",
+        "method": "POST",
+        "jsonParameters": true,
+        "bodyParametersJson": "{ \"author\": \"urn:li:person:{{ $env.LINKEDIN_USER_ID }}\", \"lifecycleState\": \"PUBLISHED\", \"specificContent\": { \"com.linkedin.ugc.ShareContent\": { \"shareCommentary\": { \"text\": \"{{ $json['choices'][0]['text'] }}\\n{{ $json.selected_link }}\" }, \"shareMediaCategory\": \"ARTICLE\" } }, \"visibility\": { \"com.linkedin.ugc.MemberNetworkVisibility\": \"PUBLIC\" } }"
+      },
+      "id": "publish_linkedin",
+      "name": "Publish on LinkedIn",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [1500, 600],
+      "credentials": { "httpBearerAuth": "" }
+    },
+    // Pinterest, Reddit, Medium (igual que antes, puedes replicar la estructura)
+    // Registro en Google Sheets
+    {
+      "parameters": {
+        "operation": "append",
+        "sheetId": "{{ $env.SHEET_ID_PUBLICATIONS }}",
+        "range": "Publicaciones!A:G",
+        "values": "={{ [$json.name, $json.category, $json.country, $json.language, $json.selected_link, $json.publishedAt, $json.success] }}"
+      },
+      "id": "register_publication",
+      "name": "Register Publication",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 1,
+      "position": [1700, 300],
+      "credentials": { "" }
+    }
+  ],
+  "connections": {
+    "trigger": { "main": [[{ "node": "get_products", "type": "main", "index": 0 }]] },
+    "get_products": { "main": [[{ "node": "prepare_links", "type": "main", "index": 0 }]] },
+    "prepare_links": { "main": [[{ "node": "geoip", "type": "main", "index": 0 }]] },
+    "geoip": { "main": [[{ "node": "assign_country_link", "type": "main", "index": 0 }]] },
+    "assign_country_link": { "main": [[{ "node": "generate_text", "type": "main", "index": 0 }]] },
+    "generate_text": { "main": [[{ "node": "generate_video", "type": "main", "index": 0 }]] },
+    "generate_video": {
+      "main": [
+        [{ "node": "publish_youtube", "type": "main", "index": 0 }],
+        [{ "node": "publish_facebook", "type": "main", "index": 0 }],
+        [{ "node": "publish_instagram", "type": "main", "index": 0 }],
+        [{ "node": "publish_tiktok", "type": "main", "index": 0 }],
+        [{ "node": "publish_twitter", "type": "main", "index": 0 }],
+        [{ "node": "publish_linkedin", "type": "main", "index": 0 }]
+      ]
+    },
+    "publish_youtube": { "main": [[{ "node": "register_publication", "type": "main", "index": 0 }]] },
+    "publish_facebook": { "main": [[{ "node": "register_publication", "type": "main", "index": 0 }]] },
+    "publish_instagram": { "main": [[{ "node": "register_publication", "type": "main", "index": 0 }]] },
+    "publish_tiktok": { "main": [[{ "node": "register_publication", "type": "main", "index": 0 }]] },
+    "publish_twitter": { "main": [[{ "node": "register_publication", "type": "main", "index": 0 }]] },
+    "publish_linkedin": { "main": [[{ "node": "register_publication", "type": "main", "index": 0 }]] }
+  }
+}
