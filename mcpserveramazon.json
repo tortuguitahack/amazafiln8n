@@ -1,0 +1,16 @@
+
+{
+  "mcpServers": {
+    "n8n-mcp": {
+      "command": "npx",
+      "args": ["n8n-mcp"],
+      "env": {
+        "MCP_MODE": "stdio",
+        "LOG_LEVEL": "error",
+        "DISABLE_CONSOLE_OUTPUT": "true",
+        "N8N_API_URL": "https://n8n.scrapes.ai",
+        "N8N_API_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJiNGNjZWY4Mi1jMDQ3LTQ3NjUtYjJjNS1lMzk4ODc0NmFiM2YiLCJpc3MiOiJuOG4iLCJhdWQiOiJwdWJsaWMtYXBpIiwiaWF0IjoxNzUyMzQxMzk0LCJleHAiOjE3NTQ4ODQ4MDB9.BfkKdOA6gIV8Zl2hD6ZIsbU8-9yxV1OrkICB8f5xNZo"
+      }
+    }
+  }
+}
