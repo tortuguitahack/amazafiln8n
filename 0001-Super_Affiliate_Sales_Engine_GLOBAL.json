@@ -1,0 +1,126 @@
+{
+  "name": "Super_Affiliate_Sales_Engine_GLOBAL",
+  "active": false,
+  "versionId": "v3_global_autosell",
+  "tags": [
+    {
+      "name": "afiliados"
+    },
+    {
+      "name": "ventas"
+    },
+    {
+      "name": "multimedia"
+    },
+    {
+      "name": "automatizacion"
+    },
+    {
+      "name": "social-media"
+    }
+  ],
+  "settings": {},
+  "nodes": [
+    {
+      "parameters": {
+        "functionCode": "return [{ json: { title: \"Smartphone X\", price: \"199.99\", offer_link: \"https://www.amazon.com/dp/B09X1LJDXN?tag=diegodgard0-20\" } }];"
+      },
+      "id": "start_product",
+      "name": "Simulación Producto",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        1600,
+        100
+      ]
+    },
+    {
+      "parameters": {
+        "model": "gpt-4o",
+        "prompt": "Crea un texto altamente persuasivo y emocional para vender el siguiente producto. Incluye técnicas de marketing emocional, neuroventa y persuasión hipnótica. Producto: {{ $json.title }}. Precio: {{ $json.price }}. Link: {{ $json.offer_link }}",
+        "temperature": 0.9
+      },
+      "id": "generate_persuasion_text",
+      "name": "Generate Persuasive Text",
+      "type": "n8n-nodes-base.openai",
+      "typeVersion": 1,
+      "position": [
+        1800,
+        200
+      ],
+      "credentials": {
+        "openAIApi": "REEMPLAZAR_OPENAI_CREDENCIAL"
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://api.elevenlabs.io/v1/text-to-speech/REEMPLAZAR_VOICE_ID",
+        "method": "POST",
+        "jsonParameters": true,
+        "bodyParametersJson": "{\n  \"text\": \"{{$json.persuasion_text}}\",\n  \"model_id\": \"eleven_multilingual_v2\",\n  \"voice_settings\": {\n    \"stability\": 0.4,\n    \"similarity_boost\": 0.6\n  }\n}",
+        "options": {},
+        "headerParametersJson": "{\n  \"xi-api-key\": \"REEMPLAZAR_ELEVENLABS_API_KEY\",\n  \"Content-Type\": \"application/json\"\n}"
+      },
+      "id": "generate_audio",
+      "name": "Generate Audio (TTS)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [
+        2000,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://api.heygen.com/v1/video/generate",
+        "method": "POST",
+        "jsonParameters": true,
+        "bodyParametersJson": "{\n  \"script\": \"{{$json.persuasion_text}}\",\n  \"voice_url\": \"{{$node[\\\"Generate Audio (TTS)\\\"].binary.data.url}}\",\n  \"output_format\": \"mp4\"\n}",
+        "headerParametersJson": "{\n  \"Authorization\": \"Bearer REEMPLAZAR_VIDEO_API_KEY\"\n}"
+      },
+      "id": "generate_video",
+      "name": "Generate Video",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [
+        2200,
+        200
+      ]
+    }
+  ],
+  "connections": {
+    "start_product": {
+      "main": [
+        [
+          {
+            "node": "generate_persuasion_text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "generate_persuasion_text": {
+      "main": [
+        [
+          {
+            "node": "generate_audio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "generate_audio": {
+      "main": [
+        [
+          {
+            "node": "generate_video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}
