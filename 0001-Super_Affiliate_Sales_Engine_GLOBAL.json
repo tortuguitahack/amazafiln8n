@@ -23,7 +23,7 @@
   "nodes": [
     {
       "parameters": {
-        "functionCode": "return [{ json: { title: \"Smartphone X\", price: \"199.99\", offer_link: \"https://www.amazon.com/dp/B09X1LJDXN?tag=diegodgard0-20\" } }];"
+        "functionCode": "return [{ json: { title: \"Smartphone X\", price: \"199.99\", offer_link: \"https://www.amazon.com/dp/B09X1LJDXN?tag=diegoedgard0-20\" } }];"
       },
       "id": "start_product",
       "name": "Simulación Producto",
