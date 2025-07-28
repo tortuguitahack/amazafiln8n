@@ -1,0 +1,253 @@
+{
+  "name": "Amazon_Affiliates_Global_Pro",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {
+        "triggerTimes": [
+          { "mode": "everyX", "value": 20, "unit": "minutes" }
+        ]
+      },
+      "id": "cron_trigger",
+      "name": "CRON Trigger",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [100, 300]
+    },
+    {
+      "parameters": {
+        "operation": "read",
+        "sheetId": "{{ $env.SHEET_ID_PRODUCTS }}",
+        "range": "Productos!A2:H" 
+      },
+      "id": "get_products",
+      "name": "Get Products",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 1,
+      "position": [300, 300],
+      "credentials": { "googleSheetsOAuth2Api": "{{ $env.GSHEET_CREDENTIALS_ID }}" }
+    },
+    {
+      "parameters": {
+        "batchSize": 5
+      },
+      "id": "split_batches",
+      "name": "Split In Batches",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 1,
+      "position": [500, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Filtrar productos ya publicados y limpiar datos\nreturn items.filter(item => !item.json.Publicado).map(item => {\n  return {\n    json: {\n      product_id: item.json.ID,\n      name: item.json.Nombre.trim(),\n      category: item.json.Categoria.trim(),\n      audience: item.json.Audiencia || 'general',\n      platforms: (item.json.Plataformas || 'facebook,instagram,twitter,tiktok,youtube,linkedin').split(','),\n      links: {\n        US: item.json.AmazonUS?.trim(),\n        ES: item.json.AmazonES?.trim(),\n        CA: item.json.AmazonCA?.trim(),\n        UK: item.json.AmazonUK?.trim(),\n        AU: item.json.AmazonAU?.trim(),\n        PL: item.json.AmazonPL?.trim(),\n        FR: item.json.AmazonFR?.trim()\n      }\n    }\n  };\n});"
+      },
+      "id": "prepare_links",
+      "name": "Prepare Links",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [700, 300]
+    },
+    {
+      "parameters": {
+        "url": "https://ipapi.co/json/",
+        "method": "GET"
+      },
+      "id": "geoip",
+      "name": "Detect Country (GeoIP)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [900, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Asignar país e idioma y link por país\nconst geo = items[0].json;\nconst countryCodes = {\n  US: { code: 'US', lang: 'en', link: 'AmazonUS'},\n  ES: { code: 'ES', lang: 'es', link: 'AmazonES'},\n  CA: { code: 'CA', lang: 'en', link: 'AmazonCA'},\n  GB: { code: 'UK', lang: 'en', link: 'AmazonUK'},\n  AU: { code: 'AU', lang: 'en', link: 'AmazonAU'},\n  PL: { code: 'PL', lang: 'pl', link: 'AmazonPL'},\n  FR: { code: 'FR', lang: 'fr', link: 'AmazonFR'}\n};\nconst country = countryCodes[geo.country_code] || countryCodes['US'];\nreturn items.map(item => {\n  return {\n    json: {\n      ...item.json,\n      country: country.code,\n      language: country.lang,\n      selected_link: item.json.links[country.code]\n    }\n  };\n});"
+      },
+      "id": "assign_country_link",
+      "name": "Assign Country/Link",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [1100, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Añadir UTM parameters para Analytics\nconst utmParams = '?utm_source={{platform}}&utm_medium=affiliate&utm_campaign=' + encodeURIComponent(item.json.name);\nreturn items.map(item => ({\n  json: {\n    ...item.json,\n    selected_link_utm: item.json.selected_link + utmParams.replace('{{platform}}', item.json.platform || 'general')\n  }\n}));"
+      },
+      "id": "add_utm",
+      "name": "Add UTM Parameters",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [1300, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Generar variantes de copy A/B para cada plataforma y público\nconst platforms = ['facebook','instagram','twitter','tiktok','youtube','linkedin'];\nconst variants = ['A','B'];\nlet result = [];\nitems.forEach(item => {\n  platforms.forEach(platform => {\n    variants.forEach(variant => {\n      result.push({json: {...item.json, platform, variant}});\n    });\n  });\n});\nreturn result;"
+      },
+      "id": "generate_variants",
+      "name": "Generate Copy Variants",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [1500, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Traducción automática si idioma destino no es inglés\nconst axios = require('axios');\nconst targetLang = item.json.language;\nif (targetLang !== 'en') {\n  // Aquí puedes llamar a DeepL o Google Translate API (ejemplo ficticio)\n  // const translated = await axios.post(...)\n  // item.json.name = translated.data.name;\n  // ...\n}\nreturn items;"
+      },
+      "id": "auto_translate",
+      "name": "Auto Translate",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [1700, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Mensaje legal de afiliado\nconst legal = {\n  'en': 'Affiliate link. As Amazon Associates, we may earn commissions from qualifying purchases.',\n  'es': 'Enlace de afiliado. Como asociados de Amazon, podemos recibir comisión por compras realizadas a través de este enlace.',\n  'fr': 'Lien affilié. En tant qu\'associés Amazon, nous pouvons recevoir une commission.',\n  'pl': 'Link partnerski. Jako partnerzy Amazon możemy otrzymywać prowizje.'\n};\nreturn items.map(item => ({\n  json: {\n    ...item.json,\n    affiliate_disclaimer: legal[item.json.language] || legal['en']\n  }\n}));"
+      },
+      "id": "add_legal",
+      "name": "Add Legal Disclaimer",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [1900, 300]
+    },
+    {
+      "parameters": {
+        "model": "gpt-4",
+        "prompt": "You are a professional copywriter. Write a social media post for platform {{ $json.platform }}, product {{ $json.name }} ({{ $json.category }}) for audience {{ $json.audience }} in {{ $json.country }} ({{ $json.language }}). Use variant {{ $json.variant }}. The post must be viral, urgent, emotional, original, adapted to the local culture, include relevant hashtags/emojis, and finish with this legal disclaimer: {{ $json.affiliate_disclaimer }}. Redirect to: {{ $json.selected_link_utm }}. Use this prompt for each platform:\nFacebook: Start with a bold question, storytelling, and 2 emojis.\nInstagram: Use a personal anecdote, 3 trending hashtags, and a call-to-action.\nTwitter: Concise, witty, 2 hashtags, 1 emoji, and a strong CTA.\nTikTok: Hook phrase, trending hashtag, 1 emoji, and challenge format.\nYouTube: Key benefit as a question, story, and CTA with urgency.\nLinkedIn: Professional tone, problem-solution, no emojis, and clear CTA.\n"
+      },
+      "id": "generate_copy",
+      "name": "Generate AI Copy",
+      "type": "n8n-nodes-base.openai",
+      "typeVersion": 1,
+      "position": [2100, 300],
+      "credentials": { "openAIApi": "{{ $env.OPENAI_API_KEY }}" }
+    },
+    {
+      "parameters": {
+        "prompt": "Create a viral short video (15-30s, vertical) for {{ $json.platform }} for product: {{ $json.name }} ({{ $json.category }}), for {{ $json.country }} in {{ $json.language }}, using this script: {{ $json['choices'][0]['text'] }}. Output download link to MP4.",
+        "model": "pikalabs-v1"
+      },
+      "id": "generate_video",
+      "name": "Generate Video",
+      "type": "n8n-nodes-community.pikalabs",
+      "typeVersion": 1,
+      "position": [2300, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Validar resultado video\nreturn items.map(item => {\n  if (!item.json.video_url) {\n    item.json.error = 'Video generation failed';\n  }\n  return item;\n});"
+      },
+      "id": "validate_video",
+      "name": "Validate Video",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [2500, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [{ "value1": "{{ $json.error }}", "operation": "notEmpty" }]
+        }
+      },
+      "id": "check_video_error",
+      "name": "Check Video Error",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [2700, 300]
+    },
+    {
+      "parameters": {
+        "url": "{{ $env.SLACK_WEBHOOK_URL }}",
+        "method": "POST",
+        "jsonParameters": true,
+        "bodyParametersJson": "{ \"text\": \"[ERROR] Failed to generate video for {{ $json.name }} on {{ $json.platform }}. Error: {{ $json.error }}\" }"
+      },
+      "id": "notify_error",
+      "name": "Notify Error (Slack)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [2900, 200]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Retry logic (simple example)\nreturn items;"
+      },
+      "id": "retry_video",
+      "name": "Retry Video",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [2900, 400]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Lógica de publicación y URLs finales por plataforma\nconst links = {\n  facebook: 'https://graph.facebook.com/v18.0/me/feed',\n  instagram: 'https://graph.facebook.com/v18.0/{{ $env.IG_USER_ID }}/media',\n  twitter: 'https://api.twitter.com/2/tweets',\n  tiktok: 'https://api.thirdparty-tiktok.com/upload',\n  youtube: 'https://www.googleapis.com/upload/youtube/v3/videos?uploadType=resumable&part=snippet,status',\n  linkedin: 'https://api.linkedin.com/v2/ugcPosts'\n};\nitem.json.publish_url = links[item.json.platform];\nreturn items;"
+      },
+      "id": "set_publish_url",
+      "name": "Set Publish URL",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [3100, 300]
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.publish_url }}",
+        "method": "POST",
+        "jsonParameters": true,
+        "bodyParametersJson": "{\n  \"message\": \"{{ $json['choices'][0]['text'] }}\\n{{ $json.selected_link_utm }}\",\n  \"caption\": \"{{ $json['choices'][0]['text'] }}\\n{{ $json.selected_link_utm }}\",\n  \"text\": \"{{ $json['choices'][0]['text'] }}\\n{{ $json.selected_link_utm }}\",\n  \"video_url\": \"{{ $json.video_url }}\"\n}"
+      },
+      "id": "publish_platform",
+      "name": "Publish on Platform",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [3300, 300],
+      "credentials": { "httpBearerAuth": "{{ $env.PLATFORM_TOKEN }}" }
+    },
+    {
+      "parameters": {
+        "functionCode": "// Validar publicación\nitem.json.publishedAt = new Date().toISOString();\nitem.json.success = $json.status === 200 ? 'OK' : 'FAIL';\nitem.json.post_url = $json.url || null;\nreturn [item];"
+      },
+      "id": "validate_publish",
+      "name": "Validate Publish",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [3500, 300]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "sheetId": "{{ $env.SHEET_ID_PUBLICATIONS }}",
+        "range": "Publicaciones!A:J",
+        "values": "={{ [$json.name, $json.category, $json.country, $json.language, $json.selected_link_utm, $json.platform, $json.post_url, $json.success, $json.publishedAt, $json.variant] }}"
+      },
+      "id": "register_publication",
+      "name": "Register Publication",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 1,
+      "position": [3700, 300],
+      "credentials": { "googleSheetsOAuth2Api": "{{ $env.GSHEET_CREDENTIALS_ID }}" }
+    }
+  ],
+  "connections": {
+    "cron_trigger": { "main": [[{ "node": "get_products", "type": "main", "index": 0 }]] },
+    "get_products": { "main": [[{ "node": "split_batches", "type": "main", "index": 0 }]] },
+    "split_batches": { "main": [[{ "node": "prepare_links", "type": "main", "index": 0 }]] },
+    "prepare_links": { "main": [[{ "node": "geoip", "type": "main", "index": 0 }]] },
+    "geoip": { "main": [[{ "node": "assign_country_link", "type": "main", "index": 0 }]] },
+    "assign_country_link": { "main": [[{ "node": "add_utm", "type": "main", "index": 0 }]] },
+    "add_utm": { "main": [[{ "node": "generate_variants", "type": "main", "index": 0 }]] },
+    "generate_variants": { "main": [[{ "node": "auto_translate", "type": "main", "index": 0 }]] },
+    "auto_translate": { "main": [[{ "node": "add_legal", "type": "main", "index": 0 }]] },
+    "add_legal": { "main": [[{ "node": "generate_copy", "type": "main", "index": 0 }]] },
+    "generate_copy": { "main": [[{ "node": "generate_video", "type": "main", "index": 0 }]] },
+    "generate_video": { "main": [[{ "node": "validate_video", "type": "main", "index": 0 }]] },
+    "validate_video": { "main": [[{ "node": "check_video_error", "type": "main", "index": 0 }]] },
+    "check_video_error": {
+      "main": [
+        [{ "node": "notify_error", "type": "main", "index": 0 }],
+        [{ "node": "set_publish_url", "type": "main", "index": 0 }]
+      ]
+    },
+    "notify_error": { "main": [[{ "node": "retry_video", "type": "main", "index": 0 }]] },
+    "set_publish_url": { "main": [[{ "node": "publish_platform", "type": "main", "index": 0 }]] },
+    "publish_platform": { "main": [[{ "node": "validate_publish", "type": "main", "index": 0 }]] },
+    "validate_publish": { "main": [[{ "node": "register_publication", "type": "main", "index": 0 }]] }
+  }
+}
