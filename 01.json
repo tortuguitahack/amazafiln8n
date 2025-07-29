@@ -77,8 +77,6 @@
       "typeVersion": 1,
       "position": [1300, 300]
     },
-    // --- Publicar en cada red social, credenciales a completar ---
-    // YouTube Shorts
     {
       "parameters": {
         "url": "https://www.googleapis.com/upload/youtube/v3/videos?uploadType=resumable&part=snippet,status",
@@ -93,7 +91,6 @@
       "position": [1500, 100],
       "credentials": { "httpBearerAuth": "" }
     },
-    // Facebook
     {
       "parameters": {
         "url": "https://graph.facebook.com/v18.0/me/feed",
@@ -108,7 +105,6 @@
       "position": [1500, 200],
       "credentials": { "httpBearerAuth": "" }
     },
-    // Instagram
     {
       "parameters": {
         "url": "https://graph.facebook.com/v18.0/{{ $env.IG_USER_ID }}/media",
@@ -123,7 +119,6 @@
       "position": [1500, 300],
       "credentials": { "httpBearerAuth": "" }
     },
-    // TikTok
     {
       "parameters": {
         "url": "https://api.thirdparty-tiktok.com/upload",
@@ -138,7 +133,6 @@
       "position": [1500, 400],
       "credentials": { "httpBearerAuth": "" }
     },
-    // Twitter/X
     {
       "parameters": {
         "url": "https://api.twitter.com/2/tweets",
@@ -153,7 +147,6 @@
       "position": [1500, 500],
       "credentials": { "httpBearerAuth": "" }
     },
-    // LinkedIn
     {
       "parameters": {
         "url": "https://api.linkedin.com/v2/ugcPosts",
@@ -168,8 +161,6 @@
       "position": [1500, 600],
       "credentials": { "httpBearerAuth": "" }
     },
-    // Pinterest, Reddit, Medium (igual que antes, puedes replicar la estructura)
-    // Registro en Google Sheets
     {
       "parameters": {
         "operation": "append",
