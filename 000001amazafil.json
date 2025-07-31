@@ -1,0 +1,452 @@
+{
+  "name": "Amazon Affiliate Multi-Social Posting Automated",
+  "nodes": [
+    {
+      "parameters": {
+        "triggerTimes": {
+          "item": [
+            {
+              "hour": 9,
+              "minute": 0
+            }
+          ]
+        }
+      },
+      "name": "Scheduled Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "sheetId": "1VTZ3HNNndZgl7SKuZmgV6iHCDatjSdHNTzXFClgZKQ4",
+        "range": "Sheet1!A:F",
+        "options": {
+          "returnAll": true
+        }
+      },
+      "name": "Get Rows from Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 1,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "const rows = items.filter(item => item.json.Estado?.toLowerCase() === 'ready');\nreturn rows;"
+      },
+      "name": "Filter Ready Rows",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Agrega ID afiliado Amazon al link\nitems.forEach(item => {\n  const url = item.json.Url_Amazon || '';\n  if (url.includes('?')) {\n    item.json.Amazon_Afiliado = url + '&tag=diegodgard0f-20';\n  } else {\n    item.json.Amazon_Afiliado = url + '?tag=diegodgard0f-20';\n  }\n});\nreturn items;"
+      },
+      "name": "Add Amazon Affiliate Tag",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [850, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "items.forEach(item => {\n  const nombre = item.json.Nombre || '';\n  const afiliado = item.json.Amazon_Afiliado || '';\n  const descripcion = item.json.Descripción || '';\n\n  item.json.Caption = `${descripcion} Descubre este producto: ${nombre} 👉 ${afiliado}`.trim();\n  item.json.Title = nombre;\n});\nreturn items;"
+      },
+      "name": "Prepare Caption and Title",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [1050, 300]
+    },
+    {
+      "parameters": {
+        "requestMethod": "POST",
+        "url": "https://backend.blotato.com/v2/media",
+        "jsonParameters": true,
+        "options": {},
+        "bodyParametersJson": "{\"url\":\"{{$json[\"Imagen/Video\"]}}\",\"type\":\"{{$json[\"Url_Amazon\"].endsWith('.mp4') ? 'video' : 'image'}}\"}"
+      },
+      "name": "Upload Media to Blotato",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [1250, 300],
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "YOUR_BLOTATO_API_CREDENTIALS_ID",
+          "name": "Blotato API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "functionCode": "// Extraemos media_url para usarlo en posts\nreturn items.map(item => {\n  if(item.json && item.json.media_url){\n    item.json.post_media_url = item.json.media_url;\n  } else {\n    item.json.post_media_url = item.json.media_url || '';\n  }\n  return item;\n});"
+      },
+      "name": "Extract Media URL",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [1450, 300]
+    },
+    {
+      "parameters": {
+        "requestMethod": "POST",
+        "url": "https://backend.blotato.com/v2/post", 
+        "jsonParameters": true,
+        "bodyParametersJson": "{\n  \"target_type\": \"instagram\",\n  \"content\": \"{{$json.Caption}}\",\n  \"media_urls\": [\"{{$json.post_media_url}}\"],\n  \"account_id\": \"YOUR_INSTAGRAM_ACCOUNT_ID\"\n}"
+      },
+      "name": "Post to Instagram",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [1650, 100],
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "YOUR_BLOTATO_API_CREDENTIALS_ID",
+          "name": "Blotato API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "requestMethod": "POST",
+        "url": "https://backend.blotato.com/v2/post",
+        "jsonParameters": true,
+        "bodyParametersJson": "{\n  \"target_type\": \"twitter\",\n  \"content\": \"{{$json.Caption}}\",\n  \"media_urls\": [\"{{$json.post_media_url}}\"],\n  \"account_id\": \"YOUR_TWITTER_ACCOUNT_ID\"\n}"
+      },
+      "name": "Post to Twitter (X)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [1650, 220],
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "YOUR_BLOTATO_API_CREDENTIALS_ID",
+          "name": "Blotato API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "requestMethod": "POST",
+        "url": "https://backend.blotato.com/v2/post",
+        "jsonParameters": true,
+        "bodyParametersJson": "{\n  \"target_type\": \"facebook\",\n  \"content\": \"{{$json.Caption}}\",\n  \"media_urls\": [\"{{$json.post_media_url}}\"],\n  \"account_id\": \"YOUR_FACEBOOK_ACCOUNT_ID\"\n}"
+      },
+      "name": "Post to Facebook",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [1650, 340],
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "YOUR_BLOTATO_API_CREDENTIALS_ID",
+          "name": "Blotato API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "requestMethod": "POST",
+        "url": "https://backend.blotato.com/v2/post",
+        "jsonParameters": true,
+        "bodyParametersJson": "{\n  \"target_type\": \"tiktok\",\n  \"content\": \"{{$json.Caption}}\",\n  \"media_urls\": [\"{{$json.post_media_url}}\"],\n  \"account_id\": \"YOUR_TIKTOK_ACCOUNT_ID\"\n}"
+      },
+      "name": "Post to TikTok",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [1650, 460],
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "YOUR_BLOTATO_API_CREDENTIALS_ID",
+          "name": "Blotato API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "requestMethod": "POST",
+        "url": "https://backend.blotato.com/v2/post",
+        "jsonParameters": true,
+        "bodyParametersJson": "{\n  \"target_type\": \"youtube\",\n  \"title\": \"{{$json.Title}}\",\n  \"content\": \"{{$json.Caption}}\",\n  \"media_urls\": [\"{{$json.post_media_url}}\"],\n  \"account_id\": \"YOUR_YOUTUBE_ACCOUNT_ID\"\n}"
+      },
+      "name": "Post to YouTube",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [1650, 580],
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "YOUR_BLOTATO_API_CREDENTIALS_ID",
+          "name": "Blotato API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "requestMethod": "POST",
+        "url": "https://backend.blotato.com/v2/post",
+        "jsonParameters": true,
+        "bodyParametersJson": "{\n  \"target_type\": \"pinterest\",\n  \"content\": \"{{$json.Caption}}\",\n  \"media_urls\": [\"{{$json.post_media_url}}\"],\n  \"account_id\": \"YOUR_PINTEREST_ACCOUNT_ID\",\n  \"board_id\": \"YOUR_PINTEREST_BOARD_ID\"\n}"
+      },
+      "name": "Post to Pinterest",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [1850, 100],
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "YOUR_BLOTATO_API_CREDENTIALS_ID",
+          "name": "Blotato API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "requestMethod": "POST",
+        "url": "https://backend.blotato.com/v2/post",
+        "jsonParameters": true,
+        "bodyParametersJson": "{\n  \"target_type\": \"threads\",\n  \"content\": \"{{$json.Caption}}\",\n  \"media_urls\": [\"{{$json.post_media_url}}\"],\n  \"account_id\": \"YOUR_THREADS_ACCOUNT_ID\"\n}"
+      },
+      "name": "Post to Threads",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [1850, 220],
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "YOUR_BLOTATO_API_CREDENTIALS_ID",
+          "name": "Blotato API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "requestMethod": "POST",
+        "url": "https://backend.blotato.com/v2/post",
+        "jsonParameters": true,
+        "bodyParametersJson": "{\n  \"target_type\": \"bluesky\",\n  \"content\": \"{{$json.Caption}}\",\n  \"media_urls\": [\"{{$json.post_media_url}}\"],\n  \"account_id\": \"YOUR_BLUESKY_ACCOUNT_ID\"\n}"
+      },
+      "name": "Post to Bluesky",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [1850, 340],
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "YOUR_BLOTATO_API_CREDENTIALS_ID",
+          "name": "Blotato API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "sheetId": "1VTZ3HNNndZgl7SKuZmgV6iHCDatjSdHNTzXFClgZKQ4",
+        "range": "Sheet1!F",
+        "keyColumn": "Nombre",
+        "keyValue": "={{$json.Nombre}}",
+        "updateData": {
+          "Estado": "Publicado"
+        }
+      },
+      "name": "Update Row Status",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 1,
+      "position": [2050, 300]
+    }
+  ],
+  "connections": {
+    "Scheduled Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get Rows from Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Rows from Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "Filter Ready Rows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Ready Rows": {
+      "main": [
+        [
+          {
+            "node": "Add Amazon Affiliate Tag",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add Amazon Affiliate Tag": {
+      "main": [
+        [
+          {
+            "node": "Prepare Caption and Title",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Caption and Title": {
+      "main": [
+        [
+          {
+            "node": "Upload Media to Blotato",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload Media to Blotato": {
+      "main": [
+        [
+          {
+            "node": "Extract Media URL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Media URL": {
+      "main": [
+        [
+          {
+            "node": "Post to Instagram",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Post to Twitter (X)",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Post to Facebook",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Post to TikTok",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Post to YouTube",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Post to Pinterest",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Post to Threads",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Post to Bluesky",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Post to Instagram": {
+      "main": [
+        [
+          {
+            "node": "Update Row Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Post to Twitter (X)": {
+      "main": [
+        [
+          {
+            "node": "Update Row Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Post to Facebook": {
+      "main": [
+        [
+          {
+            "node": "Update Row Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Post to TikTok": {
+      "main": [
+        [
+          {
+            "node": "Update Row Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Post to YouTube": {
+      "main": [
+        [
+          {
+            "node": "Update Row Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Post to Pinterest": {
+      "main": [
+        [
+          {
+            "node": "Update Row Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Post to Threads": {
+      "main": [
+        [
+          {
+            "node": "Update Row Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Post to Bluesky": {
+      "main": [
+        [
+          {
+            "node": "Update Row Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}
