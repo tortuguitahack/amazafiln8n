@@ -1,0 +1,126 @@
+{
+  "name": "Subworkflow - Manejo avanzado de errores y reintentos",
+  "nodes": [
+    {
+      "parameters": {},
+      "name": "Start",
+      "type": "n8n-nodes-base.start",
+      "typeVersion": 1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "triggerOnError": true
+      },
+      "name": "Error Trigger (Catch)",
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [500, 300]
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "sheetId": "TU_GOOGLE_SHEETS_ID",
+        "range": "ErrorLogs!A:E",
+        "operation": "append",
+        "data": [
+          [
+            "={{ new Date().toISOString() }}",
+            "={{ $json.workflow.name }}",
+            "={{ $json.node.name }}",
+            "={{ $json.error.message }}",
+            "={{ $json.error.stack }}"
+          ]
+        ]
+      },
+      "name": "Log de Error en Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 1,
+      "position": [750, 300],
+      "credentials": { "googleApi": "GOOGLE_SHEETS_CREDENTIALS" }
+    },
+    {
+      "parameters": {
+        "email": "TUDIRECCION@correo.com",
+        "subject": "Alerta: Error en workflow {{$json.workflow.name}}",
+        "text": "Se detectó un error en el nodo {{$json.node.name}}.\nMensaje: {{$json.error.message}}\nHora: {{ new Date().toISOString() }}\nRevisa el log en Google Sheets para detalles."
+      },
+      "name": "Enviar Email de Alerta",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 1,
+      "position": [1000, 300],
+      "credentials": { "smtp": "TU_SMTP_CREDENCIALES" }
+    },
+    {
+      "parameters": {
+        "chatId": "TU_CHAT_ID_TELEGRAM",
+        "text": "🚨 Alerta de error en {{$json.workflow.name}} nodo {{$json.node.name}}. Mensaje: {{$json.error.message}}"
+      },
+      "name": "Enviar mensaje Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [1000, 420],
+      "credentials": { "telegramApi": "TELEGRAM_CREDENCIALES" }
+    },
+    {
+      "parameters": {
+        "functionCode": "const maxRetries = 3;\nlet retries = $workflow.getContext('retries') || 0;\nif(retries >= maxRetries) {\n  throw new Error('Max retries reached');\n}\n$workflow.setContext('retries', retries + 1);\nreturn items;"
+      },
+      "name": "Contador de Reintentos",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [750, 450]
+    },
+    {
+      "parameters": { "waitTime": 10000 },
+      "name": "Esperar antes de reintentar",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1,
+      "position": [950, 450]
+    },
+    {
+      "parameters": { "expression": "={{ $workflow.getContext('retries') < 3 }}" },
+      "name": "Comprobar si reintentar",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [1150, 450]
+    },
+    {
+      "parameters": {
+        "workflowId": "ID_WORKFLOW_A_REINTENTAR",
+        "waitTillDone": true,
+        "inputData": {}
+      },
+      "name": "Reintentar Workflow",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [1350, 450]
+    }
+  ],
+  "connections": {
+    "Error Trigger (Catch)": {
+      "main": [
+        [
+          { "node": "Log de Error en Google Sheets", "type": "main", "index": 0 },
+          { "node": "Enviar Email de Alerta", "type": "main", "index": 0 },
+          { "node": "Enviar mensaje Telegram", "type": "main", "index": 0 },
+          { "node": "Contador de Reintentos", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Contador de Reintentos": {
+      "main": [[{ "node": "Comprobar si reintentar", "type": "main", "index": 0 }]]
+    },
+    "Comprobar si reintentar": {
+      "main": [
+        [
+          { "node": "Reintentar Workflow", "type": "main", "index": 0 },
+          { "node": "Start", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Reintentar Workflow": {
+      "main": [[{ "node": "Start", "type": "main", "index": 0 }]]
+    }
+  }
+}
