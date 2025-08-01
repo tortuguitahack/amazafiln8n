@@ -1,0 +1,218 @@
+{
+  "name": "Amazon Affiliate - Workflow Principal con Manejo de Errores",
+  "nodes": [
+    {
+      "parameters": {
+        "triggerTimes": { "item": [{ "hour": 9, "minute": 0 }] }
+      },
+      "name": "Scheduled Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [100, 300]
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "sheetId": "TU_GOOGLE_SHEETS_ID",
+        "range": "Sheet1!A:F",
+        "options": { "returnAll": true }
+      },
+      "name": "Get Rows Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 1,
+      "position": [310, 300],
+      "credentials": { "googleApi": "GOOGLE_SHEETS_CREDENTIALS" }
+    },
+    {
+      "parameters": {
+        "functionCode": "return items.filter(item => {\n  const estado = (item.json.Estado || '').toLowerCase();\n  const urlValida = item.json.Url_Amazon && item.json.Url_Amazon.startsWith('http');\n  const mediaValida = item.json['Imagen/Video'] && /\\.(jpg|jpeg|png|gif|mp4)$/i.test(item.json['Imagen/Video']);\n  const nombreValido = !!item.json.Nombre;\n  return estado === 'ready' && urlValida && mediaValida && nombreValido;\n});"
+      },
+      "name": "Filter Rows Validas",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [520, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "items.forEach(item => {\n  const url = item.json.Url_Amazon || '';\n  if (url.includes('?')) {\n    item.json.Amazon_Afiliado = url + '&tag=diegodgard0f-20';\n  } else {\n    item.json.Amazon_Afiliado = url + '?tag=diegodgard0f-20';\n  }\n});\nreturn items;"
+      },
+      "name": "Add Tag Afiliado",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [730, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "items.forEach(item => {\n  const descripcion = item.json.Descripción ? item.json.Descripción.trim() + ' ' : '';\n  item.json.CaptionBase = descripcion + `Descubre este producto: ${item.json.Nombre} 👉 ${item.json.Amazon_Afiliado}`;\n  item.json.Title = item.json.Nombre;\n});\nreturn items;"
+      },
+      "name": "Prepara Caption Base",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [940, 300]
+    },
+
+    // Llamadas a sub-workflows sociales con manejo de errores
+    {
+      "parameters": {
+        "workflowId": "ID_SUBWORKFLOW_INSTAGRAM",
+        "waitTillDone": true,
+        "inputData": "={{$json}}"
+      },
+      "name": "Call Instagram WF",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [1170, 80]
+    },
+    {
+      "parameters": {
+        "workflowId": "ID_SUBWORKFLOW_TWITTER",
+        "waitTillDone": true,
+        "inputData": "={{$json}}"
+      },
+      "name": "Call Twitter (X) WF",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [1170, 160]
+    },
+    {
+      "parameters": {
+        "workflowId": "ID_SUBWORKFLOW_FACEBOOK",
+        "waitTillDone": true,
+        "inputData": "={{$json}}"
+      },
+      "name": "Call Facebook WF",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [1170, 240]
+    },
+    {
+      "parameters": {
+        "workflowId": "ID_SUBWORKFLOW_TIKTOK",
+        "waitTillDone": true,
+        "inputData": "={{$json}}"
+      },
+      "name": "Call TikTok WF",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [1170, 320]
+    },
+    {
+      "parameters": {
+        "workflowId": "ID_SUBWORKFLOW_YOUTUBE",
+        "waitTillDone": true,
+        "inputData": "={{$json}}"
+      },
+      "name": "Call YouTube WF",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [1170, 400]
+    },
+    {
+      "parameters": {
+        "workflowId": "ID_SUBWORKFLOW_PINTEREST",
+        "waitTillDone": true,
+        "inputData": "={{$json}}"
+      },
+      "name": "Call Pinterest WF",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [1170, 480]
+    },
+    {
+      "parameters": {
+        "workflowId": "ID_SUBWORKFLOW_THREADS",
+        "waitTillDone": true,
+        "inputData": "={{$json}}"
+      },
+      "name": "Call Threads WF",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [1170, 560]
+    },
+    {
+      "parameters": {
+        "workflowId": "ID_SUBWORKFLOW_BLUESKY",
+        "waitTillDone": true,
+        "inputData": "={{$json}}"
+      },
+      "name": "Call Bluesky WF",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [1170, 640]
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "authentication": "serviceAccount",
+        "sheetId": "TU_GOOGLE_SHEETS_ID",
+        "range": "Sheet1!F",
+        "keyColumn": "Nombre",
+        "keyValue": "={{$json.Nombre}}",
+        "updateData": { "Estado": "Publicado" }
+      },
+      "name": "Actualizar Estado Publicado",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 1,
+      "position": [1350, 400],
+      "credentials": { "googleApi": "GOOGLE_SHEETS_CREDENTIALS" }
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "sheetId": "TU_GOOGLE_SHEETS_ID",
+        "operation": "append",
+        "range": "Logs!A:D",
+        "data": [
+          [
+            "={{new Date().toISOString()}}",
+            "={{$json.Nombre}}",
+            "Publicado exitosamente",
+            "Redes: Instagram, Twitter/X, Facebook, TikTok, YouTube, Pinterest, Threads, Bluesky"
+          ]
+        ]
+      },
+      "name": "Log de Éxito",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 1,
+      "position": [1350, 480],
+      "credentials": { "googleApi": "GOOGLE_SHEETS_CREDENTIALS" }
+    }
+  ],
+  "connections": {
+    "Scheduled Trigger": {
+      "main": [[{ "node": "Get Rows Google Sheets", "type": "main", "index": 0 }]]
+    },
+    "Get Rows Google Sheets": {
+      "main": [[{ "node": "Filter Rows Validas", "type": "main", "index": 0 }]]
+    },
+    "Filter Rows Validas": {
+      "main": [[{ "node": "Add Tag Afiliado", "type": "main", "index": 0 }]]
+    },
+    "Add Tag Afiliado": {
+      "main": [[{ "node": "Prepara Caption Base", "type": "main", "index": 0 }]]
+    },
+    "Prepara Caption Base": {
+      "main": [[
+        { "node": "Call Instagram WF", "type": "main", "index": 0 },
+        { "node": "Call Twitter (X) WF", "type": "main", "index": 0 },
+        { "node": "Call Facebook WF", "type": "main", "index": 0 },
+        { "node": "Call TikTok WF", "type": "main", "index": 0 },
+        { "node": "Call YouTube WF", "type": "main", "index": 0 },
+        { "node": "Call Pinterest WF", "type": "main", "index": 0 },
+        { "node": "Call Threads WF", "type": "main", "index": 0 },
+        { "node": "Call Bluesky WF", "type": "main", "index": 0 }
+      ]]
+    },
+    "Call Instagram WF": {
+      "main": [
+        [
+          { "node": "Actualizar Estado Publicado", "type": "main", "index": 0 },
+          { "node": "Log de Éxito", "type": "main", "index": 0 }
+        ]
+      ]
+    }
+  ],
+  "settings": {
+    "errorWorkflow": "ID_SUBWORKFLOW_ERRORES"
+  }
+}
