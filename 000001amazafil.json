@@ -28,7 +28,186 @@
       },
       "name": "Get Rows from Google Sheets",
       "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 1,{
+  "nodes": [
+    {
+      "parameters": {
+        "functionCode": "return [{ json: { title: \"Amazon Oferts\", offer_link: \"https://www.amazon.com?&linkCode=ll2&tag=diegoedgard0f-20&linkId=6aff75466158e9aee2c886016424c121&language=en_US&ref_=as_li_ss_tl\" } }];"
+      },
+      "id": "6b33fb8d-3966-4f49-bf10-8f924ed3841c",
+      "name": "Simulación Producto",
+      "type": "n8n-nodes-base.function",
       "typeVersion": 1,
+      "position": [
+        -6224,
+        1504
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://www.amazon.com?&linkCode=ll2&tag=diegoedgard0f-20&linkId=6aff75466158e9aee2c886016424c121&language=en_US&ref_=as_li_ss_tl",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "openAiApi",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -5616,
+        1728
+      ],
+      "id": "99d84320-6e77-4c38-bb37-290c7c344740",
+      "name": "Generate Persuasive Text1",
+      "credentials": {
+        "openAiApi": {
+          "id": "tW4z31toJ1mz89Ti",
+          "name": "OpenAi account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 30
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -6448,
+        1504
+      ],
+      "id": "79c378be-571d-4596-8c19-04a8e7ae40ba",
+      "name": "Schedule Trigger1"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.1,
+      "position": [
+        -6000,
+        1488
+      ],
+      "id": "975c5a1a-fbb1-4bd8-9d5e-253476242dc6",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "model": "tts-1-hd",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        -5616,
+        1520
+      ],
+      "id": "7d6f57ec-f6ae-4837-8e83-fc8b09b2dad0",
+      "name": "Generate audio",
+      "credentials": {
+        "openAiApi": {
+          "id": "tW4z31toJ1mz89Ti",
+          "name": "OpenAi account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "video",
+        "modelId": {
+          "__rl": true,
+          "value": "models/veo-3.0-generate-preview",
+          "mode": "list",
+          "cachedResultName": "models/veo-3.0-generate-preview"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        -5616,
+        1312
+      ],
+      "id": "fe28e31b-fb62-4695-81fb-db427ace19ed",
+      "name": "Generate a video",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "yp0dWStszfWkmBTo",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Simulación Producto": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Persuasive Text1": {
+      "main": [
+        []
+      ]
+    },
+    "Schedule Trigger1": {
+      "main": [
+        [
+          {
+            "node": "Simulación Producto",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Generate audio",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Generate a video",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Generate Persuasive Text1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate audio": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "f2876dd240c502be830885ffd240b49b98955d75c0148c1f0f5d1cf349fd253a"
+  }
+}
       "position": [450, 300]
     },
     {
@@ -42,7 +221,7 @@
     },
     {
       "parameters": {
-        "functionCode": "// Agrega ID afiliado Amazon al link\nitems.forEach(item => {\n  const url = item.json.Url_Amazon || '';\n  if (url.includes('?')) {\n    item.json.Amazon_Afiliado = url + '&tag=diegodgard0f-20';\n  } else {\n    item.json.Amazon_Afiliado = url + '?tag=diegodgard0f-20';\n  }\n});\nreturn items;"
+        "functionCode": "// Agrega ID afiliado Amazon al link\nitems.forEach(item => {\n  const url = item.json.Url_Amazon || '';\n  if (url.includes('?')) {\n    item.json.Amazon_Afiliado = url + '&tag=diegoedgard0f-20';\n  } else {\n    item.json.Amazon_Afiliado = url + '?tag=diegoedgard0f-20';\n  }\n});\nreturn items;"
       },
       "name": "Add Amazon Affiliate Tag",
       "type": "n8n-nodes-base.function",
