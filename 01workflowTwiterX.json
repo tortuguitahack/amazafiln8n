@@ -1,0 +1,66 @@
+{
+  "name": "Subworkflow - Publicar en Twitter (X)",
+  "nodes": [
+    {
+      "parameters": {},
+      "name": "Start",
+      "type": "n8n-nodes-base.start",
+      "typeVersion": 1,
+      "position": [150, 280]
+    },
+    {
+      "parameters": {
+        "requestMethod": "POST",
+        "url": "https://backend.blotato.com/v2/media",
+        "jsonParameters": true,
+        "bodyParametersJson": "{\"url\":\"{{$json['Imagen/Video']}}\",\"type\":\"{{ $json['Imagen/Video'].toLowerCase().endsWith('.mp4') ? 'video' : 'image' }}\"}"
+      },
+      "name": "Subir media Blotato",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [380, 280],
+      "credentials": {
+        "httpBasicAuth": { "id": "BLOTATO_API_CREDENTIALS_ID", "name": "Blotato API" }
+      }
+    },
+    {
+      "parameters": {
+        "functionCode": "return items.map(item => {\n  item.json.media_url = item.json.media_url || (item.json.body && item.json.body.media_url) || '';\n  return item;\n});"
+      },
+      "name": "Extraer media_url",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [580, 280]
+    },
+    {
+      "parameters": {
+        "requestMethod": "POST",
+        "url": "https://backend.blotato.com/v2/post",
+        "jsonParameters": true,
+        "bodyParametersJson": "{\n  \"target_type\": \"twitter\",\n  \"account_id\": \"YOUR_TWITTER_ACCOUNT_ID\",\n  \"content\": \"{{$json.CaptionBase}}\",\n  \"media_urls\": [\"{{$json.media_url}}\"]\n}"
+      },
+      "name": "Publicar en Twitter (X)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [750, 280],
+      "credentials": {
+        "httpBasicAuth": { "id": "BLOTATO_API_CREDENTIALS_ID", "name": "Blotato API" }
+      }
+    },
+    {
+      "parameters": {
+        "functionCode": "if(items[0].json.error){\n  throw new Error('Fallo publicación Twitter (X): ' + JSON.stringify(items[0].json));\n}\nreturn items;"
+      },
+      "name": "Validar resultado publicación",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [950, 280]
+    }
+  ],
+  "connections": {
+    "Start": { "main": [[{ "node": "Subir media Blotato", "type": "main", "index": 0 }]] },
+    "Subir media Blotato": { "main": [[{ "node": "Extraer media_url", "type": "main", "index": 0 }]] },
+    "Extraer media_url": { "main": [[{ "node": "Publicar en Twitter (X)", "type": "main", "index": 0 }]] },
+    "Publicar en Twitter (X)": { "main": [[{ "node": "Validar resultado publicación", "type": "main", "index": 0 }]] }
+  }
+}
