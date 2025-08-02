@@ -1,0 +1,231 @@
+{
+  "name": "Amazon Affiliation Master Workflow Improved",
+  "nodes": [
+    {
+      "parameters": {
+        "triggerTimes": {
+          "item": [
+            {
+              "hour": 9,
+              "minute": 0
+            }
+          ]
+        }
+      },
+      "name": "Scheduled Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [200, 300]
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "sheetId": "TU_GOOGLE_SHEETS_ID",
+        "range": "Sheet1!A:F",
+        "options": { "returnAll": true }
+      },
+      "name": "Get Rows from Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 1,
+      "position": [400, 300]
+    },
+    {
+      "parameters": {
+        // Validar filas con campos requeridos y Estado='Ready'
+        "functionCode": "return items.filter(item => {\n  const status = (item.json.Estado || '').toLowerCase();\n  const validUrl = item.json.Url_Amazon && item.json.Url_Amazon.startsWith('http');\n  const validMedia = item.json['Imagen/Video'] && (item.json['Imagen/Video'].match(/\\.(jpg|jpeg|png|gif|mp4)$/i));\n  const validName = !!item.json.Nombre;\n  return status === 'ready' && validUrl && validMedia && validName;\n});"
+      },
+      "name": "Filter Valid Rows",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [600, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Agrega tag afiliado Amazon\nitems.forEach(item => {\n  const url = item.json.Url_Amazon || '';\n  if (url.includes('?')) {\n    item.json.Amazon_Afiliado = url + '&tag=diegodgard0f-20';\n  } else {\n    item.json.Amazon_Afiliado = url + '?tag=diegodgard0f-20';\n  }\n});\nreturn items;"
+      },
+      "name": "Add Affiliate Tag",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [800, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "items.forEach(item => {\n  item.json.CaptionBase = item.json.Descripción ? item.json.Descripción.trim() + ' ' : '';\n  item.json.CaptionBase += `Descubre este producto: ${item.json.Nombre} 👉 ${item.json.Amazon_Afiliado}`;\n  item.json.Title = item.json.Nombre;\n});\nreturn items;"
+      },
+      "name": "Prepare Base Caption",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [1000, 300]
+    },
+
+    // Ejecutar primeros pasos y luego llamar Subworkflows por red social (ejemplo Instagram)
+    {
+      "parameters": {
+        "workflowId": "SUBWORKFLOW_INSTAGRAM_ID",
+        "waitTillDone": true,
+        "inputData": "={{$json}}"
+      },
+      "name": "Call Instagram Workflow",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [1200, 300]
+    },
+    {
+      "parameters": {
+        "workflowId": "SUBWORKFLOW_TIKTOK_ID",
+        "waitTillDone": true,
+        "inputData": "={{$json}}"
+      },
+      "name": "Call TikTok Workflow",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [1200, 400]
+    },
+    {
+      "parameters": {
+        "workflowId": "SUBWORKFLOW_YOUTUBE_ID",
+        "waitTillDone": true,
+        "inputData": "={{$json}}"
+      },
+      "name": "Call YouTube Workflow",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [1200, 500]
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "sheetId": "TU_GOOGLE_SHEETS_ID",
+        "operation": "update",
+        "range": "Sheet1!F",
+        "keyColumn": "Nombre",
+        "keyValue": "={{$json.Nombre}}",
+        "updateData": {
+          "Estado": "Publicado"
+        }
+      },
+      "name": "Update Row Status to Published",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 1,
+      "position": [1400, 400]
+    },
+
+    // Nodo para loguear publicaciones exitosas
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "sheetId": "TU_GOOGLE_SHEETS_ID",
+        "operation": "append",
+        "range": "Logs!A:D",
+        "options": {},
+        "data": [
+          [
+            "={{new Date().toISOString()}}",
+            "={{$json.Nombre}}",
+            "Publicado exitosamente",
+            "Redes sociales: Instagram, TikTok, YouTube"
+          ]
+        ]
+      },
+      "name": "Log Success",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 1,
+      "position": [1400, 500]
+    }
+  ],
+  "connections": {
+    "Scheduled Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get Rows from Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Rows from Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "Filter Valid Rows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Valid Rows": {
+      "main": [
+        [
+          {
+            "node": "Add Affiliate Tag",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add Affiliate Tag": {
+      "main": [
+        [
+          {
+            "node": "Prepare Base Caption",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Base Caption": {
+      "main": [
+        [
+          {
+            "node": "Call Instagram Workflow",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Call TikTok Workflow",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Call YouTube Workflow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call Instagram Workflow": {
+      "main": [
+        [
+          {
+            "node": "Update Row Status to Published",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Log Success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call TikTok Workflow": {
+      "main": []
+    },
+    "Call YouTube Workflow": {
+      "main": []
+    },
+    "Update Row Status to Published": {
+      "main": []
+    },
+    "Log Success": {
+      "main": []
+    }
+  }
+}
