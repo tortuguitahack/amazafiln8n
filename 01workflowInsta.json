@@ -1,0 +1,72 @@
+{
+  "name": "Subworkflow - Publicar en Instagram",
+  "nodes": [
+    {
+      "parameters": {},
+      "name": "Start",
+      "type": "n8n-nodes-base.start",
+      "typeVersion": 1,
+      "position": [150, 300]
+    },
+    {
+      "parameters": {
+        "requestMethod": "POST",
+        "url": "https://backend.blotato.com/v2/media",
+        "jsonParameters": true,
+        "bodyParametersJson": "{\"url\":\"{{$json['Imagen/Video']}}\",\"type\": \"{{ $json['Imagen/Video'].toLowerCase().endsWith('.mp4') ? 'video' : 'image' }}\"}"
+      },
+      "name": "Subir media Blotato",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [400, 300],
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "BLOTATO_API_CREDENTIALS_ID",
+          "name": "Blotato API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "functionCode": "return items.map(item => {\n  item.json.media_url = item.json.media_url || (item.json.body && item.json.body.media_url) || '';\n  return item;\n});"
+      },
+      "name": "Extraer media_url",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [600, 300]
+    },
+    {
+      "parameters": {
+        "requestMethod": "POST",
+        "url": "https://backend.blotato.com/v2/post",
+        "jsonParameters": true,
+        "bodyParametersJson": "{\n  \"target_type\": \"instagram\",\n  \"account_id\": \"YOUR_INSTAGRAM_ACCOUNT_ID\",\n  \"content\": \"{{$json.CaptionBase}}\",\n  \"media_urls\": [\"{{$json.media_url}}\"]\n}"
+      },
+      "name": "Publicar en Instagram",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [800, 300],
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "BLOTATO_API_CREDENTIALS_ID",
+          "name": "Blotato API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "functionCode": "if(items[0].json.error){\n  throw new Error('Fallo publicación Instagram: ' + JSON.stringify(items[0].json));\n}\nreturn items;"
+      },
+      "name": "Validar resultado publicación",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [1000, 300]
+    }
+  ],
+  "connections": {
+    "Start": { "main": [[{"node": "Subir media Blotato", "type": "main", "index": 0}]] },
+    "Subir media Blotato": { "main": [[{"node": "Extraer media_url", "type": "main", "index": 0}]] },
+    "Extraer media_url": { "main": [[{"node": "Publicar en Instagram", "type": "main", "index": 0}]] },
+    "Publicar en Instagram": { "main": [[{"node": "Validar resultado publicación", "type": "main", "index": 0}]] }
+  }
+}
