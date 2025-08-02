@@ -1,0 +1,66 @@
+{
+  "name": "Subworkflow - Publicar en Pinterest",
+  "nodes": [
+    {
+      "parameters": {},
+      "name": "Start",
+      "type": "n8n-nodes-base.start",
+      "typeVersion": 1,
+      "position": [140, 280]
+    },
+    {
+      "parameters": {
+        "requestMethod": "POST",
+        "url": "https://backend.blotato.com/v2/media",
+        "jsonParameters": true,
+        "bodyParametersJson": "{\"url\":\"{{$json['Imagen/Video']}}\",\"type\":\"{{ $json['Imagen/Video'].toLowerCase().endsWith('.mp4') ? 'video' : 'image' }}\"}"
+      },
+      "name": "Subir media Blotato",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [390, 280],
+      "credentials": {
+        "httpBasicAuth": { "id": "BLOTATO_API_CREDENTIALS_ID", "name": "Blotato API" }
+      }
+    },
+    {
+      "parameters": {
+        "functionCode": "return items.map(i => {\n i.json.media_url = i.json.media_url || (i.json.body && i.json.body.media_url) || '';\n return i;\n});"
+      },
+      "name": "Extraer media_url",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [610, 280]
+    },
+    {
+      "parameters": {
+        "requestMethod": "POST",
+        "url": "https://backend.blotato.com/v2/post",
+        "jsonParameters": true,
+        "bodyParametersJson": "{\n  \"target_type\": \"pinterest\",\n  \"account_id\": \"YOUR_PINTEREST_ACCOUNT_ID\",\n  \"board_id\": \"YOUR_PINTEREST_BOARD_ID\",\n  \"content\": \"{{$json.CaptionBase}}\",\n  \"media_urls\": [\"{{$json.media_url}}\"]\n}"
+      },
+      "name": "Publicar en Pinterest",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [830, 280],
+      "credentials": {
+        "httpBasicAuth": { "id": "BLOTATO_API_CREDENTIALS_ID", "name": "Blotato API" }
+      }
+    },
+    {
+      "parameters": {
+        "functionCode": "if(items[0].json.error){\n throw new Error('Fallo publicación Pinterest: ' + JSON.stringify(items[0].json));\n}\nreturn items;"
+      },
+      "name": "Validar resultado publicación",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [1040, 280]
+    }
+  ],
+  "connections": {
+    "Start": { "main": [[{ "node": "Subir media Blotato", "type": "main", "index": 0 }]] },
+    "Subir media Blotato": { "main": [[{ "node": "Extraer media_url", "type": "main", "index": 0 }]] },
+    "Extraer media_url": { "main": [[{ "node": "Publicar en Pinterest", "type": "main", "index": 0 }]] },
+    "Publicar en Pinterest": { "main": [[{ "node": "Validar resultado publicación", "type": "main", "index": 0 }]] }
+  }
+}
