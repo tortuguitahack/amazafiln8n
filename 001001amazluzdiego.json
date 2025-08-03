@@ -1,0 +1,329 @@
+{
+  "name": "Amazon Affiliate Multi-Social Publishing with Free AI",
+  "nodes": [
+    {
+      "parameters": {
+        "triggerTimes": {
+          "item": [
+            {
+              "hour": 9,
+              "minute": 0
+            }
+          ]
+        }
+      },
+      "name": "Scheduled Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [
+        150,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "sheetId": "TU_GOOGLE_SHEETS_ID",
+        "range": "Sheet1!A:G",
+        "options": {
+          "returnAll": true
+        }
+      },
+      "name": "Get Rows Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 1,
+      "position": [
+        350,
+        300
+      ],
+      "credentials": {
+        "googleApi": "GOOGLE_SHEETS_CREDENTIALS"
+      }
+    },
+    {
+      "parameters": {
+        "functionCode": "return items.filter(item => {\n  const estado = (item.json.Estado || '').toLowerCase();\n  const urlValida = item.json.Url_Amazon && item.json.Url_Amazon.startsWith('http');\n  const nombreValido = !!item.json.Nombre;\n  return estado === 'ready' && urlValida && nombreValido;\n});"
+      },
+      "name": "Filter Rows Ready",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        550,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Añadimos tag afiliado Amazon al enlace\nitems.forEach(item => {\n  const url = item.json.Url_Amazon || '';\n  if (url.includes('?')) {\n    item.json.Afiliate_Link = url + '&tag=diegodgard02-20';\n  } else {\n    item.json.Afiliate_Link = url + '?tag=diegodgard02-20';\n  }\n});\nreturn items;"
+      },
+      "name": "Add Amazon Affiliate Tag",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        750,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "prompt": "Escribe un caption atractivo para redes sociales promocionando este producto Amazon:\nNombre del producto: {{$json.Nombre}}\nDescripción base: {{$json.Descripción || 'Sin descripción'}}\nEnlace de compra (afiliado): {{$json.Afiliate_Link}}\nHazlo corto y generando interés.",
+        "model": "gpt-3.5-turbo",
+        "max_tokens": 150,
+        "temperature": 0.7
+      },
+      "name": "Generate Caption - OpenAI",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 1,
+      "position": [
+        950,
+        300
+      ],
+      "credentials": {
+        "openAIApi": "OPENAI_API_CREDENTIALS"
+      }
+    },
+    {
+      "parameters": {
+        "functionCode": "items.forEach(item => {\n  if(Array.isArray(item.json.choices) && item.json.choices.length>0){\n    item.json.Caption = item.json.choices[0].message.content.trim();\n  } else if (item.json.text) {\n    // En caso de respuesta antigua\n    item.json.Caption = item.json.text.trim();\n  } else {\n    item.json.Caption = `Descubre este producto: ${item.json.Nombre} 👉 ${item.json.Afiliate_Link}`;\n  }\n});\nreturn items;"
+      },
+      "name": "Extract Generated Caption",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        1150,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "prompt": "Genera un prompt para imagen de producto basado en el nombre y descripción:\nNombre: {{$json.Nombre}}\nDescripción: {{$json.Descripción || 'Sin descripción'}}\nHaz prompt detallado para crear imagen de producto en estilo realista.",
+        "model": "gpt-3.5-turbo",
+        "max_tokens": 100,
+        "temperature": 0.7
+      },
+      "name": "Generate Image Prompt - OpenAI",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 1,
+      "position": [
+        1150,
+        480
+      ],
+      "credentials": {
+        "openAIApi": "OPENAI_API_CREDENTIALS"
+      }
+    },
+    {
+      "parameters": {
+        "functionCode": "items.forEach(item => {\n  if(Array.isArray(item.json.choices) && item.json.choices.length > 0){\n    item.json.ImgPrompt = item.json.choices[0].message.content.trim();\n  } else if(item.json.text){\n    item.json.ImgPrompt = item.json.text.trim();\n  } else {\n    item.json.ImgPrompt = 'Imagen realista de producto Amazon';\n  }\n});\nreturn items;"
+      },
+      "name": "Extract Image Prompt",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        1350,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "requestMethod": "POST",
+        "url": "https://api.stability.ai/v1/generation/stable-diffusion-v1-5/text-to-image",
+        "jsonParameters": true,
+        "options": {},
+        "bodyParametersJson": "{\n  \"cfg_scale\":7,\n  \"height\":512,\n  \"width\":512,\n  \"samples\":1,\n  \"steps\":30,\n  \"text_prompts\":[{\"text\":\"{{$json.ImgPrompt}}\"}]\n}\n",
+        "headerParametersUi": {
+          "parameter": [
+            {
+              "name": "Authorization",
+              "value": "Bearer TU_STABILITY_API_KEY"
+            }
+          ]
+        }
+      },
+      "name": "Generate Image via Stability API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [
+        1550,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "functionCode": "items.forEach(item => {\n  if(item.json && item.json.artifacts && item.json.artifacts.length > 0){\n    // La API devuelve imagen base64\n    const b64 = item.json.artifacts[0].base64;\n    item.json.GeneratedImage = `data:image/png;base64,${b64}`;\n  } else {\n    item.json.GeneratedImage = null;\n  }\n});\nreturn items;"
+      },
+      "name": "Extract Generated Image Base64",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        1750,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "functionCode": "items.forEach(item => {\n  item.json.PostImage = item.json['Imagen/Video'] && item.json['Imagen/Video'] !== '' ? item.json['Imagen/Video'] : item.json.GeneratedImage;\n  // Algunos servicios pueden aceptar base64 o url, ajusta según API\n});\nreturn items;"
+      },
+      "name": "Determine Final Image URL/Base64",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        1900,
+        480
+      ]
+    },
+
+    // --- Publicaciones en Redes Sociales, ejemplo genérico HTTP Requests ---
+
+    {
+      "parameters": {
+        "requestMethod": "POST",
+        "url": "TU_ENDPOINT_API_INSTAGRAM",
+        "jsonParameters": true,
+        "bodyParametersJson": "{\n  \"caption\": \"{{$json.Caption}}\",\n  \"image\": \"{{$json.PostImage}}\",\n  \"access_token\": \"TU_INSTAGRAM_API_TOKEN\"\n}"
+      },
+      "name": "Post to Instagram",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [
+        2100,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "requestMethod": "POST",
+        "url": "TU_ENDPOINT_API_TWITTER",
+        "jsonParameters": true,
+        "bodyParametersJson": "{\n  \"status\": \"{{$json.Caption}}\",\n  \"media\": \"{{$json.PostImage}}\",\n  \"access_token\": \"TU_TWITTER_API_TOKEN\"\n}"
+      },
+      "name": "Post to Twitter",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [
+        2100,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "requestMethod": "POST",
+        "url": "TU_ENDPOINT_API_FACEBOOK",
+        "jsonParameters": true,
+        "bodyParametersJson": "{\n  \"message\": \"{{$json.Caption}}\",\n  \"image\": \"{{$json.PostImage}}\",\n  \"access_token\": \"TU_FACEBOOK_API_TOKEN\"\n}"
+      },
+      "name": "Post to Facebook",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [
+        2100,
+        440
+      ]
+    },
+
+    // Agrega más nodos similares para TikTok, YouTube, Pinterest, Threads, Bluesky con tu API y parámetros
+
+    {
+      "parameters": {
+        "operation": "update",
+        "authentication": "serviceAccount",
+        "sheetId": "TU_GOOGLE_SHEETS_ID",
+        "range": "Sheet1!G",
+        "keyColumn": "Nombre",
+        "keyValue": "={{$json.Nombre}}",
+        "updateData": {
+          "Estado": "Publicado"
+        }
+      },
+      "name": "Update Row Status to Published",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 1,
+      "position": [
+        2350,
+        300
+      ],
+      "credentials": {
+        "googleApi": "GOOGLE_SHEETS_CREDENTIALS"
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "sheetId": "TU_GOOGLE_SHEETS_ID",
+        "operation": "append",
+        "range": "Logs!A:D",
+        "data": [
+          [
+            "={{new Date().toISOString()}}",
+            "={{$json.Nombre}}",
+            "Publicado exitosamente",
+            "Redes: Instagram, Twitter, Facebook, etc."
+          ]
+        ]
+      },
+      "name": "Log Success",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 1,
+      "position": [
+        2350,
+        380
+      ],
+      "credentials": {
+        "googleApi": "GOOGLE_SHEETS_CREDENTIALS"
+      }
+    }
+
+
+  ],
+  "connections": {
+    "Scheduled Trigger": {
+      "main": [[{"node": "Get Rows Google Sheets", "type": "main", "index": 0}]]
+    },
+    "Get Rows Google Sheets": {
+      "main": [[{"node": "Filter Rows Ready", "type": "main", "index": 0}]]
+    },
+    "Filter Rows Ready": {
+      "main": [[{"node": "Add Amazon Affiliate Tag", "type": "main", "index": 0}]]
+    },
+    "Add Amazon Affiliate Tag": {
+      "main": [[{"node": "Generate Caption - OpenAI", "type": "main", "index": 0}]]
+    },
+    "Generate Caption - OpenAI": {
+      "main": [[{"node": "Extract Generated Caption", "type": "main", "index": 0}]]
+    },
+    "Extract Generated Caption": {
+      "main": [[{"node": "Generate Image Prompt - OpenAI", "type": "main", "index": 0}]]
+    },
+    "Generate Image Prompt - OpenAI": {
+      "main": [[{"node": "Extract Image Prompt", "type": "main", "index": 0}]]
+    },
+    "Extract Image Prompt": {
+      "main": [[{"node": "Generate Image via Stability API", "type": "main", "index": 0}]]
+    },
+    "Generate Image via Stability API": {
+      "main": [[{"node": "Extract Generated Image Base64", "type": "main", "index": 0}]]
+    },
+    "Extract Generated Image Base64": {
+      "main": [[{"node": "Determine Final Image URL/Base64", "type": "main", "index": 0}]]
+    },
+    "Determine Final Image URL/Base64": {
+      "main": [[
+        {"node": "Post to Instagram", "type": "main", "index": 0},
+        {"node": "Post to Twitter", "type": "main", "index": 0},
+        {"node": "Post to Facebook", "type": "main", "index": 0}
+      ]]
+    },
+    "Post to Instagram": {
+      "main": [[{"node": "Update Row Status to Published", "type": "main", "index": 0}]]
+    },
+    "Post to Twitter": {
+      "main": []
+    },
+    "Post to Facebook": {
+      "main": []
+    },
+    "Update Row Status to Published": {
+      "main": [[{"node": "Log Success", "type": "main", "index": 0}]]
+    }
+  }
+}
