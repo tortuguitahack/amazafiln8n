@@ -173,8 +173,6 @@
       ]
     },
 
-    // --- Publicaciones en Redes Sociales, ejemplo genérico HTTP Requests ---
-
     {
       "parameters": {
         "requestMethod": "POST",
@@ -220,8 +218,6 @@
         440
       ]
     },
-
-    // Agrega más nodos similares para TikTok, YouTube, Pinterest, Threads, Bluesky con tu API y parámetros
 
     {
       "parameters": {
