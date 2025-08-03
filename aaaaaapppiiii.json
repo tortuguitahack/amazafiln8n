@@ -1,0 +1,217 @@
+{
+  "name": "Amazon Affiliates Multi-Social + Free IA Generation",
+  "nodes": [
+    {
+      "parameters": {
+        "triggerTimes": {
+          "item": [
+            {
+              "hour": 9,
+              "minute": 0
+            }
+          ]
+        }
+      },
+      "name": "Scheduled Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [150, 250]
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "sheetId": "TU_GOOGLE_SHEETS_ID",
+        "range": "Productos!A:E",
+        "options": { "returnAll": true }
+      },
+      "name": "Get Rows Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 1,
+      "position": [350, 250],
+      "credentials": { "googleApi": "google_sheets_prod" }
+    },
+    {
+      "parameters": {
+        "functionCode": "return items.filter(item => {\n  const estado = (item.json.Estado || '').toLowerCase();\n  const urlValida = item.json.Url_Amazon && item.json.Url_Amazon.startsWith('http');\n  const nombreValido = !!item.json.Nombre;\n  return estado === 'ready' && urlValida && nombreValido;\n});"
+      },
+      "name": "Filter Ready Rows",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [550, 250]
+    },
+    {
+      "parameters": {
+        "functionCode": "items.forEach(item => {\n  const url = item.json.Url_Amazon || '';\n  if (url.includes('?')) {\n    item.json.Afiliate_Link = url + '&tag=diegodgard02-20';\n  } else {\n    item.json.Afiliate_Link = url + '?tag=diegodgard02-20';\n  }\n});\nreturn items;"
+      },
+      "name": "Add Amazon Affiliate Tag",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [750, 250]
+    },
+    {
+      "parameters": {
+        "prompt": "Genera una descripción atractiva y breve para promocionar el producto Amazon:\nNombre: {{$json.Nombre}}\nDescripción base: {{$json.Descripción || 'No disponible'}}\nEnlace de compra afiliado: {{$json.Afiliate_Link}}\nHaz un texto para captar la atención en redes sociales.",
+        "model": "gpt-3.5-turbo",
+        "temperature": 0.7,
+        "max_tokens": 150
+      },
+      "name": "Generate Caption via OpenAI",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 1,
+      "position": [950, 250],
+      "credentials": { "openAIApi": "openai_api" }
+    },
+    {
+      "parameters": {
+        "functionCode": "items.forEach(item => {\n  const choices = item.json.choices || [];\n  if (choices.length > 0 && choices[0].message) {\n    item.json.Caption = choices[0].message.content.trim();\n  } else if(item.json.text){\n    item.json.Caption = item.json.text.trim();\n  } else {\n    item.json.Caption = `Compra ya: ${item.json.Afiliate_Link}`;\n  }\n});\nreturn items;"
+      },
+      "name": "Extract Caption Text",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [1150, 250]
+    },
+    {
+      "parameters": {
+        "prompt": "Crea un prompt detallado para generar una imagen de producto realista del siguiente:\nNombre: {{$json.Nombre}}\nDescripción: {{$json.Descripción || 'No disponible'}}\n",
+        "model": "gpt-3.5-turbo",
+        "temperature": 0.7,
+        "max_tokens": 100
+      },
+      "name": "Generate Image Prompt via OpenAI",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 1,
+      "position": [1150, 450],
+      "credentials": { "openAIApi": "openai_api" }
+    },
+    {
+      "parameters": {
+        "functionCode": "items.forEach(item => {\n  const choices = item.json.choices || [];\n  if (choices.length > 0 && choices[0].message) {\n    item.json.ImagePrompt = choices[0].message.content.trim();\n  } else if (item.json.text) {\n    item.json.ImagePrompt = item.json.text.trim();\n  } else {\n    item.json.ImagePrompt = 'Producto Amazon fotografía realista';\n  }\n});\nreturn items;"
+      },
+      "name": "Extract Image Prompt",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [1350, 450]
+    },
+    {
+      "parameters": {
+        "requestMethod": "POST",
+        "url": "https://api.stability.ai/v1/generation/stable-diffusion-v1-5/text-to-image",
+        "jsonParameters": true,
+        "bodyParametersJson": "{\"cfg_scale\":7,\"height\":512,\"width\":512,\"samples\":1,\"steps\":30,\"text_prompts\":[{\"text\":\"{{$json.ImagePrompt}}\"}]}",
+        "headerParametersUi": {
+          "parameter": [
+            {
+              "name": "Authorization",
+              "value": "Bearer TU_STABILITY_API_KEY"
+            }
+          ]
+        }
+      },
+      "name": "Generate Image via Stability API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [1550, 450]
+    },
+    {
+      "parameters": {
+        "functionCode": "items.forEach(item => {\n  if (item.json.artifacts && item.json.artifacts.length > 0) {\n    const base64img = item.json.artifacts[0].base64;\n    item.json.GeneratedImage = `data:image/png;base64,${base64img}`;\n  } else {\n    item.json.GeneratedImage = null;\n  }\n});\nreturn items;"
+      },
+      "name": "Extract Base64 Image",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [1750, 450]
+    },
+    {
+      "parameters": {
+        "functionCode": "items.forEach(item => {\n  // Usa imagen generada si no existe URL en Google Sheets\n  item.json.PostImage = item.json['Imagen/Video'] && item.json['Imagen/Video'].length > 5 ? item.json['Imagen/Video'] : item.json.GeneratedImage;\n});\nreturn items;"
+      },
+      "name": "Determine Final Image",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [1900, 450]
+    },
+
+    {
+      "parameters": {
+        "requestMethod": "POST",
+        "url": "TU_ENDPOINT_INSTAGRAM_API",
+        "jsonParameters": true,
+        "bodyParametersJson": "{ \"caption\": \"{{$json.Caption}}\", \"image\": \"{{$json.PostImage}}\", \"access_token\": \"TU_INSTAGRAM_ACCESS_TOKEN\" }"
+      },
+      "name": "Publish to Instagram",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [2100, 250]
+    },
+
+    {
+      "parameters": {
+        "requestMethod": "POST",
+        "url": "TU_ENDPOINT_TWITTER_API",
+        "jsonParameters": true,
+        "bodyParametersJson": "{ \"status\": \"{{$json.Caption}}\", \"media\": \"{{$json.PostImage}}\", \"access_token\": \"TU_TWITTER_ACCESS_TOKEN\" }"
+      },
+      "name": "Publish to Twitter",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [2100, 350]
+    },
+
+    {
+      "parameters": {
+        "operation": "update",
+        "authentication": "serviceAccount",
+        "sheetId": "TU_GOOGLE_SHEETS_ID",
+        "range": "Productos!E:E",
+        "keyColumn": "Nombre",
+        "keyValue": "={{$json.Nombre}}",
+        "updateData": { "Estado": "Publicado" }
+      },
+      "name": "Update Row Status",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 1,
+      "position": [2350, 300],
+      "credentials": { "googleApi": "google_sheets_prod" }
+    },
+
+    {
+      "parameters": {
+        "operation": "append",
+        "authentication": "serviceAccount",
+        "sheetId": "TU_GOOGLE_SHEETS_ID",
+        "range": "Logs!A:D",
+        "data": [
+          [ "={{new Date().toISOString()}}", "={{$json.Nombre}}", "Publicado Instagram y Twitter", "OK" ]
+        ]
+      },
+      "name": "Log Success",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 1,
+      "position": [2350, 380],
+      "credentials": { "googleApi": "google_sheets_prod" }
+    }
+  ],
+
+  "connections": {
+    "Scheduled Trigger": { "main": [[{ "node": "Get Rows Google Sheets", "type": "main", "index": 0 }]] },
+    "Get Rows Google Sheets": { "main": [[{ "node": "Filter Ready Rows", "type": "main", "index": 0 }]] },
+    "Filter Ready Rows": { "main": [[{ "node": "Add Amazon Affiliate Tag", "type": "main", "index": 0 }]] },
+    "Add Amazon Affiliate Tag": { "main": [[{ "node": "Generate Caption via OpenAI", "type": "main", "index": 0 }]] },
+    "Generate Caption via OpenAI": { "main": [[{ "node": "Extract Caption Text", "type": "main", "index": 0 }]] },
+    "Extract Caption Text": { "main": [[{ "node": "Generate Image Prompt via OpenAI", "type": "main", "index": 0 }]] },
+    "Generate Image Prompt via OpenAI": { "main": [[{ "node": "Extract Image Prompt", "type": "main", "index": 0 }]] },
+    "Extract Image Prompt": { "main": [[{ "node": "Generate Image via Stability API", "type": "main", "index": 0 }]] },
+    "Generate Image via Stability API": { "main": [[{ "node": "Extract Base64 Image", "type": "main", "index": 0 }]] },
+    "Extract Base64 Image": { "main": [[{ "node": "Determine Final Image", "type": "main", "index": 0 }]] },
+    "Determine Final Image": {
+      "main": [
+        [
+          { "node": "Publish to Instagram", "type": "main", "index": 0 },
+          { "node": "Publish to Twitter", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Publish to Instagram": { "main": [[{ "node": "Update Row Status", "type": "main", "index": 0 }]] },
+    "Update Row Status": { "main": [[{ "node": "Log Success", "type": "main", "index": 0 }]] }
+  }
+}
