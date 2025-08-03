@@ -1,0 +1,224 @@
+{
+  "name": "Amazon Affiliate with OpenAI & Gemini Veo3 Workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "triggerTimes": {
+          "item": [
+            {
+              "hour": 9,
+              "minute": 0
+            }
+          ]
+        }
+      },
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [
+        150,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "sheetId": "TU_GOOGLE_SHEETS_ID",
+        "range": "Sheet1!A:F",
+        "options": {
+          "returnAll": true
+        }
+      },
+      "name": "Get Products from Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 1,
+      "position": [
+        350,
+        300
+      ],
+      "credentials": {
+        "googleApi": "GOOGLE_SHEETS_CREDENTIALS"
+      }
+    },
+    {
+      "parameters": {
+        "functionCode": "return items.filter(item => {\n  const estado = (item.json.Estado || '').toLowerCase();\n  const urlValida = item.json.Url_Amazon && item.json.Url_Amazon.startsWith('http');\n  const mediaValida = item.json['Imagen/Video'] && /\\.(jpg|jpeg|png|gif|mp4)$/i.test(item.json['Imagen/Video']);\n  const nombreValido = !!item.json.Nombre;\n  return estado === 'ready' && urlValida && mediaValida && nombreValido;\n});"
+      },
+      "name": "Filter Valid Products",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        550,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Agrega tag afiliado Amazon\nitems.forEach(item => {\n  const url = item.json.Url_Amazon || '';\n  if (url.includes('?')) {\n    item.json.Amazon_Afiliado = url + '&tag=diegodgard0f-20';\n  } else {\n    item.json.Amazon_Afiliado = url + '?tag=diegodgard0f-20';\n  }\n});\nreturn items;"
+      },
+      "name": "Add Amazon Affiliate Tag",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        750,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "model": "gpt-4o-mini",
+        "generationSettings": {},
+        "prompt": "Eres un experto en marketing. Genera un caption atractivo para Instagram sobre el producto con nombre: {{$json.Nombre}}, incluyendo una breve descripción: {{$json.Descripción}}, y el enlace afiliado: {{$json.Amazon_Afiliado}}. Usa hashtags populares tecnológicos y mantiene el texto dentro de 2200 caracteres.",
+        "maxTokens": 150,
+        "temperature": 0.7,
+        "topP": 1,
+        "presencePenalty": 0,
+        "frequencyPenalty": 0,
+        "stopSequences": []
+      },
+      "name": "Generate Instagram Caption (OpenAI)",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 1,
+      "position": [
+        950,
+        260
+      ],
+      "credentials": {
+        "openAIApi": "OPENAI_API_CREDENTIALS"
+      }
+    },
+    {
+      "parameters": {
+        "model": "gemini-1-mini-video-alpha",
+        "prompt": "Genera un video promocional breve para el producto llamado {{$json.Nombre}}. Usa la descripción: {{$json.Descripción}} para guiar el video. El video debe tener formato mp4 y durar 15 segundos máximo.",
+        "maxTokens": 1500,
+        "stopSequences": [],
+        "responseFormat": "base64"
+      },
+      "name": "Generate Product Video (Gemini Veo3)",
+      "type": "n8n-nodes-base.gemini",
+      "typeVersion": 1,
+      "position": [
+        950,
+        360
+      ],
+      "credentials": {
+        "gemini": "GEMINI_API_CREDENTIALS"
+      }
+    },
+    {
+      "parameters": {
+        "dataPropertyName": "data:video/mp4;base64={{$json['video_base64']}}",
+        "binaryPropertyName": "video",
+        "fileName": "producto-{{$json.Nombre}}.mp4"
+      },
+      "name": "Create Binary Video",
+      "type": "n8n-nodes-base.binary",
+      "typeVersion": 1,
+      "position": [
+        1150,
+        360
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "operation": "upload",
+        "additionalFields": {},
+        "options": {},
+        "binaryData": true
+      },
+      "name": "Upload Video to Google Drive",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 1,
+      "position": [
+        1350,
+        360
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": "GOOGLE_DRIVE_CREDENTIALS"
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://api.redsocial.ejemplo/post",
+        "method": "POST",
+        "jsonParameters": true,
+        "bodyParametersJson": "{\n  \"caption\": \"{{$json[\"openai\"][0].text}}\",\n  \"media_url\": \"{{$json[\"files\"][0].webContentLink}}\",\n  \"account_id\": \"TU_INSTAGRAM_ACCOUNT_ID\"\n}"
+      },
+      "name": "Post to Instagram API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [
+        1550,
+        300
+      ],
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "HTTP_BASIC_AUTH_BLOTATO",
+          "name": "HTTP Basic Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "sheetId": "TU_GOOGLE_SHEETS_ID",
+        "range": "Sheet1!F",
+        "keyColumn": "Nombre",
+        "keyValue": "={{$json.Nombre}}",
+        "updateData": {
+          "Estado": "Publicado"
+        }
+      },
+      "name": "Update Status in Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 1,
+      "position": [
+        1750,
+        300
+      ],
+      "credentials": {
+        "googleApi": "GOOGLE_SHEETS_CREDENTIALS"
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [[{"node": "Get Products from Google Sheets", "type": "main", "index": 0}]]
+    },
+    "Get Products from Google Sheets": {
+      "main": [[{"node": "Filter Valid Products", "type": "main", "index": 0}]]
+    },
+    "Filter Valid Products": {
+      "main": [[{"node": "Add Amazon Affiliate Tag", "type": "main", "index": 0}]]
+    },
+    "Add Amazon Affiliate Tag": {
+      "main": [
+        [
+          {"node": "Generate Instagram Caption (OpenAI)", "type": "main", "index": 0},
+          {"node": "Generate Product Video (Gemini Veo3)", "type": "main", "index": 0}
+        ]
+      ]
+    },
+    "Generate Instagram Caption (OpenAI)": {
+      "main": [[{"node": "Post to Instagram API", "type": "main", "index": 0}]]
+    },
+    "Generate Product Video (Gemini Veo3)": {
+      "main": [
+        [
+          {"node": "Create Binary Video", "type": "main", "index": 0}
+        ]
+      ]
+    },
+    "Create Binary Video": {
+      "main": [[{"node": "Upload Video to Google Drive", "type": "main", "index": 0}]]
+    },
+    "Upload Video to Google Drive": {
+      "main": [[{"node": "Post to Instagram API", "type": "main", "index": 0}]]
+    },
+    "Post to Instagram API": {
+      "main": [[{"node": "Update Status in Sheets", "type": "main", "index": 0}]]
+    }
+  }
+}
