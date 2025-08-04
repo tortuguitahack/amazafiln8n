@@ -1,0 +1,231 @@
+{
+  "name": "Freelance-VirtualAssistant-UltraProPlus",
+  "nodes": [
+    {
+      "name": "Scheduler",
+      "type": "n8n-nodes-base.cron",
+      "parameters": { "mode": "everyDay", "hour": 8, "minute": 15 },
+      "typeVersion": 1,
+      "position": [100, 100]
+    },
+    {
+      "name": "ScrapeJobs",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "httpMethod": "GET",
+        "url": "https://api.apify.com/v2/actor-tasks/TU_ACTOR_ID/runs/last/dataset/items?token=TU_APIFY_TOKEN"
+      },
+      "typeVersion": 1,
+      "position": [200, 100]
+    },
+    {
+      "name": "SplitTestProposalA",
+      "type": "n8n-nodes-base.openai",
+      "parameters": {
+        "openaiApiKey": "TU_OPENAI_APIKEY",
+        "model": "gpt-3.5-turbo",
+        "messages": [{
+          "role": "system",
+          "content": "Redacta una propuesta impecable (versión A), profesional y cálida, para {{$json['job_title']}} en {{$json['platform']}} (idioma: {{$json['lang']}})."
+        }]
+      },
+      "typeVersion": 1,
+      "position": [310, 60]
+    },
+    {
+      "name": "SplitTestProposalB",
+      "type": "n8n-nodes-base.openai",
+      "parameters": {
+        "openaiApiKey": "TU_OPENAI_APIKEY",
+        "model": "gpt-3.5-turbo",
+        "messages": [{
+          "role": "system",
+          "content": "Escribe una propuesta persuasiva (versión B), con énfasis en resultados y tecnología. Job: {{$json['job_title']}}, idioma: {{$json['lang']}}, plataforma: {{$json['platform']}}."
+        }]
+      },
+      "typeVersion": 1,
+      "position": [310, 140]
+    },
+    {
+      "name": "LangDecision",
+      "type": "n8n-nodes-base.code",
+      "parameters": {
+        "language": "javascript",
+        "code": "const pais = item.country;\nif(pais === 'Brasil') { item.lang = 'pt'; } else if (pais === 'France') { item.lang = 'fr'; } else { item.lang = 'en'; }\nreturn item;"
+      },
+      "typeVersion": 1,
+      "position": [250, 100]
+    },
+    {
+      "name": "SplitSelector",
+      "type": "n8n-nodes-base.code",
+      "parameters": {
+        "language": "javascript",
+        "code": "item.selected = Math.random() < 0.5 ? 'A' : 'B';\nreturn item;"
+      },
+      "typeVersion": 1,
+      "position": [370, 100]
+    },
+    {
+      "name": "NotifyTelegram",
+      "type": "n8n-nodes-base.telegram",
+      "parameters": {
+        "credentialsTelegramApi": "TUS_CREDENCIALES_TELEGRAM",
+        "text": "Nuevo proyecto {{$json['job_title']}} / {{$json['platform']}} país: {{$json['country']}}. ¿Enviar propuesta {{$json['selected']}}? [SI/NO]",
+        "chatId": "TU_TELEGRAM_ID"
+      },
+      "typeVersion": 1,
+      "position": [470, 100]
+    },
+    {
+      "name": "SendProposal",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "httpMethod": "POST",
+        "url": "https://www.freelancer.com/api/bid?token=TU_FREELANCER_APIKEY",
+        "bodyParametersUi": {
+          "parameter": [
+            { "name": "job_id", "value": "={{$json['job_id']}}" },
+            {
+              "name": "proposal",
+              "value": "={{$json['selected'] === 'A' ? $node['SplitTestProposalA'].json['choices'][0]['message']['content'] : $node['SplitTestProposalB'].json['choices'][0]['message']['content']}}"
+            },
+            { "name": "bid_amount", "value": "={{$json['recommended_bid']}}" }
+          ]
+        }
+      },
+      "typeVersion": 1,
+      "position": [570, 100]
+    },
+    {
+      "name": "LogLeadCRM",
+      "type": "n8n-nodes-base.googleSheets",
+      "parameters": {
+        "authentication": "serviceAccount",
+        "spreadsheetId": "TU_GOOGLESHEET_ID",
+        "sheetName": "LeadsCRM",
+        "operation": "append",
+        "columns": [
+          "fecha",
+          "job_id",
+          "titulo",
+          "cliente",
+          "pais",
+          "plataforma",
+          "idioma",
+          "estado",
+          "propuesta",
+          "resultado"
+        ],
+        "values": [
+          "={{$now}}",
+          "={{$json['job_id']}}",
+          "={{$json['job_title']}}",
+          "={{$json['client_name']}}",
+          "={{$json['country']}}",
+          "={{$json['platform']}}",
+          "={{$json['lang']}}",
+          "Bid",
+          "={{$json['selected'] === 'A' ? $node['SplitTestProposalA'].json['choices'][0]['message']['content'] : $node['SplitTestProposalB'].json['choices'][0]['message']['content']}}",
+          "pendiente"
+        ]
+      },
+      "typeVersion": 1,
+      "position": [670, 100]
+    },
+    {
+      "name": "TriggerInvoice",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {
+        "path": "nuevo-trabajo-exitoso",
+        "httpMethod": "POST",
+        "responseMode": "lastNode"
+      },
+      "typeVersion": 1,
+      "position": [770, 100]
+    },
+    {
+      "name": "PrepareInvoiceData",
+      "type": "n8n-nodes-base.set",
+      "parameters": {
+        "values": [
+          { "name": "invoice_id", "value": "INV-{{random}}" },
+          { "name": "country", "value": "={{$json['country']}}" },
+          { "name": "platform", "value": "={{$json['platform']}}" },
+          { "name": "amount", "value": "={{$json['amount']}}" },
+          { "name": "cliente", "value": "={{$json['client_name']}}" },
+          { "name": "detalle", "value": "Servicio freelance automatizado" }
+        ]
+      },
+      "typeVersion": 1,
+      "position": [800, 100]
+    },
+    {
+      "name": "GenInvoicePDF",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "httpMethod": "POST",
+        "url": "https://api.apitemplate.io/v1/create?template_id=TU_TEMPLATE&apiKey=TU_APITEMPLATE_APIKEY",
+        "bodyParametersUi": {
+          "parameter": [
+            { "name": "invoice_id", "value": "={{$json['invoice_id']}}" },
+            { "name": "client", "value": "={{$json['cliente']}}" },
+            { "name": "country", "value": "={{$json['country']}}" },
+            { "name": "platform", "value": "={{$json['platform']}}" },
+            { "name": "amount", "value": "={{$json['amount']}}" },
+            { "name": "detalle", "value": "={{$json['detalle']}}" }
+          ]
+        }
+      },
+      "typeVersion": 1,
+      "position": [900, 100]
+    },
+    {
+      "name": "SendInvoiceEmail",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "fromEmail": "TUFREELANCE@EMAIL.COM",
+        "toEmail": "={{$json['customer_email']}}",
+        "subject": "Factura por servicio realizado",
+        "text": "Adjunto factura por tu servicio. ¡Gracias!",
+        "binaryPropertyName": "pdf_file"
+      },
+      "typeVersion": 1,
+      "position": [1000, 100]
+    },
+    {
+      "name": "ReportePaisPlataforma",
+      "type": "n8n-nodes-base.googleSheets",
+      "parameters": {
+        "authentication": "serviceAccount",
+        "spreadsheetId": "TU_GOOGLESHEET_ID",
+        "sheetName": "EstadoPorPaisPlataforma",
+        "operation": "append",
+        "columns": ["fecha", "pais", "plataforma", "monto", "estado"],
+        "values": [
+          "={{$now}}",
+          "={{$json['country']}}",
+          "={{$json['platform']}}",
+          "={{$json['amount']}}",
+          "Completado"
+        ]
+      },
+      "typeVersion": 1,
+      "position": [1100, 100]
+    }
+  ],
+  "connections": {
+    "Scheduler": { "main": [["ScrapeJobs"]] },
+    "ScrapeJobs": { "main": [["LangDecision"]] },
+    "LangDecision": {
+      "main": [["SplitTestProposalA", "SplitTestProposalB", "SplitSelector"]]
+    },
+    "SplitSelector": { "main": [["NotifyTelegram"]] },
+    "NotifyTelegram": { "main": [["SendProposal"]] },
+    "SendProposal": { "main": [["LogLeadCRM"]] },
+    "LogLeadCRM": { "main": [["TriggerInvoice"]] },
+    "TriggerInvoice": { "main": [["PrepareInvoiceData"]] },
+    "PrepareInvoiceData": { "main": [["GenInvoicePDF"]] },
+    "GenInvoicePDF": { "main": [["SendInvoiceEmail", "ReportePaisPlataforma"]] }
+  }
+}
