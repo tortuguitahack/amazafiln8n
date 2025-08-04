@@ -1,0 +1,68 @@
+{
+  "name": "Afiliados-SEO-Persuasivo",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "GET",
+        "url": "https://trends.google.com/trends/trendingsearches/daily/rss?geo=US"
+      },
+      "name": "Detectar Tendencias Nicho",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [250, 200]
+    },
+    {
+      "parameters": {
+        "model": "gpt-3.5-turbo",
+        "messages": [
+          {
+            "role": "system",
+            "content": "Eres un copywriter experto en hipnosis conversacional y persuasión de ventas para afiliados. Genera un post SEO de 600 palabras y un email de 120 palabras que persuada al lector/lead a hacer click usando técnicas hipnóticas, urgencias y CTAs filosas para el siguiente producto/tendencia: {{$json[\"items\"][\"title\"]}}"
+          }
+        ],
+        "openaiApiKey": "={{$env.OPENAI_API_KEY}}"
+      },
+      "name": "Escribir Post Hipnosis IA",
+      "type": "n8n-nodes-base.openai",
+      "typeVersion": 1,
+      "position": [500, 200]
+    },
+    {
+      "parameters": {
+        "resource": "post",
+        "operation": "create",
+        "title": "Automated SEO Affiliate Post",
+        "content": "={{$node[\"Escribir Post Hipnosis IA\"].json[\"choices\"][0][\"message\"][\"content\"]}}",
+        "status": "publish"
+      },
+      "name": "Publicar en Blog",
+      "type": "n8n-nodes-base.wordpress",
+      "typeVersion": 1,
+      "position": [750, 200]
+    },
+    {
+      "parameters": {
+        "fromEmail": "tuemail@gmail.com",
+        "toEmail": "={{$json[\"leadEmail\"]}}",
+        "subject": "El secreto para tu libertad financiera este mes (solo 24h)",
+        "text": "={{$node[\"Escribir Post Hipnosis IA\"].json[\"choices\"][0][\"message\"][\"content\"]}}"
+      },
+      "name": "Enviar Email Hipnótico",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 1,
+      "position": [1000, 200]
+    }
+  ],
+  "connections": {
+    "Detectar Tendencias Nicho": {
+      "main": [
+        ["Escribir Post Hipnosis IA"]
+      ]
+    },
+    "Escribir Post Hipnosis IA": {
+      "main": [
+        ["Publicar en Blog", "Enviar Email Hipnótico"]
+      ]
+    }
+  }
+}
