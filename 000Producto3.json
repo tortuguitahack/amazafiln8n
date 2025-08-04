@@ -1,0 +1,176 @@
+{
+  "name": "Dropshipping-MultiStore-MAX-AUTO",
+  "nodes": [
+    // 1. Scheduler diario para toda la operación
+    {
+      "name": "ScheduleCheck",
+      "type": "n8n-nodes-base.cron",
+      "parameters": { "mode": "everyDay", "hour": 7, "minute": 0 },
+      "position": [100,100]
+    },
+
+    // 2. Leer productos/tiendas y URLs competencia de Google Sheets
+    {
+      "name": "ReadSheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "parameters": {
+        "authentication":"serviceAccount",
+        "spreadsheetId":"TU_GOOGLESHEET_ID",
+        "sheetName":"TiendasYCompetencia",
+        "operation":"getAll"
+      },
+      "position":[200,100]
+    },
+
+    // 3. Scraping precios y stock propia tienda y competidores (BrightData, Unwrangle, ScrapeGraphAI)
+    {
+      "name": "ScrapeCompetitor",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "httpMethod": "GET",
+        "url": "https://api.unwrangle.com/product?url={{$json['competitor_url']}}&apikey=TU_UNWRANGLE_API"
+      },
+      "position": [350,100]
+    },
+
+    // 4. Ajuste automático de precios según competencia
+    {
+      "name": "DynamicPricing",
+      "type": "n8n-nodes-base.code",
+      "parameters": {
+        "language": "javascript",
+        "code": "const margen = 0.97;\nitem.new_price = item.competitor_price * margen;\nreturn item;"
+      },
+      "position": [450,100]
+    },
+
+    // 5. Actualiza precio/stock en tienda (ejemplo: WooCommerce API, Ecwid, Shopify, Square, Wix...)
+    {
+      "name": "UpdateOwnStore",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "httpMethod": "PUT",
+        "url": "{{$json['store_api_url']}}",
+        "headerParametersUi": { "parameter": [ { "name":"Authorization","value":"Bearer TU_TIENDA_APIKEY" } ] },
+        "bodyParametersUi": {
+          "parameter": [
+            { "name":"stock",  "value":"={{$json['current_stock']}}" },
+            { "name":"price",  "value":"={{$json['new_price']}}" }
+          ]
+        }
+      },
+      "position": [550,100]
+    },
+
+    // 6. Split-testing automático de títulos y descripciones
+    {
+      "name": "SplitTestProductText",
+      "type": "n8n-nodes-base.code",
+      "parameters": {
+        "language": "javascript",
+        "code": "const titles = ['🔥Solo Hoy','ENVÍO GRATIS','⭐Más Vendido','¡Oferta Limiteda!'];\nconst res = item;\nres.product_title = titles[Math.floor(Math.random()*titles.length)]+' '+item.base_title;\nreturn res;"
+      },
+      "position":[650,100]
+    },
+
+    // 7. Cross-sell y email automation a clientes (después de venta; OpenAI + Gmail/SMTP)
+    {
+      "name": "GenCrossSellEmail",
+      "type": "n8n-nodes-base.openai",
+      "parameters": {
+        "model":"gpt-3.5-turbo",
+        "openaiApiKey":"TU_OPENAI_APIKEY",
+        "messages":[{"role":"system","content":"Crea un email de cross-sell SHORT para productos dropshipping, usando urgencia, CTA clara y recomendando productos complementarios a {{$json['product_title']}}. Personaliza: {{$json['customer_name']}}."}]
+      },
+      "position":[800,100]
+    },
+    {
+      "name": "SendCrossSellEmail",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "fromEmail":"TIENDAVIP@EMAIL.COM",
+        "toEmail":"={{$json['customer_email']}}",
+        "subject":"Gracias por tu compra: Descubre lo que va perfecto con {{$json['product_title']}}",
+        "text":"={{$node['GenCrossSellEmail'].json['choices'][0]['message']['content']}}"
+      },
+      "position":[900,100]
+    },
+
+    // 8. Anuncios y publicaciones automáticas multicanal usando Upload-Post/Blotato (Facebook, IG, TikTok, Pinterest, X)
+    {
+      "name": "PostToMultiSocials",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "httpMethod":"POST",
+        "url":"https://api.upload-post.com/post",
+        "headerParametersUi": {
+          "parameter": [{ "name":"Authorization","value":"Apikey TU_UPLOADPOST_APIKEY" }]
+        },
+        "bodyParametersUi": { "parameter": [
+          { "name":"image_url","value":"={{$json['main_image_url']}}"},
+          { "name":"text","value":"Oferta {{$json['product_title']}} solo hoy: {{$json['new_price']}} 🔥 Ingresa ya: {{$json['store_url']}} #dropshipping #oferta"},
+          { "name":"platforms","value":"facebook,instagram,tiktok,pinterest,x"}
+        ]}
+      },
+      "position":[1100,100]
+    },
+
+    // 9. WhatsApp/Telegram para alertas y ventas directas con WasenderAPI/Telegram
+    {
+      "name": "SendWhatsApp",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "httpMethod":"POST",
+        "url":"https://api.wasenderapi.com/message/send",
+        "bodyParametersUi":{
+          "parameter":[
+            {"name":"api_key","value":"TU_WASENDERAPI_KEY"},
+            {"name":"receiver","value":"={{$json['customer_whatsapp']}}"},
+            {"name":"message","value":"¡Hola {{$json['customer_name']}}! Mira la nueva oferta en {{$json['product_title']}}. Solo hoy: {{$json['new_price']}}. Compra aquí: {{$json['store_url']}}"}
+          ]
+        }
+      },
+      "position":[1100,200]
+    },
+    {
+      "name":"SendTelegram",
+      "type":"n8n-nodes-base.telegram",
+      "parameters":{
+        "credentialsTelegramApi":"TUS_CREDENCIALES_TELEGRAM",
+        "text":"¡Nuevo anuncio publicado en todas tus tiendas a las {{now}}!",
+        "chatId":"TU_TELEGRAM_ID"
+      },
+      "position":[1200,100]
+    },
+
+    // 10. Dashboard avanzado ventas, stock, anuncios, competidores, cross-sell
+    {
+      "name": "DashboardSheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "parameters": {
+        "authentication":"serviceAccount",
+        "spreadsheetId":"TU_GOOGLESHEET_ID",
+        "sheetName":"DatosMaster",
+        "operation":"append",
+        "columns":["fecha","tienda","producto","precio","stock","cliente","email","wasap","venta","competitor_price","own_new_price","announcement"],
+        "values":[
+          "={{$now}}", "={{$json['store_name']}}", "={{$json['product_title']}}", "={{$json['new_price']}}", "={{$json['current_stock']}}", "={{$json['customer_name']}}", "={{$json['customer_email']}}", "={{$json['customer_whatsapp']}}", "={{$json['order_id']}}", "={{$json['competitor_price']}}", "={{$json['new_price']}}", "Publicado"
+        ]
+      },
+      "position":[1300,100]
+    }
+  ],
+  "connections": {
+    "ScheduleCheck":{"main":[["ReadSheet"]]},
+    "ReadSheet":{"main":[["ScrapeCompetitor"]]},
+    "ScrapeCompetitor":{"main":[["DynamicPricing"]]},
+    "DynamicPricing":{"main":[["UpdateOwnStore"]]},
+    "UpdateOwnStore":{"main":[["SplitTestProductText"]]},
+    "SplitTestProductText":{"main":[["GenCrossSellEmail","PostToMultiSocials"]]},
+    "GenCrossSellEmail":{"main":[["SendCrossSellEmail"]]},
+    "PostToMultiSocials":{"main":[["SendTelegram"]]},
+    "SendCrossSellEmail":{"main":[["SendWhatsApp","DashboardSheet"]]},
+    "SendWhatsApp":{"main":[["DashboardSheet"]]},
+    "SendTelegram":{"main":[["DashboardSheet"]]}
+  }
+}
