@@ -1,0 +1,156 @@
+{
+  "name": "DropshippingMultiStore-UltraPro",
+  "nodes": [
+    {
+      "name": "ScheduleDailyCheck",
+      "type": "n8n-nodes-base.cron",
+      "parameters": { "mode": "everyDay", "hour": 6, "minute": 0 },
+      "typeVersion": 1,
+      "position": [100, 100]
+    },
+    {
+      "name": "GetStoresProducts",
+      "type": "n8n-nodes-base.googleSheets",
+      "parameters": {
+        "authentication": "serviceAccount",
+        "spreadsheetId": "TU_GOOGLESHEET_ID",
+        "sheetName": "TiendasProductos",
+        "operation": "getAll"
+      },
+      "typeVersion": 1,
+      "position": [300, 100]
+    },
+    {
+      "name": "ScrapeStockPrice",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "httpMethod": "GET",
+        "url": "={{$json[\"product_url\"]}}"
+      },
+      "typeVersion": 1,
+      "position": [500, 100]
+    },
+    {
+      "name": "UpdateStoreListing",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "httpMethod": "PUT",
+        "url": "={{$json[\"store_api_url\"]}}",
+        "headerParametersUi": {
+          "parameter": [ { "name": "Authorization", "value": "Bearer TU_APIKEY_STORE" } ]
+        },
+        "bodyParametersUi": {
+          "parameter": [
+            { "name": "stock", "value": "={{$json[\"current_stock\"]}}" },
+            { "name": "price", "value": "={{$json[\"current_price\"]}}" }
+          ]
+        }
+      },
+      "typeVersion": 1,
+      "position": [700, 100]
+    },
+    {
+      "name": "SplitTestTitles",
+      "type": "n8n-nodes-base.code",
+      "parameters": {
+        "language": "javascript",
+        "code": "const titles = [ 'SUPER OFERTA', 'ENVÍO GRATIS', 'NUEVO 2025', 'LIMITADO HOY' ];\nconst idx = Math.floor(Math.random() * titles.length);\nitem.product_title = titles[idx] + ' ' + item.product_base_title;\nreturn item;"
+      },
+      "typeVersion": 1,
+      "position": [700, 200]
+    },
+    {
+      "name": "WebhookOrder",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {
+        "path": "nueva-orden-dropshipping",
+        "httpMethod": "POST",
+        "responseMode": "lastNode"
+      },
+      "typeVersion": 1,
+      "position": [900, 100]
+    },
+    {
+      "name": "SendOrderMail",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "fromEmail": "tutienda@email.com",
+        "toEmail": "={{$json[\"customer_email\"]}}",
+        "subject": "Confirmación y tracking de tu pedido",
+        "text": "Gracias por tu compra! Aquí tu tracking: {{$json[\"tracking_url\"]}}"
+      },
+      "typeVersion": 1,
+      "position": [1100, 100]
+    },
+    {
+      "name": "NotifyTelegram",
+      "type": "n8n-nodes-base.telegram",
+      "parameters": {
+        "credentialsTelegramApi": "TUS_CREDENCIALES_TELEGRAM",
+        "text": "Nuevo pedido en tienda {{$json[\"store_name\"]}} producto: {{$json[\"product_title\"]}} - cliente: {{$json[\"customer_name\"]}}",
+        "chatId": "TU_TELEGRAM_ID"
+      },
+      "typeVersion": 1,
+      "position": [1100, 200]
+    },
+    {
+      "name": "ReportToDashboard",
+      "type": "n8n-nodes-base.googleSheets",
+      "parameters": {
+        "authentication": "serviceAccount",
+        "spreadsheetId": "TU_GOOGLESHEET_ID",
+        "sheetName": "DashVentas",
+        "operation": "append",
+        "columns": [ "fecha", "store", "producto", "precio", "stock", "venta", "cliente", "email" ],
+        "values": [
+          "={{$now}}",
+          "={{$json[\"store_name\"]}}",
+          "={{$json[\"product_title\"]}}",
+          "={{$json[\"current_price\"]}}",
+          "={{$json[\"current_stock\"]}}",
+          "={{$json[\"order_id\"]}}",
+          "={{$json[\"customer_name\"]}}",
+          "={{$json[\"customer_email\"]}}"
+        ]
+      },
+      "typeVersion": 1,
+      "position": [1100, 300]
+    },
+    {
+      "name": "LowStockAlert",
+      "type": "n8n-nodes-base.if",
+      "parameters": {
+        "conditions": {
+          "number": [ { "value1": "={{$json[\"current_stock\"]}}", "operation": "lessThan", "value2": 5 } ]
+        }
+      },
+      "typeVersion": 1,
+      "position": [1300, 100]
+    },
+    {
+      "name": "OrderRestock",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "httpMethod": "POST",
+        "url": "https://api.cjdropshipping.com/restocking",
+        "bodyParametersUi": {
+          "parameter": [
+            { "name": "apikey", "value": "TU_APIKEY_CJDROPSHIPPING" },
+            { "name": "product_id", "value": "={{$json[\"product_id\"]}}" },
+            { "name": "quantity", "value": "100" }
+          ]
+        }
+      },
+      "typeVersion": 1,
+      "position": [1500, 100]
+    }
+  ],
+  "connections": {
+    "ScheduleDailyCheck": { "main": [ [ "GetStoresProducts"] ] },
+    "GetStoresProducts": { "main": [ [ "ScrapeStockPrice"] ] },
+    "ScrapeStockPrice": { "main": [ [ "UpdateStoreListing","SplitTestTitles"] ] },
+    "UpdateStoreListing": { "main": [ ["LowStockAlert"] ] },
+    "WebhookOrder": { "main": [ ["SendOrderMail","NotifyTelegram","ReportToDashboard"] ] },
+    "LowStockAlert": { "main": [ ["OrderRestock"] ] }
+  }
+}
