@@ -1,0 +1,192 @@
+{
+  "name": "Afiliados-Expertos-MegaFlow",
+  "nodes": [
+    // 1. SCRAPING Y TENDENCIAS AMAZON/HOTMART
+    {
+      "name": "ScrapingAmazon",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "httpMethod": "GET",
+        "url": "https://api.scrapingbee.com/v1/?api_key=TU_API_KEY_BEE&url=https://www.amazon.com/s?k=palabra_clave"
+      },
+      "position": [200, 200]
+    },
+    {
+      "name": "ScrapingHotmart",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "httpMethod": "GET",
+        "url": "https://api.hotmart.com/payments/api/v1/products?query=palabra_clave&access_token=TU_HOTMART_API"
+      },
+      "position": [200, 400]
+    },
+
+    // 2. GENERACIÓN DE COPY Y VIDEOS CON IA
+    {
+      "name": "CopyPersuasivo",
+      "type": "n8n-nodes-base.openai",
+      "parameters": {
+        "model": "gpt-3.5-turbo",
+        "openaiApiKey": "TU_API_OPENAI",
+        "messages": [
+          {
+            "role": "system",
+            "content": "Crea 2 textos diferentes para promoción afiliado siguiendo hipnosis conversacional, AIDA y CTA fuerte para el producto: {{$json[\"data\"].nombre_producto}}.\nIncluye urgencia, beneficio y llamada a la acción clara."
+          }
+        ]
+      },
+      "position": [500, 250]
+    },
+    {
+      "name": "GenerarVideoCorto",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "httpMethod": "POST",
+        "url": "https://api.pictory.ai/generate",
+        "bodyParametersUi": {
+          "parameter": [
+            {"name": "api_key", "value": "TU_API_PICTORY"},
+            {"name": "script", "value": "={{$node[\"CopyPersuasivo\"].json[\"choices\"][0][\"message\"][\"content\"]}}"},
+            {"name": "title", "value": "={{$json[\"data\"].nombre_producto}} promo"}
+          ]
+        }
+      },
+      "position": [650, 250]
+    },
+
+    // 3. PUBLICACIÓN MULTICANAL
+    {
+      "name": "PostWordpress",
+      "type": "n8n-nodes-base.wordpress",
+      "parameters": {
+        "credentialsWordpressApi": "TUS_CREDENCIALES_WORDPRESS",
+        "operation": "create",
+        "resource": "post",
+        "title": "={{$json[\"data\"].nombre_producto}} ¡Descúbrelo!",
+        "content": "={{$node[\"CopyPersuasivo\"].json[\"choices\"][0][\"message\"][\"content\"]}}",
+        "status": "publish"
+      },
+      "position": [800, 150]
+    },
+    {
+      "name": "PublicarShortYouTube",
+      "type": "n8n-nodes-base.youtube",
+      "parameters": {
+        "credentialsYoutubeApi": "TUS_CREDENCIALES_YOUTUBE",
+        "operation": "upload",
+        "videoPath": "={{$node[\"GenerarVideoCorto\"].json[\"video_url\"]}}",
+        "title": "Promo {{$json[\"data\"].nombre_producto}} #Shorts",
+        "description": "={{$node[\"CopyPersuasivo\"].json[\"choices\"][0][\"message\"][\"content\"]}}"
+      },
+      "position": [950, 250]
+    },
+    {
+      "name": "TwitterPost",
+      "type": "n8n-nodes-base.twitter",
+      "parameters": {
+        "credentialsTwitterApi": "TUS_CREDENCIALES_TWITTER",
+        "resource": "tweet",
+        "text": "={{$node[\"CopyPersuasivo\"].json[\"choices\"][1][\"message\"][\"content\"]}}"
+      },
+      "position": [1050, 350]
+    },
+
+    // 4. EMAIL MARKETING Y A/B TESTING
+    {
+      "name": "EnviarEmailA",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "fromEmail": "TUMAIL@TUEMPRESA.COM",
+        "toEmail": "={{$json[\"lead_email\"]}}",
+        "subject": "¿Listo para conseguir {{$json[\"data\"].beneficio}} ya?",
+        "text": "={{$node[\"CopyPersuasivo\"].json[\"choices\"][0][\"message\"][\"content\"]}}"
+      },
+      "position": [1200, 150]
+    },
+    {
+      "name": "EnviarEmailB",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "fromEmail": "TUMAIL@TUEMPRESA.COM",
+        "toEmail": "={{$json[\"lead_email\"]}}",
+        "subject": "Solo por hoy: {{$json[\"data\"].nombre_producto}} al mejor precio",
+        "text": "={{$node[\"CopyPersuasivo\"].json[\"choices\"][1][\"message\"][\"content\"]}}"
+      },
+      "position": [1200, 300]
+    },
+
+    // 5. DASHBOARD Y REPORTING GOOGLE SHEETS
+    {
+      "name": "ActualizarDashboard",
+      "type": "n8n-nodes-base.googleSheets",
+      "parameters": {
+        "authentication": "serviceAccount",
+        "spreadsheetId": "TU_GOOGLE_SHEET_ID",
+        "sheetName": "Leads",
+        "operation": "append",
+        "columns": [
+          "fecha", "producto", "canal", "respuesta", "email"
+        ],
+        "values": [
+          "={{$now}}",
+          "={{$json[\"data\"].nombre_producto}}",
+          "={{$json[\"datos_canal\"]}}",
+          "={{$json[\"conversion\"]}}",
+          "={{$json[\"lead_email\"]}}"
+        ]
+      },
+      "position": [1350, 200]
+    },
+
+    // 6. ALERTAS Y RETARGETING
+    {
+      "name": "AlertaTelegram",
+      "type": "n8n-nodes-base.telegram",
+      "parameters": {
+        "credentialsTelegramApi": "TUS_CREDENCIALES_TELEGRAM",
+        "text": "Nuevo lead/conversión para {{$json[\"data\"].nombre_producto}} vía {{$json[\"datos_canal\"]}}",
+        "chatId": "TU_CHAT_ID"
+      },
+      "position": [1500, 200]
+    },
+    {
+      "name": "Retargeting",
+      "type": "n8n-nodes-base.if",
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{$json[\"conversion\"]}}",
+              "operation": "equal",
+              "value2": 0
+            }
+          ]
+        }
+      },
+      "position": [1650, 200]
+    },
+    {
+      "name": "EmailRetargeting",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "fromEmail": "TUMAIL@TUEMPRESA.COM",
+        "toEmail": "={{$json[\"lead_email\"]}}",
+        "subject": "¿Necesitas ayuda para decidir?",
+        "text": "Hola, todavía tienes disponible la oferta exclusiva de {{$json[\"data\"].nombre_producto}}. No pierdas la oportunidad. ¡Haz clic antes de que se agote!"
+      },
+      "position": [1800, 200]
+    }
+  ],
+
+  "connections": {
+    "ScrapingAmazon": { "main": [ [ "CopyPersuasivo" ] ] },
+    "ScrapingHotmart": { "main": [ [ "CopyPersuasivo" ] ] },
+    "CopyPersuasivo": { "main": [ [ "GenerarVideoCorto", "PostWordpress", "PublicarShortYouTube", "TwitterPost", "EnviarEmailA", "EnviarEmailB" ] ] },
+    "GenerarVideoCorto": { "main": [ [ "PublicarShortYouTube" ] ] },
+    "EnviarEmailA": { "main": [ [ "ActualizarDashboard" ] ] },
+    "EnviarEmailB": { "main": [ [ "ActualizarDashboard" ] ] },
+    "ActualizarDashboard": { "main": [ [ "AlertaTelegram" ] ] },
+    "AlertaTelegram": { "main": [ [ "Retargeting" ] ] },
+    "Retargeting": { "main": [ [ "EmailRetargeting" ] ] }
+  }
+}
