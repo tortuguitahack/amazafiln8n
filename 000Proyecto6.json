@@ -1,0 +1,182 @@
+{
+  "name": "Freelance-Assistant-UltraPro",
+  "nodes": [
+    // 1. Programador (Scheduler) para chequeo de oportunidades y tareas
+    {
+      "name": "Scheduler",
+      "type": "n8n-nodes-base.cron",
+      "parameters": { "mode": "everyDay", "hour": 8, "minute": 15 },
+      "position": [100,100]
+    },
+
+    // 2. Scrapear/prospectar trabajos y leads (Upwork, Freelancer, LinkedIn, etc; ejemplo Apify/HTTP)
+    {
+      "name": "ScrapeJobs",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "httpMethod": "GET",
+        "url": "https://api.apify.com/v2/actor-tasks/TU_ACTOR_ID/runs/last/dataset/items?token=TU_APIFY_TOKEN"
+      },
+      "position": [200,100]
+    },
+
+    // 3. AI Análisis y escaneo de oportunidades
+    {
+      "name": "AIAnalyzeJobs",
+      "type": "n8n-nodes-base.openai",
+      "parameters": {
+        "openaiApiKey": "TU_OPENAI_APIKEY",
+        "model":"gpt-3.5-turbo",
+        "messages": [
+          {"role":"system","content":"Analiza estos trabajos y prioriza los que mejor se ajustan a: Habilidades, $ deseado, rating del cliente y tiempo estimado. Devuelve solo los relevantes."}
+        ]
+      },
+      "position": [310,100]
+    },
+
+    // 4. Generador de propuestas personalizadas ultra persuasivas
+    {
+      "name": "AIGenProposal",
+      "type": "n8n-nodes-base.openai",
+      "parameters": {
+        "openaiApiKey": "TU_OPENAI_APIKEY",
+        "model":"gpt-3.5-turbo",
+        "messages": [
+          {"role":"system","content":"Genera una propuesta corta, personalizada, con CTA y diferenciador, para: {{$json['job_title']}}."}
+        ]
+      },
+      "position": [420,100]
+    },
+
+    // 5. Detección de duplicados y workflow de auto/tele-aprobación
+    {
+      "name": "CheckDuplicateBid",
+      "type": "n8n-nodes-base.code",
+      "parameters": {
+        "language":"javascript",
+        "code":"if ([/* IDs previas */].includes(item.job_id)) return null; return item;"
+      },
+      "position": [530,100]
+    },
+
+    // 6. Notificación y aprobación por Telegram
+    {
+      "name": "NotifyTelegram",
+      "type": "n8n-nodes-base.telegram",
+      "parameters": {
+        "credentialsTelegramApi": "TUS_CREDENCIALES_TELEGRAM",
+        "text": "Nuevo proyecto: {{$json['job_title']}}\n¿Bid? [SI] [NO]\nPropuesta: {{$node['AIGenProposal'].json['choices'][0]['message']['content']}}",
+        "chatId": "TU_TELEGRAM_ID"
+      },
+      "position":[640,100]
+    },
+
+    // 7. Autopostulación (aprobada por Telegram botón o auto, ej. Upwork/Freelancer API/HTTP Request)
+    {
+      "name": "PostProposal",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "httpMethod": "POST",
+        "url": "https://www.freelancer.com/api/bid?token=TU_FREELANCER_APIKEY",
+        "bodyParametersUi": { "parameter":[
+          {"name":"job_id","value":"={{$json['job_id']}}"},
+          {"name":"proposal","value":"={{$node['AIGenProposal'].json['choices'][0]['message']['content']}}"},
+          {"name":"bid_amount","value":"={{$json['recommended_bid']}}"}
+        ]}
+      },
+      "position": [750,100]
+    },
+
+    // 8. Dashboard leads, bids y client CRM (Google Sheets)
+    {
+      "name": "LogLeadSheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "parameters": {
+        "authentication":"serviceAccount",
+        "spreadsheetId":"TU_GOOGLESHEET_ID",
+        "sheetName":"LeadsBids",
+        "operation":"append",
+        "columns":["fecha","job_id","titulo","cliente","plataforma","estado","monto","propuesta","resultado"],
+        "values":[
+          "={{$now}}",
+          "={{$json['job_id']}}",
+          "={{$json['job_title']}}",
+          "={{$json['client_name']}}",
+          "={{$json['platform']}}",
+          "Bid",
+          "={{$json['recommended_bid']}}",
+          "={{$node['AIGenProposal'].json['choices'][0]['message']['content']}}",
+          "pendiente"
+        ]
+      },
+      "position":[870,100]
+    },
+
+    // 9. Monitor multi-canal (Gmail/Slack/Telegram) para respuestas y tareas
+    {
+      "name": "EmailMonitor",
+      "type": "n8n-nodes-base.gmail",
+      "parameters": {
+        "resource":"message",
+        "operation":"getAll",
+        "labelIds":"INBOX",
+        "returnAll":true
+      },
+      "position":[1000,100]
+    },
+
+    // 10. IA responde, agenda y coordina tareas/proyectos (Google Calendar, Slack/Discord y Sheets/Notion)
+    {
+      "name":"AISchedule",
+      "type":"n8n-nodes-base.openai",
+      "parameters":{
+        "openaiApiKey":"TU_OPENAI_APIKEY",
+        "model":"gpt-3.5-turbo",
+        "messages":[
+          {"role":"system","content":"Dada esta consulta/email/tarea, responde cordialmente, agenda reunión si es necesario o asigna seguimiento."}
+        ]
+      },
+      "position":[1130,100]
+    },
+    {
+      "name":"UpdCalendar",
+      "type":"n8n-nodes-base.googleCalendar",
+      "parameters":{
+        "authentication":"oAuth2",
+        "operation":"create",
+        "calendar":"primary",
+        "start":"={{$json['meeting_start']}}",
+        "end":"={{$json['meeting_end']}}",
+        "summary":"={{$json['meeting_topic']}}"
+      },
+      "position":[1230,100]
+    },
+
+    // 11. Seguimiento automático, recordatorios y reporte semanal
+    {
+      "name":"SlackDM",
+      "type":"n8n-nodes-base.slack",
+      "parameters":{
+        "resource":"message",
+        "operation":"post",
+        "channel":"@TU_USUARIO",
+        "text":"Resumen semanal CRM: {{$json['lead_count']}} leads, {{$json['meetings']}} reuniones, {{$json['sales_closed']}} ventas."
+      },
+      "position":[1350,100]
+    }
+  ],
+
+  "connections": {
+    "Scheduler":{"main":[["ScrapeJobs"]]},
+    "ScrapeJobs":{"main":[["AIAnalyzeJobs"]]},
+    "AIAnalyzeJobs":{"main":[["AIGenProposal"]]},
+    "AIGenProposal":{"main":[["CheckDuplicateBid"]]},
+    "CheckDuplicateBid":{"main":[["NotifyTelegram"]]},
+    "NotifyTelegram":{"main":[["PostProposal"]]},
+    "PostProposal":{"main":[["LogLeadSheet"]]},
+    "LogLeadSheet":{"main":[["EmailMonitor"]]},
+    "EmailMonitor":{"main":[["AISchedule"]]},
+    "AISchedule":{"main":[["UpdCalendar"]]},
+    "UpdCalendar":{"main":[["SlackDM"]]}
+  }
+}
