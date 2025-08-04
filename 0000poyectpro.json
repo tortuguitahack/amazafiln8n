@@ -1,0 +1,294 @@
+{
+  "name": "PulpoMonetizacion-UltraPro",
+  "nodes": [
+    // ENTRADA DE OPORTUNIDAD/IDEA (Lead, producto, tendencia, encargo)
+    {
+      "name": "IdeaEntry",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {
+        "path": "nueva-oportunidad",
+        "httpMethod": "POST",
+        "responseMode": "lastNode"
+      },
+      "typeVersion": 1,
+      "position": [100, 0]
+    },
+
+    // DETECCIÓN Y ENRIQUECIMIENTO MULTICANAL (Trends, Amazon, Hotmart, web)
+    {
+      "name": "TrendScraper",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "httpMethod": "GET",
+        "url": "https://trends.google.com/trends/trendingsearches/daily/rss?geo=US"
+      },
+      "typeVersion": 1,
+      "position": [300, 0]
+    },
+    {
+      "name": "AmazonHotmartScan",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "httpMethod": "GET",
+        "url": "https://api.scrapingbee.com/v1/?api_key=TU_APIKEY&url=https://www.amazon.com/s?k={{$json['tendencia']}}"
+      },
+      "typeVersion": 1,
+      "position": [300, 80]
+    },
+
+    // IA CREACIÓN PRODUCTOS: Digitales, Físicos, Bundles
+    {
+      "name": "GenProductAI",
+      "type": "n8n-nodes-base.openai",
+      "parameters": {
+        "openaiApiKey": "TU_OPENAI_APIKEY",
+        "model": "gpt-3.5-turbo",
+        "messages": [
+          {
+            "role": "system",
+            "content": "Genera propuesta de producto viral mundial (ebook/curso/físico/bundle) multilingüe sobre: {{$json['tendencia'] || $json['idea']}}. Incluye: título, resumen, specs, precios, copy multilingüe, canales recomendados."
+          }
+        ]
+      },
+      "typeVersion": 1,
+      "position": [500, 50]
+    },
+
+    // CREACIÓN AUTOMÁTICA DE IMAGEN/PORTADA Y VIDEO AI
+    {
+      "name": "GenImage",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "httpMethod": "POST",
+        "url": "https://api.stablediffusionapi.com/v3/text2img",
+        "bodyParametersUi": {
+          "parameter": [
+            {"name":"key","value":"TU_APIKEY_IMG"},
+            {"name":"prompt","value":"Imagen/portada mundial para: {{$json['titulo']}} ({{$json['idiomas']}})"}
+          ]
+        }
+      },
+      "typeVersion": 1,
+      "position": [700, 0]
+    },
+    {
+      "name": "GenVideoAI",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "httpMethod": "POST",
+        "url": "https://api.klap.app/api/v1/generate-video",
+        "bodyParametersUi": {
+          "parameter": [
+            {"name":"api_key","value":"TU_KLAP_APIKEY"},
+            {"name":"script","value":"={{$json['copy_ml']}}"},
+            {"name":"images_url","value":"={{$node['GenImage'].json['image_url']}}"},
+            {"name":"languages","value":"={{$json['idiomas']}}"}
+          ]
+        }
+      },
+      "typeVersion": 1,
+      "position": [700, 80]
+    },
+
+    // CREAR Y SUBIR AUTOMATICAMENTE: WEB, AMAZON, TIENDAS, BUNDLES
+    {
+      "name": "UploadToWebShop",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "httpMethod": "POST",
+        "url": "https://api.webshop.com/v1/products",
+        "bodyParametersUi": {
+          "parameter": [
+            {"name":"api_key","value":"TU_WEBSHOP_APIKEY"},
+            {"name":"name","value":"={{$json['titulo']}}"},
+            {"name":"description","value":"={{$json['copy_ml']}}"},
+            {"name":"image_url","value":"={{$node['GenImage'].json['image_url']}}"},
+            {"name":"price","value":"={{$json['price']}}"},
+            {"name":"languages","value":"={{$json['idiomas']}}"}
+          ]
+        }
+      },
+      "typeVersion": 1,
+      "position": [950, 0]
+    },
+    {
+      "name": "UploadToAmazon",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "httpMethod": "POST",
+        "url": "https://api.amazon.com/list-product",
+        "bodyParametersUi": {
+          "parameter": [
+            {"name":"access_token","value":"TU_AMAZON_APIKEY"},
+            {"name":"title","value":"={{$json['titulo']}}"},
+            {"name":"description","value":"={{$json['copy_ml']}}"},
+            {"name":"image_url","value":"={{$node['GenImage'].json['image_url']}}"},
+            {"name":"price","value":"={{$json['price']}}"},
+            {"name":"languages","value":"={{$json['idiomas']}}"}
+          ]
+        }
+      },
+      "typeVersion": 1,
+      "position": [950, 80]
+    },
+
+    // PUBLICACIÓN Y PROMOCIÓN - MULTIPLATAFORMA VIDEO/PRODUCTO
+    {
+      "name": "PublishMultiPlatform",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "httpMethod": "POST",
+        "url": "https://api.upload-post.com/post",
+        "headerParametersUi": {
+          "parameter": [{ "name": "Authorization", "value": "Apikey TU_UPLOADPOST_APIKEY" }]
+        },
+        "bodyParametersUi": {
+          "parameter": [
+            {"name":"image_url","value":"={{$node['GenImage'].json['image_url']}}"},
+            {"name":"video_url","value":"={{$node['GenVideoAI'].json['video_url']}}"},
+            {"name":"text","value":"={{$json['copy_ml']}}"},
+            {"name":"platforms","value":"facebook,instagram,tiktok,youtube,pinterest,x,linkedin"}
+          ]
+        }
+      },
+      "typeVersion": 1,
+      "position": [1200, 40]
+    },
+
+    // ECOMMERCE, PAGO, FACTURACIÓN Y LOGÍSTICA GLOBAL
+    {
+      "name": "StripeCheckout",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "httpMethod": "POST",
+        "url": "https://api.stripe.com/v1/payment_links",
+        "headerParametersUi": {
+          "parameter": [ {"name":"Authorization", "value":"Bearer TU_STRIPE_API_KEY"} ]
+        },
+        "bodyParametersUi": {
+          "parameter": [
+            {"name":"line_items[0][price_data][currency]", "value":"usd"},
+            {"name":"line_items[0][price_data][product_data][name]", "value":"={{$json['titulo']}}"},
+            {"name":"line_items[0][price_data][unit_amount]", "value":"={{$json['price_ml']*100}}"},
+            {"name":"line_items[0][quantity]", "value":"1"}
+          ]
+        }
+      },
+      "typeVersion": 1,
+      "position": [1400, 0]
+    },
+    {
+      "name": "GenerateInvoicePDF",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "httpMethod": "POST",
+        "url": "https://api.apitemplate.io/v1/create?template_id=TU_TEMPLATE_ID&apiKey=TU_INVOICE_APIKEY",
+        "bodyParametersUi": {
+          "parameter": [
+            {"name": "invoiceId", "value": "={{$json['invoice_id']}}"},
+            {"name": "customerName", "value": "={{$json['customer_name']}}"},
+            {"name": "amount", "value": "={{$json['price_ml']}}"},
+            {"name": "date", "value": "={{$now}}"}
+          ]
+        }
+      },
+      "typeVersion": 1,
+      "position": [1600, 0]
+    },
+
+    // ATENCIÓN AL CLIENTE AUTOMÁTICA (Multiplataforma, Multilingüe)
+    {
+      "name": "ClientSupportAI",
+      "type": "n8n-nodes-base.openai",
+      "parameters": {
+        "openaiApiKey": "TU_OPENAI_APIKEY",
+        "model": "gpt-3.5-turbo",
+        "messages": [
+          {
+            "role": "system",
+            "content": "Eres un asistente virtual multilingüe: resuelve dudas, gestiona pedidos, reembolsos y genera respuestas rápidas y personalizadas en idioma del cliente."
+          }
+        ]
+      },
+      "typeVersion": 1,
+      "position": [1600, 100]
+    },
+    {
+      "name": "SupportWebhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {
+        "path": "client-support",
+        "httpMethod": "POST",
+        "responseMode": "lastNode"
+      },
+      "typeVersion": 1,
+      "position": [1600, 200]
+    },
+
+    // ANÁLISIS, REPORTING, GOOGLE OPAL Y OPTIMIZACIÓN AI
+    {
+      "name": "SalesCRMtoSheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "parameters": {
+        "authentication": "serviceAccount",
+        "sheetName": "VentasGlobales",
+        "spreadsheetId": "TU_GOOGLESHEET_ID",
+        "operation": "append",
+        "columns": ["fecha","producto","cliente","pais","platform","idioma","monto","canal","facturaId"],
+        "values": [
+          "={{$now}}","={{$json['titulo']}}","={{$json['customer_name']}}",
+          "={{$json['country']}}","={{$json['platform']}}",
+          "={{$json['lang']}}","={{$json['price_ml']}}",
+          "={{$json['channel']}}","={{$json['invoice_id']}}"
+        ]
+      },
+      "typeVersion": 1,
+      "position": [1800, 20]
+    },
+    {
+      "name": "OpalGoogleMonetize",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "httpMethod":"POST",
+        "url":"https://opal.google.com/api/monetize",
+        "bodyParametersUi": {
+          "parameter": [
+            {"name":"product","value":"={{$json['titulo']}}"},
+            {"name":"channels","value":"={{$json['channels']}}"}
+          ]
+        }
+      },
+      "typeVersion": 1,
+      "position": [2000, 100]
+    },
+    {
+      "name": "AnalyticsAndImprovement",
+      "type": "n8n-nodes-base.openai",
+      "parameters": {
+        "openaiApiKey": "TU_OPENAI_APIKEY",
+        "model": "gpt-3.5-turbo",
+        "messages": [
+          {"role":"system","content":"Eres un analista de datos expertos. Evalúa los resultados de ventas, pagos, tickets y campañas, y genera reporte de mejoras para incrementar la monetización global y por país/canal/producto."}
+        ]
+      },
+      "typeVersion": 1,
+      "position": [2200, 40]
+    }
+  ],
+  "connections": {
+    "IdeaEntry": {"main": [["TrendScraper","AmazonHotmartScan"]]},
+    "TrendScraper": {"main": [["GenProductAI"]]},
+    "AmazonHotmartScan": {"main": [["GenProductAI"]]},
+    "GenProductAI": {"main": [["GenImage"]]},
+    "GenImage": {"main": [["GenVideoAI"]]},
+    "GenVideoAI": {"main": [["UploadToWebShop","UploadToAmazon"]]},
+    "UploadToWebShop": {"main": [["PublishMultiPlatform"]]},
+    "UploadToAmazon": {"main": [["PublishMultiPlatform"]]},
+    "PublishMultiPlatform": {"main": [["StripeCheckout"]]},
+    "StripeCheckout": {"main": [["GenerateInvoicePDF"]]},
+    "GenerateInvoicePDF": {"main": [["SalesCRMtoSheets"]]},
+    "SupportWebhook": {"main": [["ClientSupportAI"]]},
+    "SalesCRMtoSheets": {"main": [["OpalGoogleMonetize"]]},
+    "OpalGoogleMonetize": {"main": [["AnalyticsAndImprovement"]]}
+  }
+}
