@@ -1,0 +1,245 @@
+{
+  "name": "YT-TikTok-Growth-Pro-Max",
+  "nodes": [
+    {
+      "name": "LoadIdeas",
+      "type": "n8n-nodes-base.googleSheets",
+      "parameters": {
+        "authentication": "serviceAccount",
+        "spreadsheetId": "TU_GOOGLESHEET_ID",
+        "sheetName": "IdeasVideo",
+        "operation": "getAll"
+      },
+      "typeVersion": 1,
+      "position": [100, 100]
+    },
+    {
+      "name": "GenScript",
+      "type": "n8n-nodes-base.openai",
+      "parameters": {
+        "model": "gpt-3.5-turbo",
+        "openaiApiKey": "TU_OPENAI_APIKEY",
+        "messages": [
+          {
+            "role": "system",
+            "content": "Escribe un guion viral para un video de menos de 60 segundos sobre {{$json['idea']}}. Estilo punchline, final sorprendente, intro gancho, hashtags, CTA a comentarios y like."
+          }
+        ]
+      },
+      "typeVersion": 1,
+      "position": [250, 100]
+    },
+    {
+      "name": "GenImage",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "httpMethod": "POST",
+        "url": "https://api.stablediffusionapi.com/v3/text2img",
+        "bodyParametersUi": {
+          "parameter": [
+            {"name": "key", "value": "TU_APIKEY_IMG"},
+            {"name": "prompt", "value": "={{$node['GenScript'].json['choices'][0]['message']['content']}}"}
+          ]
+        }
+      },
+      "typeVersion": 1,
+      "position": [400, 100]
+    },
+    {
+      "name": "GenVoiceover",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "httpMethod": "POST",
+        "url": "https://api.elevenlabs.io/v1/text-to-speech",
+        "bodyParametersUi": {
+          "parameter": [
+            {"name": "api_key", "value": "TU_ELEVENLABS_APIKEY"},
+            {"name": "text", "value": "={{$node['GenScript'].json['choices'][0]['message']['content']}}"}
+          ]
+        }
+      },
+      "typeVersion": 1,
+      "position": [550, 100]
+    },
+    {
+      "name": "GenVideo",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "httpMethod": "POST",
+        "url": "https://api.klap.app/api/v1/generate-video",
+        "bodyParametersUi": {
+          "parameter": [
+            {"name": "api_key", "value": "TU_KLAP_APIKEY"},
+            {"name": "script", "value": "={{$node['GenScript'].json['choices'][0]['message']['content']}}"},
+            {"name": "voiceover_url", "value": "={{$node['GenVoiceover'].json['audio_url']}}"},
+            {"name": "images_url", "value": "={{$node['GenImage'].json['image_url']}}"}
+          ]
+        }
+      },
+      "typeVersion": 1,
+      "position": [700, 100]
+    },
+    {
+      "name": "SplitTestTitleA",
+      "type": "n8n-nodes-base.openai",
+      "parameters": {
+        "model": "gpt-3.5-turbo",
+        "openaiApiKey": "TU_OPENAI_APIKEY",
+        "messages": [
+          {"role": "system", "content": "Crea un título A viral y descriptivo con SEO y CTA para {{$json['idea']}}"}
+        ]
+      },
+      "typeVersion": 1,
+      "position": [850, 80]
+    },
+    {
+      "name": "SplitTestTitleB",
+      "type": "n8n-nodes-base.openai",
+      "parameters": {
+        "model": "gpt-3.5-turbo",
+        "openaiApiKey": "TU_OPENAI_APIKEY",
+        "messages": [
+          {"role": "system", "content": "Crea un título B viral, con doble sentido, misterioso y máximo CTR para {{$json['idea']}}"}
+        ]
+      },
+      "typeVersion": 1,
+      "position": [850, 140]
+    },
+    {
+      "name": "UploadShortYouTube",
+      "type": "n8n-nodes-base.youtube",
+      "parameters": {
+        "credentialsYoutubeApi": "TUS_CREDENCIALES_YOUTUBE",
+        "operation": "upload",
+        "videoPath": "={{$node['GenVideo'].json['video_url']}}",
+        "title": "={{$node['SplitTestTitleA'].json['choices'][0]['message']['content']}}",
+        "description": "={{$node['GenScript'].json['choices'][0]['message']['content']}}"
+      },
+      "typeVersion": 1,
+      "position": [1000, 80]
+    },
+    {
+      "name": "UploadShortTikTok",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "httpMethod": "POST",
+        "url": "https://api.blotato.com/tiktok/upload",
+        "bodyParametersUi": {
+          "parameter": [
+            {"name": "api_key", "value": "TU_BLOTATO_APIKEY"},
+            {"name": "video_url", "value": "={{$node['GenVideo'].json['video_url']}}"},
+            {"name": "caption", "value": "={{$node['SplitTestTitleB'].json['choices'][0]['message']['content']}}"}
+          ]
+        }
+      },
+      "typeVersion": 1,
+      "position": [1000, 140]
+    },
+    {
+      "name": "CollabAutoComments",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "httpMethod": "POST",
+        "url": "https://api.ytapi.com/comment-collab",
+        "bodyParametersUi": {
+          "parameter": [
+            {"name": "api_key", "value": "TU_YTAPIKEY"},
+            {"name": "channel_id", "value": "COLLAB_CHANNEL_ID"},
+            {"name": "comment", "value": "={{$node['GenScript'].json['choices'][0]['message']['content']}}"}
+          ]
+        }
+      },
+      "typeVersion": 1,
+      "position": [1150, 80]
+    },
+    {
+      "name": "NotifyDiscord",
+      "type": "n8n-nodes-base.discord",
+      "parameters": {
+        "credentialsDiscordApi": "TUS_CREDENCIALES_DISCORD",
+        "channelId": "TU_CANAL_ID",
+        "message": "¡Nuevo Short publicado! 🚀 Revisa nuestro canal y comparte 🔗"
+      },
+      "typeVersion": 1,
+      "position": [1300, 100]
+    },
+    {
+      "name": "UpdateAnalytics",
+      "type": "n8n-nodes-base.googleSheets",
+      "parameters": {
+        "authentication": "serviceAccount",
+        "spreadsheetId": "TU_GOOGLESHEET_ID",
+        "sheetName": "Analytics",
+        "operation": "append",
+        "columns": [
+          "fecha",
+          "idea",
+          "tituloA",
+          "tituloB",
+          "youtube_id",
+          "tiktok_id",
+          "viewsYT",
+          "viewsTT",
+          "ctrYT",
+          "ctrTT",
+          "mejorTest"
+        ],
+        "values": [
+          "={{$now}}",
+          "={{$json['idea']}}",
+          "={{$node['SplitTestTitleA'].json['choices'][0]['message']['content']}}",
+          "={{$node['SplitTestTitleB'].json['choices'][0]['message']['content']}}",
+          "={{$node['UploadShortYouTube'].json['video_id']}}",
+          "={{$node['UploadShortTikTok'].json['video_id']}}",
+          "={{$json['views_yt']}}",
+          "={{$json['views_tt']}}",
+          "={{$json['ctr_yt']}}",
+          "={{$json['ctr_tt']}}",
+          "={{$json['best_test']}}"
+        ]
+      },
+      "typeVersion": 1,
+      "position": [1450, 100]
+    },
+    {
+      "name": "AnalyzeComments",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "httpMethod": "GET",
+        "url": "https://api.ytapi.com/video/{{$node['UploadShortYouTube'].json['video_id']}}/comments?api_key=TU_YTAPIKEY"
+      },
+      "typeVersion": 1,
+      "position": [1600, 100]
+    },
+    {
+      "name": "AutoImprove",
+      "type": "n8n-nodes-base.openai",
+      "parameters": {
+        "model": "gpt-3.5-turbo",
+        "openaiApiKey": "TU_OPENAI_APIKEY",
+        "messages": [
+          {
+            "role": "system",
+            "content": "Analiza estos comentarios y dime cómo hacer el próximo short aún más viral: {{$json['comments']}}"
+          }
+        ]
+      },
+      "typeVersion": 1,
+      "position": [1750, 100]
+    }
+  ],
+  "connections": {
+    "LoadIdeas": {"main": [["GenScript"]]},
+    "GenScript": {"main": [["GenImage", "SplitTestTitleA", "SplitTestTitleB"]]},
+    "GenImage": {"main": [["GenVoiceover"]]},
+    "GenVoiceover": {"main": [["GenVideo"]]},
+    "GenVideo": {"main": [["UploadShortYouTube", "UploadShortTikTok"]]},
+    "SplitTestTitleA": {"main": [["UploadShortYouTube"]]},
+    "SplitTestTitleB": {"main": [["UploadShortTikTok"]]},
+    "UploadShortYouTube": {"main": [["CollabAutoComments", "NotifyDiscord", "UpdateAnalytics", "AnalyzeComments"]]},
+    "UploadShortTikTok": {"main": [["UpdateAnalytics"]]},
+    "CollabAutoComments": {"main": [["NotifyDiscord"]]},
+    "NotifyDiscord": {"main": [["UpdateAnalytics"]]},
+    "AnalyzeComments": {"main": [["AutoImprove"]]}
+  }
+}
