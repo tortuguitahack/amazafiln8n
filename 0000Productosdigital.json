@@ -1,0 +1,163 @@
+{
+  "name": "Digital-Product-Expert-Bundle-Courses",
+  "nodes": [
+    {
+      "parameters": {
+        "model": "gpt-3.5-turbo",
+        "openaiApiKey": "TU_APIKEY_OPENAI",
+        "messages": [
+          {
+            "role": "system",
+            "content": "Genera el contenido del producto digital solicitado por el usuario: {{$json[\"idea\"]}}. Crea una estructura de ebook/curso/plantilla, agrega valor, copy original y portada descriptiva."
+          }
+        ]
+      },
+      "name": "GenerateProduct",
+      "type": "n8n-nodes-base.openai",
+      "typeVersion": 1,
+      "position": [250, 200]
+    },
+    {
+      "parameters": {
+        "credentials": "TUS_CREDENCIALES_GOOGLEDRIVE",
+        "operation": "upload",
+        "binaryPropertyName": "productFile",
+        "parentFolderId": "TU_FOLDER_ID",
+        "setName": "Nombre_del_producto",
+        "setMimeType": "application/pdf"
+      },
+      "name": "UploadToDrive",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 1,
+      "position": [400, 200]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "url": "https://api.gumroad.com/v2/products",
+        "bodyParametersUi": {
+          "parameter": [
+            {"name": "access_token", "value": "TU_GUMROAD_ACCESS_TOKEN"},
+            {"name": "name", "value": "={{$json[\"product_name\"]}}"},
+            {"name": "price", "value": "={{$json[\"product_price\"]}}"},
+            {"name": "url", "value": "={{$node[\"UploadToDrive\"].json[\"webContentLink\"]}}"}
+          ]
+        }
+      },
+      "name": "CreateGumroadProduct",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [600, 200]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "url": "https://api.stripe.com/v1/payment_links",
+        "headerParametersUi": {
+          "parameter": [
+            {"name": "Authorization", "value": "Bearer TU_STRIPE_API_KEY"}
+          ]
+        },
+        "bodyParametersUi": {
+          "parameter": [
+            {"name": "line_items[0][price_data][currency]", "value": "usd"},
+            {"name": "line_items[0][price_data][product_data][name]", "value": "={{$json[\"product_name\"]}}"},
+            {"name": "line_items[0][price_data][unit_amount]", "value": "={{$json[\"product_price\"]*100}}"},
+            {"name": "line_items[0][quantity]", "value": "1"}
+          ]
+        }
+      },
+      "name": "CreateStripePaymentLink",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [750, 200]
+    },
+    {
+      "parameters": {
+        "credentials": "TUS_CREDENCIALES_TWITTER",
+        "resource": "tweet",
+        "text": "¡Nuevo producto {{$json[\"product_name\"]}} disponible por tiempo limitado! Accede aquí: {{$node[\"CreateGumroadProduct\"].json[\"product_permalink\"]}}"
+      },
+      "name": "PublishTwitter",
+      "type": "n8n-nodes-base.twitter",
+      "typeVersion": 1,
+      "position": [900, 150]
+    },
+    {
+      "parameters": {
+        "credentials": "TUS_CREDENCIALES_TELEGRAM",
+        "text": "🚀 ¡Nuevo producto digital listo! Mira detalles y compra fácil: {{$node[\"CreateStripePaymentLink\"].json[\"url\"]}}",
+        "chatId": "TU_CHAT_ID"
+      },
+      "name": "PublishTelegram",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [900, 250]
+    },
+    {
+      "parameters": {
+        "credentials": "TUS_CREDENCIALES_WORDPRESS",
+        "operation": "create",
+        "resource": "post",
+        "title": "={{$json[\"product_name\"]}} disponible",
+        "content": "Descubre nuestro nuevo lanzamiento y adquiere directamente: {{$node[\"CreateGumroadProduct\"].json[\"product_permalink\"]}}"
+      },
+      "name": "PublishWordpress",
+      "type": "n8n-nodes-base.wordpress",
+      "typeVersion": 1,
+      "position": [900, 350]
+    },
+    {
+      "parameters": {
+        "path": "webhook-venta-producto",
+        "httpMethod": "POST",
+        "responseMode": "lastNode"
+      },
+      "name": "ReceiveSale",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [1200, 200]
+    },
+    {
+      "parameters": {
+        "fromEmail": "TUMAIL@TUEMPRESA.COM",
+        "toEmail": "={{$json[\"buyer_email\"]}}",
+        "subject": "¡Gracias por tu compra!",
+        "text": "Hola {{$json[\"buyer_name\"]}}, adjunto encontrarás tu producto digital {{$json[\"product_name\"]}}. Descárgalo: {{$node[\"UploadToDrive\"].json[\"webContentLink\"]}}. ¿Dudas? Respóndenos aquí."
+      },
+      "name": "SendProductEmail",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 1,
+      "position": [1400, 200]
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "spreadsheetId": "TU_GOOGLE_SHEET_ID",
+        "sheetName": "Ventas",
+        "operation": "append",
+        "columns": [
+          "fecha", "producto", "comprador", "canal", "email"
+        ],
+        "values": [
+          "={{$now}}",
+          "={{$json[\"product_name\"]}}",
+          "={{$json[\"buyer_name\"]}}",
+          "={{$json[\"canal\"]}}",
+          "={{$json[\"buyer_email\"]}}"
+        ]
+      },
+      "name": "SalesDashboard",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 1,
+      "position": [1550, 200]
+    }
+  ],
+  "connections": {
+    "GenerateProduct": { "main": [ [ "UploadToDrive" ] ] },
+    "UploadToDrive": { "main": [ [ "CreateGumroadProduct", "CreateStripePaymentLink" ] ] },
+    "CreateGumroadProduct": { "main": [ [ "PublishTwitter", "PublishTelegram", "PublishWordpress" ] ] },
+    "CreateStripePaymentLink": { "main": [ [ "PublishTelegram" ] ] },
+    "ReceiveSale": { "main": [ [ "SendProductEmail", "SalesDashboard" ] ] }
+  }
+}
