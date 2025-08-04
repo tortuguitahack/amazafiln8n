@@ -1,0 +1,169 @@
+{
+  "name": "Digital-Business-Master-expert-Profit",
+  "nodes": [
+    // 1. GENERACIÓN AI CONTENIDO Y PORTADA
+    {
+      "name": "GenIdeaAI",
+      "type": "n8n-nodes-base.openai",
+      "parameters": {
+        "model": "gpt-3.5-turbo",
+        "openaiApiKey": "TU_APIKEY_OPENAI",
+        "messages": [
+          { "role": "system", "content": "Crea estructura completa de producto digital o mastermind sobre: {{$json[\"tema\"]}}. Incluye propuesta viral para referidos y feedback." }
+        ]
+      },
+      "position": [100, 60]
+    },
+    {
+      "name": "GenCoverAI",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "httpMethod": "POST",
+        "url": "https://api.stablediffusionapi.com/v3/text2img",
+        "bodyParametersUi": {
+          "parameter": [
+            { "name": "key", "value": "TU_APIKEY_IMG" },
+            { "name": "prompt", "value": "Portada premium de {{$json[\"tema\"]}} estilo mastermind/webinar, moderna y brillante, ideal para ventas online" }
+          ]
+        }
+      },
+      "position": [100, 120]
+    },
+
+    // 2. SPLIT-TESTING DE COPIES Y LANZAMIENTO MULTICANAL
+    {
+      "name": "SplitTestCopyA",
+      "type": "n8n-nodes-base.openai",
+      "parameters": {
+        "model": "gpt-3.5-turbo",
+        "openaiApiKey": "TU_APIKEY_OPENAI",
+        "messages": [
+          { "role": "system", "content": "Copy A para mastermind digital sobre {{$json[\"tema\"]}}, orientado a acción, urgencia y pertenencia a grupo top. Destaca beneficios y acceso Discord/Telegram único." }
+        ]
+      },
+      "position": [300, 60]
+    },
+    {
+      "name": "SplitTestCopyB",
+      "type": "n8n-nodes-base.openai",
+      "parameters": {
+        "model": "gpt-3.5-turbo",
+        "openaiApiKey": "TU_APIKEY_OPENAI",
+        "messages": [
+          { "role": "system", "content": "Copy B para mastermind sobre {{$json[\"tema\"]}}, resaltando comunidad, mentoría y acceso preferente a webinars. Ofrece bonus descargable." }
+        ]
+      },
+      "position": [300, 120]
+    },
+
+    // 3. PUBLICACIÓN EN REDES Y MEMBRESÍA
+    {
+      "name": "PostDiscordLink",
+      "type": "n8n-nodes-base.discord",
+      "parameters": {
+        "credentialsDiscordApi": "TUS_CREDENCIALES_DISCORD",
+        "channelId": "TU_CANAL_ID",
+        "message": "¡Bienvenido a la comunidad exclusiva de {{$json[\"tema\"]}}! Únete aquí: ENLACE_UNICO_DISCORD y participa en eventos mastermind y webinars VIP."
+      },
+      "position": [500, 60]
+    },
+    {
+      "name": "PostTelegramLink",
+      "type": "n8n-nodes-base.telegram",
+      "parameters": {
+        "credentialsTelegramApi": "TUS_CREDENCIALES_TELEGRAM",
+        "text": "Acceso privado a la comunidad de {{$json[\"tema\"]}} ({{now}}): ENLACE_UNICO_TELEGRAM. Consulta mentorías y eventos cada semana.",
+        "chatId": "TU_TELEGRAM_ID"
+      },
+      "position": [500, 120]
+    },
+
+    // 4. ENCUESTA FEEDBACK Y REFERIDOS (Typeform, Google Forms)
+    {
+      "name": "SendFeedbackSurvey",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "fromEmail": "TUMAIL@TUEMPRESA.COM",
+        "toEmail": "={{$json[\"buyer_email\"]}}",
+        "subject": "¿Nos ayudas a mejorar? Solo 1 minuto",
+        "text": "Queremos tu feedback para nuestro mastermind/webinar {{$json[\"tema\"]}}. Participa aquí y gana un bonus: LINK_TYPEFORM_FEEDBACK"
+      },
+      "position": [700, 60]
+    },
+    {
+      "name": "SendReferralSurvey",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "fromEmail": "TUMAIL@TUEMPRESA.COM",
+        "toEmail": "={{$json[\"buyer_email\"]}}",
+        "subject": "¿Recomendarías nuestro curso/mastermind? Invita y gana acceso VIP",
+        "text": "Dinos a quién invitar y participa por membresía exclusiva: LINK_GOOGLEFORMS_REFERIDOS"
+      },
+      "position": [700, 120]
+    },
+
+    // 5. ACTUALIZACIONES Y NUEVAS LECCIONES (Secuencia Email Automatizada)
+    {
+      "name": "SendLessonUpdate",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "fromEmail": "TUMAIL@TUEMPRESA.COM",
+        "toEmail": "={{$json[\"buyer_email\"]}}",
+        "subject": "¡Nueva lección disponible!",
+        "text": "Hola, ya tienes acceso a la nueva lección/video/material de {{$json[\"tema\"]}}. Ingresa aquí: LINK_VIDEO_LECCION"
+      },
+      "position": [900, 80]
+    },
+
+    // 6. PANEL DE CONTROL VENTAS/ENGAGEMENT GOOGLE SHEETS
+    {
+      "name": "PanelVentas",
+      "type": "n8n-nodes-base.googleSheets",
+      "parameters": {
+        "authentication": "serviceAccount",
+        "spreadsheetId": "TU_GOOGLE_SHEET_ID",
+        "sheetName": "PanelVentas",
+        "operation": "append",
+        "columns": [ "fecha", "producto", "tipo", "comprador", "precio", "membresia", "email", "referido", "engagement", "encuesta" ],
+        "values": [
+          "={{$now}}",
+          "={{$json[\"tema\"]}}",
+          "={{$json[\"tipo\"]}}",
+          "={{$json[\"buyer_name\"]}}",
+          "={{$json[\"precio\"]}}",
+          "={{$json[\"canal\"]}}",
+          "={{$json[\"buyer_email\"]}}",
+          "={{$json[\"referral\"]}}",
+          "={{$json[\"engagement\"]}}",
+          "={{$json[\"feedback\"]}}"
+        ]
+      },
+      "position": [1000, 130]
+    },
+
+    // 7. INTEGRACIÓN MASTERMIND-MENTORING-WEBINAR
+    {
+      "name": "NewWebinarEmail",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "fromEmail": "TUMAIL@TUEMPRESA.COM",
+        "toEmail": "={{$json[\"buyer_email\"]}}",
+        "subject": "Acceso exclusivo a nuestro próximo webinar",
+        "text": "¡Ya tienes tu pase para el próximo webinar/mastermind de {{$json[\"tema\"]}}! Ingresa aquí el día y hora: LINK_WEBINAR_VIDEO. Recuerda, tu presencia cuenta como engagement para futuras mentorías exclusivas."
+      },
+      "position": [1200, 100]
+    }
+  ],
+
+  "connections": {
+    "GenIdeaAI": { "main": [ [ "GenCoverAI", "SplitTestCopyA", "SplitTestCopyB" ] ] },
+    "GenCoverAI": { "main": [ [ "PostDiscordLink", "PostTelegramLink" ] ] },
+    "SplitTestCopyA": { "main": [ [ "PanelVentas" ] ] },
+    "SplitTestCopyB": { "main": [ [ "PanelVentas" ] ] },
+    "PostDiscordLink": { "main": [ [ "SendFeedbackSurvey" ] ] },
+    "PostTelegramLink": { "main": [ [ "SendReferralSurvey" ] ] },
+    "SendFeedbackSurvey": { "main": [ [ "SendLessonUpdate" ] ] },
+    "SendReferralSurvey": { "main": [ [ "SendLessonUpdate" ] ] },
+    "SendLessonUpdate": { "main": [ [ "PanelVentas", "NewWebinarEmail" ] ] }
+  }
+}
