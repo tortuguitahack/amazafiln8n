@@ -1,0 +1,95 @@
+{
+  "name": "Baby-Kids-HypnoVideo-AutoSuggest",
+  "nodes": [
+    // 1. Genera prompt positivo para imagen/loop animado IA
+    {
+      "name": "VisualPromptAI",
+      "type": "n8n-nodes-base.openai",
+      "parameters": {
+        "openaiApiKey": "TU_API_OPENAI",
+        "model": "gpt-3.5-turbo",
+        "messages": [
+          {"role": "system", "content": "Crea un prompt para una imagen animada hipnótica, atractiva, para bebés/niños, con formas suaves, animales simpáticos, colores calmantes, ideal para loop de video."}
+        ]
+      }
+    },
+    // 2. Genera imagen/loop (Stable Diffusion, Dall-E, LeonardoAI)
+    {
+      "name": "GenLoopImage",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "httpMethod": "POST",
+        "url": "https://api.stablediffusionapi.com/v3/text2img",
+        "bodyParametersUi": {
+          "parameter": [
+            {"name": "key", "value": "TU_APIKEY_STABLEDIFF"},
+            {"name": "prompt", "value": "={{$node['VisualPromptAI'].json['choices'][0]['message']['content']}}"}
+          ]
+        }
+      }
+    },
+    // 3. Crea melodía/soundscape IA (Boomy, Soundful, Suno, AIVA)
+    {
+      "name": "MusicAI",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "httpMethod": "POST",
+        "url": "https://api.soundful.com/v1/generate",
+        "bodyParametersUi": {
+          "parameter": [
+            {"name": "apikey", "value": "TU_APIKEY_SOUNDFUL"},
+            {"name": "genre", "value": "baby, lullaby, calm, instrumental"}
+          ]
+        }
+      }
+    },
+    // 4. Ensambla video visual+audio (Kapwing, Runway, FFMPEG en webhook/script)
+    {
+      "name": "VideoAssemble",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "httpMethod": "POST",
+        "url": "https://api.kapwing.com/v1/assemble",
+        "bodyParametersUi": {
+          "parameter": [
+            {"name": "apikey", "value": "TU_APIKEY_KAPWING"},
+            {"name": "image_url", "value": "={{$node['GenLoopImage'].json['image_url']}}"},
+            {"name": "audio_url", "value": "={{$node['MusicAI'].json['audio_url']}}"},
+            {"name": "duration", "value": "60"}
+          ]
+        }
+      }
+    },
+    // 5. Sube automáticamente a YouTube/TikTok/Google Drive
+    {
+      "name": "UploadYT",
+      "type": "n8n-nodes-base.youtube",
+      "parameters": {
+        "credentialsYoutubeApi": "TUS_CREDENCIALES_YT",
+        "operation": "upload",
+        "videoPath": "={{$node['VideoAssemble'].json['video_url']}}",
+        "title": "Loop Hipnótico Positivo para Bebés | Música Relajante | Visual Animado",
+        "description": "Entretenimiento visual y sonoro positivo para bebés y niños. Sin palabras, solo estímulos saludables."
+      }
+    },
+    {
+      "name": "UploadTikTok",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "httpMethod": "POST",
+        "url": "https://api.blotato.com/tiktok/upload",
+        "bodyParametersUi": {"parameter": [
+          {"name":"api_key","value":"TU_APIKEY_BLOTATO"},
+          {"name":"video_url","value":"={{$node['VideoAssemble'].json['video_url']}}"},
+          {"name":"caption","value":"Relax visual, solo para peques #Bebé #Niños #VideoRelajante"}
+        ]}
+      }
+    }
+  ],
+  "connections": {
+    "VisualPromptAI": {"main":[["GenLoopImage"]]},
+    "GenLoopImage": {"main":[["MusicAI"]]},
+    "MusicAI": {"main":[["VideoAssemble"]]},
+    "VideoAssemble": {"main":[["UploadYT","UploadTikTok"]]}
+  }
+}
