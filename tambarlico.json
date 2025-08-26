@@ -1,0 +1,125 @@
+{
+  "name": "Licoreria Voice Control",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "1",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "webhookId": "licoreria-voice-command"
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "content": "={{$json.command}}",
+        "additionalFields": {}
+      },
+      "id": "2",
+      "name": "Google Speech-to-Text",
+      "type": "n8n-nodes-base.googleCloudSpeech",
+      "typeVersion": 1,
+      "position": [450, 300],
+      "credentials": {
+        "googleCloudSpeechApi": {
+          "id": "1",
+          "name": "Google Cloud Speech"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "text": "={{$json.transcript}}",
+        "language": "es"
+      },
+      "id": "3",
+      "name": "Natural Language Processing",
+      "type": "n8n-nodes-base.nlp",
+      "typeVersion": 1,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "operation": "sendMessage",
+        "additionalFields": {}
+      },
+      "id": "4",
+      "name": "WhatsApp Node",
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1,
+      "position": [850, 250],
+      "credentials": {
+        "whatsAppApi": {
+          "id": "2",
+          "name": "WhatsApp Business Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "sendMessage",
+        "additionalFields": {}
+      },
+      "id": "5",
+      "name": "Telegram Node",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [850, 350],
+      "credentials": {
+        "telegramApi": {
+          "id": "3",
+          "name": "Telegram Bot"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {
+      "main": [
+        [
+          {
+            "node": "Google Speech-to-Text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Speech-to-Text": {
+      "main": [
+        [
+          {
+            "node": "Natural Language Processing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Natural Language Processing": {
+      "main": [
+        [
+          {
+            "node": "WhatsApp Node",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Telegram Node",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {},
+  "id": "100",
+  "createdAt": "2023-06-15T10:00:00.000Z",
+  "updatedAt": "2023-06-15T10:00:00.000Z",
+  "tags": []
+}
