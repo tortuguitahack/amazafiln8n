@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Afiliados Amazon - diegoedgard02-20</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #ff9900;
+            --secondary: #146eb4;
+            --dark: #232f3e;
+            --light: #f2f2f2;
+            --success: #00a650;
+            --warning: #ff9f00;
+            --danger: #ff5a5f;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f8f9fa;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--dark) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 20px 0;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+        
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .stats-overview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .stat-value {
+            font-size: 28px;
+            font-weight: bold;
+            color: var(--secondary);
+            margin: 10px 0;
+        }
+        
+        .stat-label {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+        }
+        
+        .main-content {
+            display: grid;
+            gap: 20px;
+        }
+        
+        .chart-container {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+        
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .product-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .product-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+        
+        .product-info {
+            padding: 15px;
+        }
+        
+        .product-title {
+            font-size: 16px;
+            margin-bottom: 10px;
+            height: 40px;
+            overflow: hidden;
+        }
+        
+        .product-price {
+            font-weight: bold;
+            color: var(--secondary);
+            margin-bottom: 10px;
+        }
+        
+        .product-commission {
+            color: var(--success);
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+        
+        .social-share {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 10px;
+        }
+        
+        .social-icon {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            cursor: pointer;
+            transition: opacity 0.3s ease;
+        }
+        
+        .social-icon:hover {
+            opacity: 0.8;
+        }
+        
+        .facebook { background: #3b5998; }
+        .twitter { background: #1da1f2; }
+        .pinterest { background: #bd081c; }
+        .whatsapp { background: #25d366; }
+        
+        .country-selector {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .country-btn {
+            padding: 8px 15px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .country-btn.active {
+            background: var(--secondary);
+            color: white;
+            border-color: var(--secondary);
+        }
+        
+        .sidebar {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+        
+        .sidebar-section {
+            margin-bottom: 25px;
+        }
+        
+        .sidebar-title {
+            font-size: 18px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .top-products-list {
+            list-style: none;
+        }
+        
+        .top-product-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 8px;
+            background: #f8f9fa;
+        }
+        
+        .top-product-img {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-right: 10px;
+        }
+        
+        .top-product-info {
+            flex: 1;
+        }
+        
+        .top-product-name {
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+        
+        .top-product-earnings {
+            color: var(--success);
+            font-size: 12px;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #e88a00;
+        }
+        
+        .btn-secondary {
+            background: var(--secondary);
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #115d8a;
+        }
+        
+        .filters {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .filter-select {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            flex: 1;
+        }
+        
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .products-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <div class="logo">Dashboard Afiliados Amazon</div>
+                <div class="user-info">
+                    <span>ID: diegoedgard02-20</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="controls">
+            <div>
+                <button class="btn btn-primary" onclick="refreshData()">Actualizar Datos</button>
+                <button class="btn btn-secondary" onclick="exportToCSV()">Exportar a CSV</button>
+            </div>
+            <div>
+                <span>Actualizado: <span id="last-update">-</span></span>
+            </div>
+        </div>
+
+        <div class="filters">
+            <select class="filter-select" id="category-filter">
+                <option value="all">Todas las categorías</option>
+                <option value="Luxury Beauty">Luxury Beauty (10%)</option>
+                <option value="Amazon Devices">Dispositivos Amazon (4%)</option>
+                <option value="Books">Libros (4.5%)</option>
+            </select>
+            <select class="filter-select" id="sort-filter">
+                <option value="commission">Mayor comisión</option>
+                <option value="price">Mayor precio</option>
+                <option value="popularity">Más populares</option>
+            </select>
+        </div>
+
+        <div class="stats-overview">
+            <div class="stat-card">
+                <div class="stat-label">Ganancias Totales</div>
+                <div class="stat-value" id="total-earnings">$0.00</div>
+                <div class="stat-label">Últimos 30 días</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Productos Activos</div>
+                <div class="stat-value" id="total-products">0</div>
+                <div class="stat-label">En catálogo</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Tasa de Conversión</div>
+                <div class="stat-value" id="conversion-rate">0%</div>
+                <div class="stat-label">Global</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">País Top</div>
+                <div class="stat-value" id="top-country">-</div>
+                <div class="stat-label">Por ventas</div>
+            </div>
+        </div>
+
+        <div class="country-selector" id="country-selector">
+            <div class="country-btn active" data-country="all">Todos</div>
+            <div class="country-btn" data-country="US">Estados Unidos</div>
+            <div class="country-btn" data-country="CA">Canadá</div>
+            <div class="country-btn" data-country="UK">Reino Unido</div>
+            <div class="country-btn" data-country="DE">Alemania</div>
+            <div class="country-btn" data-country="FR">Francia</div>
+            <div class="country-btn" data-country="IT">Italia</div>
+            <div class="country-btn" data-country="ES">España</div>
+            <div class="country-btn" data-country="AU">Australia</div>
+            <div class="country-btn" data-country="JP">Japón</div>
+        </div>
+
+        <div class="dashboard-grid">
+            <div class="main-content">
+                <div class="chart-container">
+                    <h3>Ventas por País</h3>
+                    <canvas id="salesChart" height="100"></canvas>
+                </div>
+
+                <div class="chart-container">
+                    <h3>Productos con Mayor Comisión</h3>
+                    <div class="products-grid" id="products-container">
+                        <!-- Los productos se cargarán aquí dinámicamente -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar">
+                <div class="sidebar-section">
+                    <h4 class="sidebar-title">Top Productos</h4>
+                    <ul class="top-products-list" id="top-products">
+                        <!-- Los productos top se cargarán aquí -->
+                    </ul>
+                </div>
+
+                <div class="sidebar-section">
+                    <h4 class="sidebar-title">Rendimiento por Categoría</h4>
+                    <canvas id="categoryChart" height="150"></canvas>
+                </div>
+
+                <div class="sidebar-section">
+                    <h4 class="sidebar-title">Compartir Dashboard</h4>
+                    <div class="social-share">
+                        <div class="social-icon facebook" onclick="shareOnFacebook()">f</div>
+                        <div class="social-icon twitter" onclick="shareOnTwitter()">t</div>
+                        <div class="social-icon pinterest" onclick="shareOnPinterest()">p</div>
+                        <div class="social-icon whatsapp" onclick="shareOnWhatsApp()">w</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    
+        let productsData = [];
+        let salesData = [];
+        
+        const salesChart = new Chart(document.getElementById('salesChart'), {
+            type: 'bar',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Ventas por País ($)',
+                    data: [],
+                    backgroundColor: '#146eb4',
+                    borderColor: '#146eb4',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+        
+        const categoryChart = new Chart(document.getElementById('categoryChart'), {
+            type: 'doughnut',
+            data: {
+                labels: [],
+                datasets: [{
+                    data: [],
+                    backgroundColor: [
+                        '#ff9900', '#146eb4', '#00a650', '#ff5a5f', '#ff9f00',
+                        '#8e44ad', '#3498db', '#2ecc71', '#e74c3c', '#f39c12'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+        
+        // Función para cargar datos desde Google Sheets
+        async function loadData() {
+            try {
+                // Esta URL debería ser reemplazada con tu webhook de n8n o API
+                const response = await fetch('https://docs.google.com/spreadsheets/d/1bNqqtvLgE7WbW_smSYqsmE7pUQod7zIovVThcHBKM74/gviz/tq?tqx=out:json');
+                const text = await response.text();
+                const data = JSON.parse(text.substring(47, text.length - 2));
+                
+                // Procesar datos de la hoja de cálculo
+                processSheetData(data);
+                
+                // Cargar datos de ventas desde Amazon API
+                await loadSalesData();
+                
+                // Actualizar la interfaz
+                updateUI();
+                
+                document.getElementById('last-update').textContent = new Date().toLocaleString();
+            } catch (error) {
+                console.error('Error loading data:', error);
+            }
+        }
+        
+        function processSheetData(data) {
+            // Procesar los datos de la hoja de cálculo
+            productsData = [];
+            
+            if (data.table.rows && data.table.rows.length > 0) {
+                const columns = data.table.cols.map(col => col.label);
+                
+                data.table.rows.forEach(row => {
+                    const product = {};
+                    row.c.forEach((cell, index) => {
+                        product[columns[index]] = cell ? cell.v : null;
+                    });
+                    productsData.push(product);
+                });
+            }
+        }
+        
+        async function loadSalesData() {
+            try {
+                // Simular carga de datos de ventas desde Amazon
+                // En una implementación real, esto se conectaría a la API de Amazon
+                salesData = [
+                    { country: 'US', earnings: 1250.75 },
+                    { country: 'CA', earnings: 420.50 },
+                    { country: 'UK', earnings: 890.25 },
+                    { country: 'DE', earnings: 610.80 },
+                    { country: 'FR', earnings: 530.40 },
+                    { country: 'IT', earnings: 470.90 },
+                    { country: 'ES', earnings: 390.60 },
+                    { country: 'AU', earnings: 320.75 },
+                    { country: 'JP', earnings: 280.30 }
+                ];
+                
+                // Actualizar gráfico de ventas
+                updateSalesChart();
+            } catch (error) {
+                console.error('Error loading sales data:', error);
+            }
+        }
+        
+        function updateSalesChart() {
+            salesChart.data.labels = salesData.map(item => item.country);
+            salesChart.data.datasets[0].data = salesData.map(item => item.earnings);
+            salesChart.update();
+            
+            // Encontrar el país con mayores ventas
+            const topCountry = salesData.reduce((max, item) => 
+                item.earnings > max.earnings ? item : max, salesData[0]);
+            document.getElementById('top-country').textContent = topCountry.country;
+            
+            // Calcular ganancias totales
+            const totalEarnings = salesData.reduce((sum, item) => sum + item.earnings, 0);
+            document.getElementById('total-earnings').textContent = `$${totalEarnings.toFixed(2)}`;
+        }
+        
+        function updateUI() {
+            // Actualizar estadísticas
+            document.getElementById('total-products').textContent = productsData.length;
+            
+            // Actualizar lista de productos
+            renderProducts();
+            renderTopProducts();
+            
+            // Actualizar gráfico de categorías
+            updateCategoryChart();
+        }
+        
+        function renderProducts() {
+            const container = document.getElementById('products-container');
+            container.innerHTML = '';
+            
+            const categoryFilter = document.getElementById('category-filter').value;
+            const sortFilter = document.getElementById('sort-filter').value;
+            
+            let filteredProducts = productsData;
+            
+            // Aplicar filtros
+            if (categoryFilter !== 'all') {
+                filteredProducts = filteredProducts.filter(product => 
+                    product.Categoría === categoryFilter);
+            }
+            
+            // Aplicar ordenamiento
+            if (sortFilter === 'commission') {
+                filteredProducts.sort((a, b) => b['Comisión Estimada'] - a['Comisión Estimada']);
+            } else if (sortFilter === 'price') {
+                filteredProducts.sort((a, b) => b.Precio - a.Precio);
+            } else if (sortFilter === 'popularity') {
+                // Ordenar por popularidad (simulado)
+                filteredProducts.sort((a, b) => Math.random() - 0.5);
+            }
+            
+            // Mostrar productos
+            filteredProducts.slice(0, 12).forEach(product => {
+                const productCard = document.createElement('div');
+                productCard.className = 'product-card';
+                
+                productCard.innerHTML = `
+                    <img src="https://via.placeholder.com/250x200/FF9900/FFFFFF?text=Amazon+Product" alt="${product.Título}" class="product-image">
+                    <div class="product-info">
+                        <div class="product-title">${product.Título}</div>
+                        <div class="product-price">$${product.Precio}</div>
+                        <div class="product-commission">Comisión: $${product['Comisión Estimada'].toFixed(2)}</div>
+                        <a href="${product['Enlace US']}" target="_blank" class="btn btn-primary" style="display: block; text-align: center;">Ver en Amazon</a>
+                        <div class="social-share">
+                            <div class="social-icon facebook" onclick="shareProductOnFacebook('${product.Título}', '${product['Enlace US']}')">f</div>
+                            <div class="social-icon twitter" onclick="shareProductOnTwitter('${product.Título}', '${product['Enlace US']}')">t</div>
+                            <div class="social-icon pinterest" onclick="shareProductOnPinterest('${product.Título}', '${product['Enlace US']}')">p</div>
+                            <div class="social-icon whatsapp" onclick="shareProductOnWhatsApp('${product.Título}', '${product['Enlace US']}')">w</div>
+                        </div>
+                    </div>
+                `;
+                
+                container.appendChild(productCard);
+            });
+        }
+        
+        function renderTopProducts() {
+            const container = document.getElementById('top-products');
+            container.innerHTML = '';
+            
+            // Tomar los 5 productos con mayor comisión
+            const topProducts = [...productsData]
+                .sort((a, b) => b['Comisión Estimada'] - a['Comisión Estimada'])
+                .slice(0, 5);
+            
+            topProducts.forEach(product => {
+                const li = document.createElement('li');
+                li.className = 'top-product-item';
+                
+                li.innerHTML = `
+                    <img src="https://via.placeholder.com/50x50/FF9900/FFFFFF?text=Product" alt="${product.Título}" class="top-product-img">
+                    <div class="top-product-info">
+                        <div class="top-product-name">${product.Título.substring(0, 30)}...</div>
+                        <div class="top-product-earnings">$${product['Comisión Estimada'].toFixed(2)}</div>
+                    </div>
+                `;
+                
+                container.appendChild(li);
+            });
+        }
+        
+        function updateCategoryChart() {
+            // Agrupar productos por categoría
+            const categories = {};
+            productsData.forEach(product => {
+                if (!categories[product.Categoría]) {
+                    categories[product.Categoría] = 0;
+                }
+                categories[product.Categoría] += product['Comisión Estimada'];
+            });
+            
+            categoryChart.data.labels = Object.keys(categories);
+            categoryChart.data.datasets[0].data = Object.values(categories);
+            categoryChart.update();
+        }
+        
+        function refreshData() {
+            loadData();
+        }
+        
+        function exportToCSV() {
+            // Implementar exportación a CSV
+            alert('Funcionalidad de exportación a CSV pronto disponible');
+        }
+        
+        function shareOnFacebook() {
+            window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`, '_blank');
+        }
+        
+        function shareOnTwitter() {
+            window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent('Mira mi dashboard de afiliados Amazon')}&url=${encodeURIComponent(window.location.href)}`, '_blank');
+        }
+        
+        function shareOnPinterest() {
+            window.open(`https://pinterest.com/pin/create/button/?url=${encodeURIComponent(window.location.href)}&description=${encodeURIComponent('Dashboard de afiliados Amazon')}`, '_blank');
+        }
+        
+        function shareOnWhatsApp() {
+            window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent('Mira mi dashboard de afiliados Amazon: ' + window.location.href)}`, '_blank');
+        }
+        
+        function shareProductOnFacebook(title, url) {
+            window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}&quote=${encodeURIComponent(title)}`, '_blank');
+        }
+        
+        function shareProductOnTwitter(title, url) {
+            window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(title)}&url=${encodeURIComponent(url)}`, '_blank');
+        }
+        
+        function shareProductOnPinterest(title, url) {
+            window.open(`https://pinterest.com/pin/create/button/?url=${encodeURIComponent(url)}&description=${encodeURIComponent(title)}`, '_blank');
+        }
+        
+        function shareProductOnWhatsApp(title, url) {
+            window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(title + ' ' + url)}`, '_blank');
+        }
+        
+        // Configurar event listeners
+        document.getElementById('category-filter').addEventListener('change', renderProducts);
+        document.getElementById('sort-filter').addEventListener('change', renderProducts);
+        
+        document.querySelectorAll('.country-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.country-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                // Filtrar productos por país (implementar según necesidad)
+                renderProducts();
+            });
+        });
+        
+        // Cargar datos iniciales
+        loadData();
+        
+        // Actualizar datos cada 5 minutos
+        setInterval(loadData, 300000);
+    </script>
+</body>
+</html>
