@@ -1,0 +1,355 @@
+{
+  "ecosistema_nivel_dios": {
+    "meta": {
+      "version": "3.0",
+      "owner": "diegocortez",
+      "last_update": "2025-09-13T00:00:00Z",
+      "description": "Ecosistema de marketing de afiliados global híper-optimizado, autoescalable y multiplataforma",
+      "nivel": "Dios",
+      "principio_fundador": "Menos esfuerzo, más conversiones, inteligencia distribuida"
+    },
+    "core_system": {
+      "central_de_credenciales": {
+        "estructura": {
+          "amazon": {
+            "affiliate_id_global": "diegoedgard02-20",
+            "configuracion_por_pais": [
+              {
+                "pais": "USA",
+                "domain": "amazon.com",
+                "affiliate_id": "diegoedgard02-20",
+                "terms_url": "https://affiliate-program.amazon.com/help/operating/agreement",
+                "cultural_notes": "Enfoque en comodidad, tecnología y valor. Tono profesional pero cercano."
+              },
+              {
+                "pais": "España",
+                "domain": "amazon.es",
+                "affiliate_id": "diegoedgard08-21",
+                "terms_url": "https://afiliados.amazon.es/help/operating/agreement",
+                "cultural_notes": "Enfoque en familia, hogar y momentos especiales. Tono cálido y emocional."
+              },
+              {
+                "pais": "UK",
+                "domain": "amazon.co.uk",
+                "affiliate_id": "diegoedgard20-21",
+                "terms_url": "https://affiliate-program.amazon.co.uk/help/operating/agreement",
+                "cultural_notes": "Mencionar 'armar el cine en casa', 'ver las series del momento' o 'para las reuniones con la familia y los cuates'. Tono muy amigable y cercano."
+              },
+              {
+                "pais": "Canada",
+                "domain": "amazon.ca",
+                "affiliate_id": "diegoedgard0c-20",
+                "terms_url": "https://associates.amazon.ca/help/operating/agreement/",
+                "cultural_notes": "Enfoque en calidad, confianza y relación precio-calidad. Tono confiable y práctico."
+              },
+              {
+                "pais": "Francia",
+                "domain": "amazon.fr",
+                "affiliate_id": "diegoedgard06-21",
+                "terms_url": "https://partenaires.amazon.fr/help/operating/agreement",
+                "cultural_notes": "Enfoque en estilo de vida, elegancia y productos premium. Tono sofisticado pero accesible."
+              },
+              {
+                "pais": "Alemania",
+                "domain": "amazon.de",
+                "affiliate_id": "diegoedgar016-21",
+                "terms_url": "https://partnernet.amazon.de/help/operating/agreement",
+                "cultural_notes": "Enfoque en calidad técnica, durabilidad y eficiencia. Tono preciso y profesional."
+              },
+              {
+                "pais": "Italia",
+                "domain": "amazon.it",
+                "affiliate_id": "diegoedgard04-21",
+                "terms_url": "https://programma-affiliazione.amazon.it/help/operating/agreement",
+                "cultural_notes": "Enfoque en familia, tradición y calidad de vida. Tono apasionado y emotivo."
+              },
+              {
+                "pais": "Polonia",
+                "domain": "amazon.pl",
+                "affiliate_id": "diegoedgardo-21",
+                "terms_url": "https://affiliate-program.amazon.pl/help/operating/agreement",
+                "cultural_notes": "Enfoque en valor, ofertas y productos prácticos. Tono directo y beneficio-claro."
+              },
+              {
+                "pais": "Suecia",
+                "domain": "amazon.se",
+                "affiliate_id": "diegoedgard01-21",
+                "terms_url": "https://affiliate-program.amazon.se/help/operating/agreement",
+                "cultural_notes": "Enfoque en sostenibilidad, diseño y funcionalidad. Tono minimalista y auténtico."
+              },
+              {
+                "pais": "Paises_Bajos",
+                "domain": "amazon.nl",
+                "affiliate_id": "diegoedgard03-21",
+                "terms_url": "https://partnernet.amazon.nl/help/operating/agreement",
+                "cultural_notes": "Enfoque en innovación, eficiencia y relación calidad-precio. Tono directo y práctico."
+              }
+            ],
+            "api_keys": {
+              "PAAPIv5": "3d629d2c-33e2-4510-87c5-6e2a5906f3aa",
+              "rapid_api_key": "45675da25bmshe5061d3f91f9da5p158ffajsn78b3f2e0c153"
+            }
+          },
+          "hotmart": {
+            "client_id": "5c1d260b-7114-4115-897e-81bf6c5ca180",
+            "client_secret": "f7ac184e-d607-46af-8c35-c445ad93d7df",
+            "basic_auth": "Basic NWMxZDI2MGItNzExNC00MTE1LTg5N2UtODFiZjZjNWNhMTgwOmY3YWMxODRlLWQ2MDctNDZhZi04YzM1LWM0NDVhZDkzZDdkZg=="
+          },
+          "openai": {
+            "model": "gpt-4-turbo",
+            "system_prompt": "Eres un experto en psicología del consumidor y neuro-marketing. Analiza el perfil del lead y determina: 1) Triggers psicológicos principales, 2) Estilo de comunicación óptimo, 3) Nivel de urgencia recomendado, 4) Productos Amazon más persuasivos para este perfil."
+          }
+        }
+      },
+      "sistema_de_enlaces_maestros": {
+        "principio": "Un solo enlace que se adapta inteligentemente al usuario basado en geolocalización, dispositivo y comportamiento",
+        "flujo": [
+          "Usuario hace clic en enlace maestro",
+          "Sistema identifica país y dispositivo mediante IP y user agent",
+          "API de Amazon PAAPI obtiene información detallada del producto",
+          "IA genera contenido personalizado según perfil cultural del país",
+          "Redirección al enlace de afiliado específico para ese país",
+          "Seguimiento avanzado de conversión y métricas"
+        ],
+        "estructura_tecnica": {
+          "endpoint": "/go/{product_id}",
+          "redirect_url": "file:///home/d3h1ckt4r/interfazAmazon.html",
+          "encriptacion": "AES-256 para protección de datos de seguimiento",
+          "cache": "Redis para reducir latencia en redirecciones frecuentes"
+        }
+      }
+    },
+    "workflow_n8n_pro": {
+      "arquitectura": "Flujo modular con nodos intercambiables y redundancia inteligente",
+      "modulos_principales": [
+        {
+          "nombre": "GeoRouter Pro",
+          "descripcion": "Sistema de enrutamiento geolocalizado con inteligencia artificial",
+          "nodos": [
+            "HTTP Request (entrada)",
+            "Function (geolocalización y análisis de user agent)",
+            "IF (decisión de país)",
+            "Amazon PAAPI (obtención de datos del producto)",
+            "Function (generación de enlace específico)",
+            "HTTP Response (redirección)"
+          ],
+          "optimizaciones": [
+            "Cache de ubicaciones frecuentes",
+            "Fallback automático para IPs no identificables",
+            "Registro detallado de patrones geográficos"
+          ]
+        },
+        {
+          "nombre": "Content Matrix AI",
+          "descripcion": "Generación de contenido hiper-personalizado para cada plataforma y país",
+          "nodos": [
+            "Trigger (calendario o evento)",
+            "Google Sheets (base de productos y campañas)",
+            "OpenAI (generación de contenido según país y plataforma)",
+            "Function (adaptación cultural específica)",
+            "Multi-platform Publisher (publicación en redes)"
+          ],
+          "matriz_de_contenido": [
+            {
+              "plataforma": "TikTok",
+              "enabled": true,
+              "formato": "Videos cortos (<15s)",
+              "tono": "Energético, divertido, con tendencias actuales",
+              "frecuencia": "3-5 veces/día",
+              "horario_optimo": "19:00-22:00 hora local"
+            },
+            {
+              "plataforma": "Instagram",
+              "enabled": true,
+              "formato": "Reels + Stories",
+              "tono": "Visual, estético, con llamados a acción claros",
+              "frecuencia": "1-2 veces/día",
+              "horario_optimo": "12:00-14:00 y 19:00-21:00 hora local"
+            },
+            {
+              "plataforma": "Facebook",
+              "enabled": true,
+              "formato": "Posts + Live",
+              "tono": "Más detallado, con testimonios y explicaciones",
+              "frecuencia": "1 vez/día",
+              "horario_optimo": "18:00-20:00 hora local"
+            },
+            {
+              "plataforma": "YouTube",
+              "enabled": true,
+              "formato": "Shorts + Videos largos",
+              "tono": "Profesional pero cercano, con demostraciones reales",
+              "frecuencia": "Shorts: 2-3/día, Videos: 2/semana",
+              "horario_optimo": "12:00 y 19:00 hora local"
+            },
+            {
+              "plataforma": "Pinterest",
+              "enabled": true,
+              "formato": "Pines visuales",
+              "tono": "Inspiracional, con enfoque en estilo de vida",
+              "frecuencia": "5-10 veces/día",
+              "horario_optimo": "8:00-10:00 y 19:00-21:00 hora local"
+            },
+            {
+              "plataforma": "Telegram",
+              "enabled": true,
+              "formato": "Alertas y ofertas exclusivas",
+              "tono": "Urgente, con sentido de exclusividad",
+              "frecuencia": "2-3 veces/semana",
+              "horario_optimo": "12:00 y 18:00 hora local"
+            }
+          ]
+        },
+        {
+          "nombre": "Lead Intelligence System",
+          "descripcion": "Análisis y segmentación avanzada de leads",
+          "nodos": [
+            "Webhook (captura de leads)",
+            "Google Sheets (almacenamiento)",
+            "OpenAI (análisis psicológico)",
+            "Function (clasificación y scoring)",
+            "Airtable (gestión avanzada de leads)",
+            "Multi-channel Nurturing (seguimiento personalizado)"
+          ],
+          "modelo_de_analisis": {
+            "triggers_psicologicos": [
+              "Miedo a perderse algo (FOMO)",
+              "Deseo de pertenecer",
+              "Búsqueda de estatus",
+              "Necesidad de seguridad",
+              "Deseo de comodidad"
+            ],
+            "estilos_de_comunicacion": [
+              "Racional (datos, especificaciones)",
+              "Emocional (historias, beneficios emocionales)",
+              "Social (pruebas sociales, testimonios)",
+              "Urgente (ofertas limitadas, stock escaso)"
+            ],
+            "niveles_de_urgencia": [
+              "Bajo (información educativa)",
+              "Medio (ofertas semanales)",
+              "Alto (ofertas de 24h)",
+              "Crítico (stock limitado, finalizando)"
+            ]
+          }
+        },
+        {
+          "nombre": "Auto-Optimizer Engine",
+          "descripcion": "Sistema de mejora continua basado en datos",
+          "nodos": [
+            "Analytics Collector (Google Analytics, n8n stats)",
+            "Function (análisis de métricas clave)",
+            "OpenAI (recomendaciones estratégicas)",
+            "A/B Testing Manager (optimización de contenido)",
+            "Workflow Adjuster (ajustes automáticos al flujo)"
+          ],
+          "metricas_clave": [
+            "CTR (Click-through rate) por plataforma y país",
+            "CVR (Conversion rate) por segmento",
+            "ROI por campaña y producto",
+            "Tiempo promedio en página",
+            "Tasa de rebote",
+            "Engagement rate por plataforma"
+          ],
+          "reglas_de_optimizacion": [
+            "Si CTR < 1.5% por 3 días, cambiar creativos automáticamente",
+            "Si CVR > 5%, incrementar presupuesto en 20%",
+            "Si tiempo en página < 15s, simplificar mensaje",
+            "Si engagement > 8%, crear variaciones similares"
+          ]
+        }
+      ]
+    },
+    "implementacion_profesional": {
+      "pasos_para_despliegue": [
+        {
+          "paso": 1,
+          "titulo": "Configuración de credenciales centralizada",
+          "detalles": "Crear credenciales en n8n para Amazon PAAPI por país (Amazon_PAAPI_US, Amazon_PAAPI_ES, etc.) con sus respectivas Access Key, Secret Key y Associate Tag"
+        },
+        {
+          "paso": 2,
+          "titulo": "Implementación del GeoRouter Pro",
+          "detalles": "Configurar el endpoint /go/{product_id} con manejo de geolocalización y redirección inteligente. Incluir sistema de fallback para IPs no identificables."
+        },
+        {
+          "paso": 3,
+          "titulo": "Configuración de la Content Matrix AI",
+          "detalles": "Conectar Google Sheets con catálogo de productos, configurar prompts específicos para OpenAI por país y plataforma, establecer horarios óptimos de publicación."
+        },
+        {
+          "paso": 4,
+          "titulo": "Implementación del Lead Intelligence System",
+          "detalles": "Configurar webhook para captura de leads, crear sistema de scoring con IA, establecer flujos de nurturing por segmento."
+        },
+        {
+          "paso": 5,
+          "titulo": "Activación del Auto-Optimizer Engine",
+          "detalles": "Conectar analíticas, configurar métricas clave y reglas de optimización, establecer ciclo de mejora continua (diario/semanal)."
+        },
+        {
+          "paso": 6,
+          "titulo": "Pruebas y monitoreo",
+          "detalles": "Realizar pruebas exhaustivas por país y plataforma, monitorear métricas en tiempo real, ajustar según resultados iniciales."
+        }
+      ],
+      "herramientas_recomendadas": [
+        "n8n (plataforma central)",
+        "Google Sheets (gestión de productos y campañas)",
+        "Airtable (gestión avanzada de leads)",
+        "OpenAI API (personalización con IA)",
+        "Redis (caching para redirecciones)",
+        "Google Analytics (seguimiento de conversiones)",
+        "Telegram (alertas en tiempo real)"
+      ],
+      "mejores_practicas_seguridad": [
+        "Nunca almacenar credenciales en texto plano",
+        "Usar variables de entorno para claves sensibles",
+        "Implementar autenticación de dos factores en n8n",
+        "Realizar auditorías de seguridad mensuales",
+        "Limitar permisos según necesidad (principio de mínimo privilegio)",
+        "Monitorear actividad sospechosa con alertas en tiempo real"
+      ]
+    },
+    "estrategia_de_escalamiento": {
+      "fase_1": {
+        "titulo": "Implementación inicial (0-30 días)",
+        "objetivos": [
+          "Configurar sistema básico en 3 países principales (USA, España, UK)",
+          "Automatizar publicación en 3 plataformas (TikTok, Instagram, Facebook)",
+          "Alcanzar 50 conversiones diarias",
+          "CTR objetivo: >2.5%"
+        ]
+      },
+      "fase_2": {
+        "titulo": "Expansión controlada (30-90 días)",
+        "objetivos": [
+          "Agregar 4 países adicionales (Canada, Francia, Alemania, Italia)",
+          "Implementar 3 plataformas adicionales (YouTube, Pinterest, Telegram)",
+          "Alcanzar 200 conversiones diarias",
+          "CVR objetivo: >4.5%"
+        ]
+      },
+      "fase_3": {
+        "titulo": "Optimización y escalamiento (90-180 días)",
+        "objetivos": [
+          "Incluir todos los países objetivo (10+)",
+          "Implementar todas las plataformas (8+)",
+          "Implementar sistema de Auto-Optimizer Engine completo",
+          "Alcanzar 500+ conversiones diarias",
+          "ROI objetivo: >5x"
+        ]
+      },
+      "fase_4": {
+        "titulo": "Nivel Dios (180+ días)",
+        "objetivos": [
+          "Sistema completamente autónomo con ajustes automáticos",
+          "Expansión a nuevos mercados y plataformas emergentes",
+          "Integración con otros programas de afiliados (Hotmart, etc.)",
+          "1000+ conversiones diarias",
+          "ROI sostenido >8x"
+        ]
+      }
+    }
+  }
+}
